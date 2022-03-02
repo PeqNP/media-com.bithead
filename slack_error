@@ -1,0 +1,12 @@
+<html>
+<head>
+<title>Slack error</title>
+</head>
+<body>
+<h2>Failed to validate your Slack registration code</h2>
+
+<p>Something went wrong when validating your Slack registration code. Please make sure that you have registered the code within the last 10 minutes.
+
+<p>Copyright 2022 Bithead LLC. All rights reserved.
+</body>
+</html>

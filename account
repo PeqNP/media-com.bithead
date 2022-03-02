@@ -3,15 +3,10 @@
 <title>Create new account</title>
 </head>
 <body>
-<p>I really appreciate your interest in @ your service!
+<h1>Register your @ys organization</h1>
 
-<p><b>@ your service is currently in closed beta.</b>
+<p>@ys is currently in closed beta. To join the beta program, please provide your company information.
 
-<p>Oh no! What? I can't buy this right now?
-
-<p>Not at all! Beta testers will get the service for free through the beta period. Possibly further than that as a huge "Thank you!" You will also get a special "beta" badge, eligible for free features, sneak peek to new features, etc.
-
-<p>If you wish to be part of the beta program please provide the following information:
 <form action="/account" method="post">
   <label for="fullname">Full name</label>
   <input type="text" id="fullname" name="fullname"><br><br>
@@ -21,8 +16,6 @@
   <input type="text" id="email" name="email"><br><br>
   <input type="submit" value="Become a beta member">
 </form>
-
-<p>This information is used only to create your account and use the app. I will never sell your information.
 
 <p>Copyright 2022 Bithead LLC. All rights reserved.
 </body>
