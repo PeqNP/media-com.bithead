@@ -7,13 +7,15 @@
 
 <p>@ys is currently in closed beta. To join the beta program, please provide your company information.
 
-<form action="/account" method="post">
+<form action="/account/create" method="post">
   <label for="fullname">Full name</label>
   <input type="text" id="fullname" name="fullname"><br><br>
   <label for="orgpath">Company domain (e.g. com.example)</label>
   <input type="text" id="orgpath" name="orgpath"><br><br>
   <label for="email">Email</label>
   <input type="text" id="email" name="email"><br><br>
+  <label for="password">Password</label>
+  <input type="text" id="password" name="password"><br><br>
   <input type="submit" value="Become a beta member">
 </form>
 
