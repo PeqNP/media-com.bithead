@@ -85,20 +85,27 @@ table {
 }
 
 body {
-    font-family: "Roboto-Regular";
-	margin: 20;
+    font-family: "SciFly";
+	margin: 20pt;
     background-color: #061920;
 	color: #fff;
 }
 
+#content {
+    margin: auto;
+    padding: 20pt;
+    background-color: #00141d;
+	width: 400pt;
+	border-radius: 5pt;
+}
+
 h1 {
-	margin: 0 0 20 0;
+	margin: 0 0 20pt 0;
 	font-size: 2em;
 }
 
 p {
-    font-family: "SciFly";
-	margin: 0 0 20 0;
+	margin: 0 0 20pt 0;
 }
 
 form {
@@ -115,12 +122,17 @@ label {
     font-family: "Roboto-Medium";
 }
 
+div.subtitle {
+    font-size: 0.75em;
+}
+
 input {
     color: #fff;
     border: 0;
     padding: 5pt;
     background-color: #0a212d;
     height: 2em;
+    width: 200pt;
 }
 input[type=button], input[type=submit], input[type=reset] {
     margin: 1em 0 0 0;
@@ -132,15 +144,13 @@ input[type=button], input[type=submit], input[type=reset] {
 }
 
 a {
-    font-family: "SciFly";
     font-size: 1em;
     color: #fff;
-    text-decoration: none;
+    text-decoration: underline #006694;
 }
 
 .header {
-    margin: 0 0 40 0;
-    font-family: "SciFly";
+    margin: 0 0 40pt 0;
 }
 
 ul.links {
@@ -154,10 +164,14 @@ ul.links li {
     vertical-align: middle;
 }
 ul.links li.first-link {
-    padding: 0 1em 0 2em;
+    padding: 0 1em 0 7em;
+}
+ul.links li a {
+    /* top right bottom left */
+    padding: 7px 10px 5px 10px;
 }
 
-.footer {
-    margin: 20 0 0 0;
+#footer {
     font-size: 0.5em;
+    margin: 20pt 0 0 0;
 }
