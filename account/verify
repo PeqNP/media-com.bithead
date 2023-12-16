@@ -1,4 +1,4 @@
-<% template/header %>
+<% template: header %>
 
   <h1>Verify your email</h1>
 
@@ -12,4 +12,4 @@
     <input type="submit" value="Verify email">
   </form>
 
-<% template/footer %>
+<% template: footer %>

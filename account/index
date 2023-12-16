@@ -1,35 +1,35 @@
-<% template/header %>
+<% template: header %>
 
   <h1>Create your @ys account</h1>
 
   <p>@ys is currently in closed beta. To join the beta program, please provide the following information:
 
   <script>
-  var error = "{error}";
+  var error = "<% var: error %>";
   if error.length > 0 {
     var elem = document.getElementById("error-message");
     elem.style.display = "block";
   }
   </script>
-  <div id="error-message">{error}</div>
+  <div id="error-message"><% var: error %></div>
 
   <form action="/account/create" method="post">
     <label for="fullname">Full name</label>
-    <input type="text" name="fullname" value="{fullname}">
+    <input type="text" name="fullname" value="<% var: fullname %>">
 
     <label for="orgpath">Company domain</label>
-    <input type="text" name="orgpath" value="{orgpath}">
+    <input type="text" name="orgpath" value="<% var: orgpath %>">
     <div class="empty"></div>
     <div class="subtitle">e.g. tesla.com, x.com, starlink.com</div>
 
     <label for="email">Email</label>
-    <input type="text" name="email" value="{email}">
+    <input type="text" name="email" value="<% var: email %>">
 
     <label for="password">Password</label>
-    <input type="password" name="password" value="{password}">
+    <input type="password" name="password" value="<% var: password %>">
 
     <div class="empty"></div>
     <input type="submit" value="Sign up">
   </form>
 
-<% template/footer %>
+<% template: footer %>
