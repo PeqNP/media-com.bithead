@@ -1,43 +1,35 @@
-<html>
-<head>
-<title>Create new account</title>
-<link rel="stylesheet" type="text/css" href="/css/styles.css" />
-</head>
-<body>
-<div id="content">
-  <div class="header">
-    <ul class="links">
-      <li><img src="/img/s/com.bithead.ays.png" alt="At Your Service" width="64" height="30"></li>
-      <li class="first-link button"><a href="https://www.getbithead.com">Home</a></li>
-      <li class="button"><a href="https://api.getbithead.com:8443/help/about/">Documentation</a></li>
-      <li class="button"><a href="https://apps.apple.com/us/app/ys/id1603918692">Download app</a></li>
-    </ul>
-  </div>
+<% template/header %>
 
   <h1>Create your @ys account</h1>
 
   <p>@ys is currently in closed beta. To join the beta program, please provide the following information:
 
+  <script>
+  var error = "{error}";
+  if error.length > 0 {
+    var elem = document.getElementById("error-message");
+    elem.style.display = "block";
+  }
+  </script>
+  <div id="error-message">{error}</div>
+
   <form action="/account/create" method="post">
     <label for="fullname">Full name</label>
-    <input type="text" name="fullname">
+    <input type="text" name="fullname" value="{fullname}">
 
     <label for="orgpath">Company domain</label>
-    <input type="text" name="orgpath">
+    <input type="text" name="orgpath" value="{orgpath}">
     <div class="empty"></div>
     <div class="subtitle">e.g. tesla.com, x.com, starlink.com</div>
 
     <label for="email">Email</label>
-    <input type="text" name="email">
+    <input type="text" name="email" value="{email}">
 
     <label for="password">Password</label>
-    <input type="password" name="password">
+    <input type="password" name="password" value="{password}">
 
     <div class="empty"></div>
     <input type="submit" value="Sign up">
   </form>
 
-  <div id="footer">Copyright ⓒ  2022 Bithead LLC. All rights reserved.</div>
-</div>
-</body>
-</html>
+<% template/footer %>

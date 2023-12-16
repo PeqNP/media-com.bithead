@@ -1,0 +1,15 @@
+<% template/header %>
+
+  <h1>Verify your email</h1>
+
+  <p>We sent you an email with a verification code. Please enter the code below to verify your email address.
+
+  <form action="/account/verify" method="post">
+    <label for="code">Code</label>
+    <input type="text" name="code">
+
+    <div class="empty"></div>
+    <input type="submit" value="Verify email">
+  </form>
+
+<% template/footer %>

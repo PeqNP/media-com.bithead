@@ -175,3 +175,7 @@ ul.links li a {
     font-size: 0.5em;
     margin: 20pt 0 0 0;
 }
+
+#error-message {
+    display: none;
+}
