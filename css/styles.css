@@ -1,0 +1,163 @@
+/** Reset **/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+}
+
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after, q:before, q:after {
+	content: '';
+	content: none;
+}
+:focus {
+	outline: 0;
+}
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+.clear {
+	clear: both;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+.clearfix:after {
+	clear: both;
+	content: ' ';
+	display: block;
+	font-size: 0;
+	line-height: 0;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+.clearfix {
+	display: inline-block;
+}
+* html .clearfix {
+	height: 1%;
+}
+.clearfix {
+	display: block;
+}
+th, td {
+	margin: 0;
+	padding: 0;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/** General **/
+
+@font-face {
+    font-family: "Roboto-Regular";
+    src: url("/font/Roboto-Regular.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+@font-face {
+    font-family: "Roboto-Medium";
+    src: url("/font/Roboto-Medium.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+@font-face {
+    font-family: "SciFly";
+    src: url("/font/SciFly-Sans.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+body {
+    font-family: "Roboto-Regular";
+	margin: 20;
+    background-color: #061920;
+	color: #fff;
+}
+
+h1 {
+	margin: 0 0 20 0;
+	font-size: 2em;
+}
+
+p {
+    font-family: "SciFly";
+	margin: 0 0 20 0;
+}
+
+form {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-gap: 5pt;
+}
+form label {
+    text-align: right;
+    padding: 4pt 0 0 0;
+}
+
+label {
+    font-family: "Roboto-Medium";
+}
+
+input {
+    color: #fff;
+    border: 0;
+    padding: 5pt;
+    background-color: #0a212d;
+    height: 2em;
+}
+input[type=button], input[type=submit], input[type=reset] {
+    margin: 1em 0 0 0;
+    font-family: "Roboto-Medium";
+    color: #fff;
+    font-size: 1.1em;
+    background-color: #006694;
+    padding: 5pt 15pt;
+}
+
+a {
+    font-family: "SciFly";
+    font-size: 1em;
+    color: #fff;
+    text-decoration: none;
+}
+
+.header {
+    margin: 0 0 40 0;
+    font-family: "SciFly";
+}
+
+ul.links {
+    list-style: none;
+    display: table;
+}
+ul.links li {
+    height: 30px;
+    display: table-cell;
+    padding: 0 1em 0 0;
+    vertical-align: middle;
+}
+ul.links li.first-link {
+    padding: 0 1em 0 2em;
+}
+
+.footer {
+    margin: 20 0 0 0;
+    font-size: 0.5em;
+}
