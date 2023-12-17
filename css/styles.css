@@ -122,7 +122,7 @@ label {
     font-family: "Roboto-Medium";
 }
 
-div.subtitle {
+.subtitle {
     font-size: 0.75em;
 }
 
@@ -147,6 +147,7 @@ a {
     font-size: 1em;
     color: #fff;
     text-decoration: underline #006694;
+    text-decoration-thickness: 3px;
 }
 
 .header {
@@ -169,6 +170,21 @@ ul.links li.first-link {
 ul.links li a {
     /* top right bottom left */
     padding: 7px 10px 5px 10px;
+}
+
+ul.steps {
+    margin-bottom: 20pt;
+}
+
+ul.steps li {
+    list-style: disc outside none;
+    display: list-item;
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+.highlighted {
+    color: #96bd0d;
 }
 
 #footer {
