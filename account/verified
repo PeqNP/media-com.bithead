@@ -7,7 +7,7 @@
   <ul class="steps">
     <li><a href="https://apps.apple.com/us/app/ys/id1603918692">Download the app</a></li>
     <li>Open the app and fill in your <b>Organization</b>, <b class="highlighted"><% var: organization %></b>.<br><span class="subtitle">Do not change the <b>Server</b> unless you are running your own instance.</span></li>
-    <li>Sign in with your username, <b class="highlighted"><% var: username %></b>, and password</li>
+    <li>Sign in with your username, <b class="highlighted"><% var: username %></b>, and password.</li>
   </ul>
 
   <p>Need help? Please call 253-329-1280.
