@@ -4,29 +4,31 @@
 
   <p>@ys is currently in closed beta. To join the beta program, please provide the following information:
 
-  <script>
-  var error = "<% var: error %>";
-  if error.length > 0 {
-    var elem = document.getElementById("error-message");
-    elem.style.display = "block";
+  <script language="javascript">
+  window.onload = function() {
+    var error = "<% var: error %>";
+    if (error.length > 0) {
+      var elem = document.getElementById("error-message");
+      elem.style.display = "block";
+    }
   }
   </script>
   <div id="error-message"><% var: error %></div>
 
   <form action="/account/create" method="post">
     <label for="fullname">Full name</label>
-    <input type="text" name="fullname" value="<% var: fullname %>">
+    <input type="text" id="fullname" name="fullname" value="<% var: fullname %>">
 
     <label for="orgpath">Company domain</label>
-    <input type="text" name="orgpath" value="<% var: orgpath %>">
+    <input type="text" id="orgpath" name="orgpath" value="<% var: orgpath %>">
     <div class="empty"></div>
     <div class="subtitle">e.g. tesla.com, x.com, starlink.com</div>
 
     <label for="email">Email</label>
-    <input type="text" name="email" value="<% var: email %>">
+    <input type="text" id="email" name="email" value="<% var: email %>">
 
     <label for="password">Password</label>
-    <input type="password" name="password" value="<% var: password %>">
+    <input type="password" id="password" name="password" value="<% var: password %>">
 
     <div class="empty"></div>
     <input type="submit" value="Sign up">
