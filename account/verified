@@ -10,6 +10,4 @@
     <li>Sign in with your username, <b class="highlighted"><% var: username %></b>, and password.</li>
   </ul>
 
-  <p>Need help? Please call 253-329-1280.
-
 <% template: footer %>

@@ -192,6 +192,11 @@ ul.steps li {
     margin: 20pt 0 0 0;
 }
 
+#need-help {
+    font-size: 0.5em;
+    float: right;
+}
+
 #error-message {
     display: none;
 }
