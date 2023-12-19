@@ -1,0 +1,25 @@
+Hi, <% var: name %>,
+
+Welcome to the At Your Service family!
+
+You account is almost ready. Please enter the code below to verify your account:
+
+<% var: code %>
+
+Once your account is verified you can sign in to the @ys app.
+
+The app can be downloaded at <% var: app_link %>.
+
+Server: (Leave this value as-is)
+Your organization: <% var: orgpath %>
+
+Your username: <% var: username %>
+
+You can read the documentation at <% var: doc_link %> or watch the YouTube videos at <% var: youtube_link %>.
+
+If you have any questions, please call me at 253-329-1280.
+
+Always at your service,
+
+Eric Chamberlain
+Owner, Bithead LLC

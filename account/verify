@@ -4,6 +4,17 @@
 
   <p>A verification code was sent to your email <b class="highlighted"><% var: email %></b>. Please enter the code below to verify your account.
 
+  <script language="javascript">
+  window.onload = function() {
+    var error = "<% var: error %>";
+    if (error.length > 0) {
+      var elem = document.getElementById("error-message");
+      elem.style.display = "block";
+    }
+  }
+  </script>
+  <div id="error-message"><% var: error %></div>
+
   <form action="/account/verify" method="post">
     <label for="code">Code</label>
     <input type="text" name="code">

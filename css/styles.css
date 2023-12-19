@@ -112,6 +112,7 @@ form {
     display: grid;
     grid-template-columns: max-content max-content;
     grid-gap: 5pt;
+    margin: 0 0 20pt 0;
 }
 form label {
     text-align: right;
