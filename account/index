@@ -2,7 +2,7 @@
 
   <h1>Create your @ys account</h1>
 
-  <p>@ys is currently in closed beta. To join the beta program, please provide the following information:
+  <p>To join the closed beta, please provide the following information:
 
   <script language="javascript">
   window.onload = function() {
@@ -31,7 +31,7 @@
     <input type="password" id="password" name="password" value="<% var: password %>">
 
     <div class="empty"></div>
-    <input type="submit" value="Sign up">
+    <input type="submit" value="Create account">
   </form>
 
 <% template: footer %>
