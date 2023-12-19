@@ -19,7 +19,7 @@
     <label for="fullname">Full name</label>
     <input type="text" id="fullname" name="fullname" value="<% var: fullname %>">
 
-    <label for="orgpath">Company domain</label>
+    <label for="orgpath">Hostname</label>
     <input type="text" id="orgpath" name="orgpath" value="<% var: orgpath %>">
     <div class="empty"></div>
     <div class="subtitle">e.g. tesla.com, x.com, starlink.com</div>
