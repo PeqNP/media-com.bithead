@@ -16,7 +16,7 @@
   <div id="error-message"><% var: error %></div>
 
   <form action="/account/create" method="post">
-    <label for="fullname">Full name</label>
+    <label for="fullname">Your name</label>
     <input type="text" id="fullname" name="fullname" value="<% var: fullname %>">
 
     <label for="orgpath">Hostname</label>
