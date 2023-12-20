@@ -114,9 +114,13 @@ form {
     grid-gap: 5pt;
     margin: 0 0 20pt 0;
 }
-form label {
+form label.title {
     text-align: right;
     padding: 4pt 0 0 0;
+}
+form label.terms {
+    padding-top: 9pt;
+    font-size: 0.8em;
 }
 
 label {
@@ -127,7 +131,7 @@ label {
     font-size: 0.75em;
 }
 
-input {
+input[type=text], input[type=password] {
     color: #fff;
     border: 0;
     padding: 5pt;
@@ -135,8 +139,15 @@ input {
     height: 2em;
     width: 200pt;
 }
+input[type=checkbox] {
+    text-align: right;
+    height: 2em;
+    padding: 5pt;
+    border: 0;
+}
 input[type=button], input[type=submit], input[type=reset] {
     margin: 1em 0 0 0;
+    border: 0;
     font-family: "Roboto-Medium";
     color: #fff;
     font-size: 1.1em;
