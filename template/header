@@ -8,8 +8,8 @@
   <div class="header">
     <ul class="links">
       <li><img src="/img/s/com.bithead.ays.png" alt="At Your Service" width="64" height="30"></li>
-      <li class="first-link button"><a href="https://www.getbithead.com">Home</a></li>
-      <li class="button"><a href="https://api.getbithead.com:8443/help/about/">Documentation</a></li>
+      <li class="first-link button"><a href="https://ays.bithead.io">Home</a></li>
+      <li class="button"><a href="https://api.bithead.io:8443/help/about/">Documentation</a></li>
       <li class="button"><a href="https://apps.apple.com/us/app/ys/id1603918692">Download app</a></li>
     </ul>
   </div>
