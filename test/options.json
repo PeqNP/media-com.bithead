@@ -1,6 +1,5 @@
 [
-    {"name": "Mario", "age": 34},
-    {"name": "Luigi", "age": 33},
-    {"name": "Princess", "age": 32},
-
+    {"name": "Mario", "value": 34},
+    {"name": "Luigi", "value": 33},
+    {"name": "Princess", "value": 32}
 ]
