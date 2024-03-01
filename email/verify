@@ -2,9 +2,15 @@ Hi, <% var: name %>,
 
 Welcome to the At Your Service family!
 
-You account is almost ready. Please enter the code below to verify your account:
+Your account is almost ready.
+
+If coming from the web, please enter the code below to verify your account:
 
 <% var: code %>
+
+Or, follow this link:
+
+<% var: url_code %>
 
 Once your account is verified you can sign in to the @ys app.
 
