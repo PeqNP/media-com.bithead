@@ -104,6 +104,11 @@ h1 {
 	font-size: 2em;
 }
 
+h2 {
+	margin: 0 0 20pt 0;
+	font-size: 1.5em;
+}
+
 p {
 	margin: 0 0 20pt 0;
 }
