@@ -1,7 +1,25 @@
+@font-face {
+    font-family: "Roboto-Regular";
+    src: url("/font/Roboto-Regular.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+@font-face {
+    font-family: "Roboto-Medium";
+    src: url("/font/Roboto-Medium.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+@font-face {
+    font-family: "SciFly";
+    src: url("/font/SciFly-Sans.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+body {
+    background-color: #061920;
+}
+
 #ays-network {
     width: 500px;
     height: 500px;
     border: 1px solid lightgray;
+    background-color: #061920;
 }
 
 #loading-bar {
