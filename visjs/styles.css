@@ -72,3 +72,66 @@ table.legend_table td {
     text-align: center;
     width: 110px;
 }
+
+/**
+ * Replace vis.js navigation buttons.
+ *
+ * The images are 30x30 in size w/ padding baked in.
+ */
+
+div.vis-network div.vis-navigation div.vis-button.vis-right {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-left {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-up {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-down {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-zoomIn {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-zoomOut {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+// Untested: This uses the `cross` image at 7x7
+div.vis-network button.vis-close {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+/**
+ * Remaining are manipulation buttons. These are all 24x24.
+ */
+
+div.vis-network div.vis-manipulation button.vis-button.vis-back {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-manipulation button.vis-button.vis-add {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-manipulation button.vis-button.vis-edit {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-manipulation button.vis-button.vis-connect {
+    background-image: url("/visjs/img/button-forward.png");
+}
+
+div.vis-network div.vis-manipulation button.vis-button.vis-delete {
+    background-image: url("/visjs/img/button-forward.png");
+}

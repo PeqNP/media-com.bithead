@@ -54,10 +54,8 @@ function makeNode(ctx, size, x, y, id) {
         // Node name
         ctx.font = "normal 12px Roboto-Regular";
         ctx.fillStyle = "white";
-
         var loc_x = x - (size * 2) + 6;
-        var loc_y = y + (size - 4);
-        // console.log("text loc_x (" + loc_x + ") loc_y (" + loc_y + ")");
+        var loc_y = y + (size - 3);
         ctx.fillText(node.name, loc_x, loc_y, 2 * size);
 
         // Bottom line with status indicator
