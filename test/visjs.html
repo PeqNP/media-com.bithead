@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Network</title>
+    <script type="text/javascript" src="/visjs/vis.js"></script>
+    <script type="text/javascript" src="/visjs/ays.js"></script>
+    <link rel="stylesheet" type="text/css" href="/visjs/styles.css" />
+    <script type="text/javascript">
+    var nodes;
+
+    function draw() {
+      // visjs examples: https://visjs.github.io/vis-network/examples/
+
+      // Change cursor for hover event. This could be used to indicate "Editing" of a node.
+      // https://visjs.github.io/vis-network/examples/network/other/cursorChange.html
+
+      // It's possible to have "groups" associated to nodes. Each group represents a type of node. The type of
+      // the nodes can be drawn differently. A legend can also be created. Refer to this example for instruction:
+      // https://visjs.github.io/vis-network/examples/network/exampleApplications/nodeLegend.html
+      // Another example using groups to define shapes for groups
+      // https://visjs.github.io/vis-network/examples/network/nodeStyles/customGroups.html
+
+      // Icons can be used instead of node shapes
+      // https://visjs.github.io/vis-network/examples/network/nodeStyles/icons.html
+
+      // Display a different image depending on selection state
+      // https://visjs.github.io/vis-network/examples/network/imageSelected/imageSelected.html
+
+      // It's possible to align labels to their edge runs, etc.
+      // https://visjs.github.io/vis-network/examples/network/labels/labelAlignment.html
+
+      // Margins can be added to labels that reside within nodes
+      // https://visjs.github.io/vis-network/examples/network/labels/labelMargins.html
+
+      // You can mask an image to be within side the node shape
+      // https://visjs.github.io/vis-network/examples/network/nodeStyles/circularImages.html
+
+      // A graph can be saved and loaded from disk
+      // https://visjs.github.io/vis-network/examples/network/other/saveAndLoad.html
+
+      // When a child node is in edit mode, the camera could auto-zoom to the node
+      // https://visjs.github.io/vis-network/examples/network/other/animationShowcase.html
+
+      // Display an element above the node when hovered above. The only problem with this is, it can't be interacted with.
+      // As soon as the mouse leaves the node, it will disappear.
+      var titleElement = document.createElement("div");
+      titleElement.style.border = "1px solid gray";
+      titleElement.style.height = "10em";
+      titleElement.style.width = "10em";
+
+      // With arbitrary DOM structure underneath.
+      var titleElementInner = document.createElement("div");
+      titleElementInner.style.height = "1em";
+      titleElementInner.style.width = "1em";
+      titleElementInner.style.background = "red";
+      titleElement.appendChild(titleElementInner);
+
+      // It's important to make this a `DataSet` so that the graph can be updated in real-time. This includes
+      // access to `update`, `add`, `remove`.
+      nodes = new vis.DataSet([
+        // Shape and color on individual nodes
+        { id: 0, label: "graph:", shape: "circle", color: "#000000" },
+        // The size of a shape may be defined. This may be useful for deps* nodes. It appears to be in points. I don't
+        // know what the default size is, or if the default size is automatic. This is smaller than the default size.
+        { id: 1, label: "com", size: 10 },
+        // The `title` is used by the pop-up when the node is hovered over
+        { id: 2, label: "bithead", title: "com.bithead" },
+        // Show a circular image. Other option is `image`, which shows it as a square. To get other shapes you would
+        // probably have to create a square image with the respective shape as a mask to make it transparent.
+        { id: 3, shape: "circularImage", label: "facebook", image: "/test/eric.jpg" },
+        // Changes the background of the label to red
+        { id: 4, label: "server", font: { background: "red" } },
+        // This will show an HTML element instead of a string title
+        { id: 5, label: "client", title: titleElement },
+
+        { id: 6, label: "database" },
+        // Draw a custom shape inline. This gets over-written well below. So please refer
+        // to the logic at the end of this function to see how a node's status will be updated.
+        {
+          id: 7,
+          label: "proxy",
+          // There is a major issue where the renderer gets called every time a node is hovered over. Why? Why is it re-rendering a node that is not anywhere near the node that is being interacted with? There may need to be logic to ignore certain redraw events. Specifically, if the state of the node doesn't change from the previous state.
+          shape: "custom",
+          ctxRenderer: renderNode
+        },
+      ]);
+      let m = new Map();
+      m.set(1, {path: "com", name: "bithead"});
+      m.set(2, {path: "com.bithead", name: "bithead"});
+      m.set(3, {path: "com.facebook", name: "facebook"});
+      m.set(4, {path: "com.bithead.server", name: "server"});
+      m.set(5, {path: "com.bithead.client", name: "client"});
+      m.set(6, {path: "com.facebook.database", name: "database"});
+      m.set(7, {path: "com.facebook.custom", name: "custom"});
+      setNodes(m);
+
+      // Zero has a special meaning. It is always at the top. If it is not defined, then then tree will appear mis-shapen.
+
+      // (?) Is it possible to shorten the length of the edge runs between nodes?
+
+      // TODO: Generate edges
+      var edges = new vis.DataSet([
+        { from: 1, to: 0, color: "rgb(20,24,200)" },
+
+        // Opacity could be used for making nodes appear in the background when another node is selected
+        { from: 1, to: 2, color: { color: "#ff0000", opacity: 0.3 } },
+        // Display a directional arrow. I'm not sure how beneficial this is as it is assumed the arrow always goes one way.
+        // My guess is, if you change the font, you can change the arrow shape too.
+        { from: 1, to: 3, arrows: { to: { enabled: true, type: "arrow" } } },
+
+        // Provides label on edge, w/ background, horizontal and on top of run
+        { from: 2, to: 4, label: "dependencies", font: { background: "#ff0000", align: "top" } },
+        { from: 2, to: 5 },
+
+        { from: 3, to: 6 },
+        { from: 3, to: 7 },
+      ]);
+
+      var container = document.getElementById("ays-network");
+      var data = {
+        nodes: nodes,
+        edges: edges,
+      };
+      var options = {
+      // Set shape for all nodes. This causes custom rendering to fail.
+      // nodes: { shape: "hexagon" },
+      layout: {
+        hierarchical: {
+          // UD (Up-Down), DU (Down-Up), LR (Left-Right), RL (Right-Left)
+          direction: "UD",
+          },
+        },
+
+        // Required for events
+        interaction: {
+          hover: true,
+          // Display navigation buttons
+          navigationButtons: true,
+          // Provides navigation from the keyboard
+          keyboard: true,
+        },
+
+        // Manipulation allows you to modify the tree. It provides an Edit button at the top along with
+        // options to add/delete nodes and edges.
+        manipulation: {
+          enabled: true,
+        },
+      };
+      var network = new vis.Network(container, data, options);
+
+      // Get the canvas HTML element
+      var networkCanvas = document
+        .getElementById("ays-network")
+        .getElementsByTagName("canvas")[0];
+      function changeCursor(newCursorStyle) {
+        networkCanvas.style.cursor = newCursorStyle;
+      }
+      function changeEventCursor(eventName, cursorType) {
+        network.on(eventName, function () {
+          changeCursor(cursorType);
+        });
+      }
+
+      /**
+      // This allows for more complex shapes to be attached to a node.
+      // Before drawing appears to be under the shape. After, above the shape.
+      network.on("initRedraw", function () {
+        // do something like move some custom elements?
+      });
+      network.on("beforeDrawing", function (ctx) {
+        // Select the node for redrawing.
+        var nodeId = 4;
+        var nodePosition = network.getPositions([nodeId]);
+        ctx.strokeStyle = "#A6D5F7";
+        ctx.fillStyle = "#294475";
+
+        // (?) Is it possible to add text here?
+
+        ctx.beginPath();
+        ctx.arc(
+          nodePosition[nodeId].x - 24,
+          nodePosition[nodeId].y,
+          10,
+          0,
+          2 * Math.PI,
+          false
+        );
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+      });
+      network.on("afterDrawing", function (ctx) {
+        var nodeId = 4;
+        var nodePosition = network.getPositions([nodeId]);
+        ctx.strokeStyle = "#294475";
+        ctx.lineWidth = 4;
+        ctx.fillStyle = "#A6D5F7";
+
+        ctx.beginPath();
+        ctx.arc(
+          nodePosition[nodeId].x + 24,
+          nodePosition[nodeId].y,
+          10,
+          0,
+          2 * Math.PI,
+          false
+        );
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+      });
+       */
+
+      // Interaction events
+
+      network.on("click", function (params) {
+        // My assumption is that the params provides information about the node that is tapped. This
+        // should allow a menu to be displayed when tapped. The `network.getPositions([nodeId])` can
+        // be used to derive x/y coordinates.
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText = "Click event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+        console.log(
+          "click event, getNodeAt returns: " +
+            this.getNodeAt(params.pointer.DOM)
+        );
+      });
+      network.on("doubleClick", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "doubleClick event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+      });
+      network.on("oncontext", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "oncontext (right click) event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+      });
+      network.on("dragStart", function (params) {
+        // There's no point in displaying this event on screen, it gets immediately overwritten
+        params.event = "[original event]";
+        console.log("dragStart Event:", params);
+        console.log(
+          "dragStart event, getNodeAt returns: " +
+            this.getNodeAt(params.pointer.DOM)
+        );
+        changeCursor("grabbing");
+      });
+      network.on("dragging", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "dragging event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+        changeCursor("grabbing");
+      });
+      network.on("dragEnd", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "dragEnd event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+        console.log("dragEnd Event:", params);
+        console.log(
+          "dragEnd event, getNodeAt returns: " +
+            this.getNodeAt(params.pointer.DOM)
+        );
+        changeCursor("grab");
+      });
+      network.on("controlNodeDragging", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "control node dragging event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+      });
+      network.on("controlNodeDragEnd", function (params) {
+        params.event = "[original event]";
+        document.getElementById("eventSpanHeading").innerText =
+          "control node drag end event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+        console.log("controlNodeDragEnd Event:", params);
+      });
+      network.on("zoom", function (params) {
+        document.getElementById("eventSpanHeading").innerText = "zoom event:";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+      });
+      network.on("showPopup", function (params) {
+        document.getElementById("eventSpanHeading").innerText =
+          "showPopup event: ";
+        document.getElementById("eventSpanContent").innerText = JSON.stringify(
+          params,
+          null,
+          4
+        );
+      });
+      network.on("hidePopup", function () {
+        console.log("hidePopup Event");
+      });
+      network.on("select", function (params) {
+        console.log("select Event:", params);
+      });
+      network.on("selectNode", function (params) {
+        console.log("selectNode Event:", params);
+      });
+      network.on("selectEdge", function (params) {
+        console.log("selectEdge Event:", params);
+      });
+      network.on("deselectNode", function (params) {
+        console.log("deselectNode Event:", params);
+      });
+      network.on("deselectEdge", function (params) {
+        console.log("deselectEdge Event:", params);
+      });
+      network.on("hoverNode", function (params) {
+        console.log("hoverNode Event:", params);
+        changeCursor("grab");
+      });
+      network.on("hoverEdge", function (params) {
+        console.log("hoverEdge Event:", params);
+        changeCursor("grab");
+      });
+      network.on("blurNode", function (params) {
+        console.log("blurNode Event:", params);
+        changeCursor("default");
+      });
+      network.on("blurEdge", function (params) {
+        console.log("blurEdge Event:", params);
+        changeCursor("default");
+      });
+
+      /**
+       Cursors for respective events
+        hoverNode
+        blurNode
+        hoverEdge
+        blurEdge
+        dragStart
+        dragging
+        dragEnd
+      */
+
+      changeEventCursor("hoverNode", "crosshair")
+
+      // Progress bar
+      // This appears to work, but I'm not sure how to test the styling as it only shows when the network is loading.
+      // (?) How do I style the bar, using these callbacks, when testing style?
+
+      network.on("stabilizationProgress", function (params) {
+          var maxWidth = 496;
+          var minWidth = 20;
+          var widthFactor = params.iterations / params.total;
+          var width = Math.max(minWidth, maxWidth * widthFactor);
+
+          document.getElementById("bar").style.width = width + "px";
+          document.getElementById("text").innerText =
+            Math.round(widthFactor * 100) + "%";
+        });
+        network.once("stabilizationIterationsDone", function () {
+          document.getElementById("text").innerText = "100%";
+          document.getElementById("bar").style.width = "496px";
+          document.getElementById("loading-bar").style.opacity = 0;
+          // really clean the dom element
+          setTimeout(function () {
+            document.getElementById("loading-bar").style.display = "none";
+          }, 500);
+        });
+    }
+
+
+    // Updating a node. This illustrates how to change the state of a node. Using the makeNode method, we provide it
+    // with a new renderer. The makeNode should eventually accept a node object to appropriately draw the object.
+    function redrawNode() {
+        updateNode(7, {path: "com.facebook.updated", name: "updated"});
+        // Triggers redraw
+        nodes.update([{id: 7}]);
+    }
+    </script>
+  </head>
+  <body onload="draw()">
+    <div id="wrapper">
+      <div id="ays-network"></div>
+      <div id="loading-bar">
+        <div class="outer-border">
+          <div id="text">0%</div>
+          <div id="border">
+            <div id="bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" onClick="redrawNode();">Update node</button>
+
+    <h2 id="eventSpanHeading"></h2>
+    <pre id="eventSpanContent"></pre>
+  </body>
+</html>
