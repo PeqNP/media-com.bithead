@@ -35,8 +35,6 @@ html, body {
     position: absolute;
     left: 10pt;
     top: 10pt;
-    width: 400pt;
-    height: 400pt;
     display: flex;
     flex-direction: column;
 }
@@ -103,12 +101,11 @@ html, body {
     border-bottom: 1pt solid #000;
 }
 
+/** Scroll Bar **/
+
 ::-webkit-scrollbar {
     width: 50pt;
     height: 50pt;
-}
-/* Part of the track not covered by thumb */
-::-webkit-scrollbar-track-piece {
 }
 ::-webkit-scrollbar-thumb {
     height: 50pt;
@@ -117,6 +114,9 @@ html, body {
 }
 ::-webkit-scrollbar-track {
     background-color: #ededed;
+}
+/* Part of the track not covered by thumb */
+::-webkit-scrollbar-track-piece {
 }
 ::-webkit-scrollbar-track:horizontal {
     border-top: 1pt solid #000;
@@ -184,9 +184,14 @@ html, body {
 #desktop .window .container {
     padding: 20pt;
     overflow: scroll;
-    /* This doeesn't quite work. It doeesn't change the size of the parent container */
     resize: both;
     font-family: "Geneva";
     font-size: 20pt;
     scrollbar-gutter: stable;
+    /* Prevents window from being resized down any further */
+    min-width: 360pt;
+    min-height: 250pt;
+    /* Setting the initial width and height prevents the window from being the size of the parent's viewport */
+    width: 360pt;
+    height: 250pt;
 }
