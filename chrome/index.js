@@ -33,9 +33,16 @@ function stylePopupMenus() {
         // Create choices
         // NOTE: This skips the first choice, which is used as the label for the menu.
         for (var j = 1; j < selectElement.length; j++) {
+            var option = selectElement.options[j];
+            if (option.classList.contains("group")) {
+                var group = document.createElement("div");
+                group.setAttribute("class", "popup-choice-group");
+                choices.appendChild(group);
+                continue;
+            }
             var choice = document.createElement("div");
             choice.setAttribute("class", "popup-choice");
-            choice.innerHTML = selectElement.options[j].innerHTML;
+            choice.innerHTML = option.innerHTML;
 
             /**
              * Select a (new) choice.

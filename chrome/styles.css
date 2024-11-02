@@ -214,6 +214,8 @@ html, body {
     border-radius: 4pt;
     outline: 2pt solid #000;
     outline-offset: 1pt;
+    /* Ensures the outline does not overlap elements that are beside it */
+    margin: 2pt;
     color: #000;
     background-color: #fff;
     height: 24pt;
@@ -338,7 +340,7 @@ label.checkbox {
 
 .popup-menu {
     position: relative;
-    height: 13pt;
+    height: 14pt;
 }
 
 .popup-menu select {
@@ -356,6 +358,7 @@ label.checkbox {
     font-family: "ChicagoFLF";
     font-size: 12pt;
     border: 1pt solid #000;
+    box-shadow: 1pt 1pt 0pt 0pt #000;
 }
 
 /* This is the first option in select */
@@ -407,10 +410,12 @@ label.checkbox {
 .popup-selected-choice {
 }
 
-/*
- * the default primary button (double borders) should not allow itself to overlay other elements. add margin?
- * add groups to options
- * add box shadow on right & bottom of select */
+.popup-choice-group {
+    height: 1pt;
+    background-color: #000;
+}
+
+/* Show the popup menu above all other elements */
 .popup-active {
     z-index: 1000;
 }
