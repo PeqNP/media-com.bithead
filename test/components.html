@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+  <head>
+    <title>Network</title>
+    <script type="text/javascript" src="/chrome/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="/chrome/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <script language="javascript">
+
+    </script>
+  </head>
+  <body onload="initUI();">
+    <div id="desktop">
+      <div> <!-- Buttons -->
+        <button type="submit" class="secondary">Submit</button>
+        <button type="submit" class="secondary" disabled>Submit</button>
+        <button type="submit" class="primary">Submit</button>
+        <button type="submit" class="tertiary">Submit</button>
+        <button type="submit" class="tertiary" disabled>Submit</button>
+      </div>
+      <div> <!-- Input -->
+        <input type="text" name="fullname" value="Test"><br/>
+        <input type="password" name="password" value="Test"><br/>
+        <label class="radio"><input type="radio" name="serialize" value="xml">XML</label><br/>
+        <label class="radio"><input type="radio" name="serialize" value="json">JSON</label><br/>
+        <label class="checkbox"><input type="checkbox" name="color" value="red">Red</label>
+      </div>
+      <div class="popup-menu" style="width: 200pt;"> <!-- Select -->
+        <select>
+          <option value="">Select one</option>
+          <option value="opt1">Option 1</option>
+          <option value="opt2">Option 2</option>
+        </select>
+      </div>
+      <br/>
+      <div class="popup-menu" style="width: 200pt;"> <!-- Select -->
+        <select>
+          <option value="">Select color</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+        </select>
+      </div>
+    </div> <!-- desktop -->
+  </body>
+</html>

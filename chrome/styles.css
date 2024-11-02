@@ -1,5 +1,7 @@
 /** Reset **/
 
+/* padding: top right bottom left; */
+
 @font-face {
     font-family: "ChicagoFLF";
     src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
@@ -23,6 +25,7 @@ html, body {
 }
 
 #desktop {
+    position: relative;
     width: 100%;
     height: 100vh;
     background-color: #ebebeb;
@@ -181,6 +184,12 @@ html, body {
     display: none;
 }
 
+/** Container **/
+
+/**
+ * The container "contains" the content of the window.
+ */
+
 #desktop .window .container {
     padding: 20pt;
     overflow: scroll;
@@ -195,3 +204,235 @@ html, body {
     width: 360pt;
     height: 250pt;
 }
+
+/** UI Components **/
+
+/* Primary: The default button option. Will activate when return key tapped. */
+
+#desktop button.primary {
+    border: 1pt solid #000;
+    border-radius: 4pt;
+    outline: 2pt solid #000;
+    outline-offset: 1pt;
+    color: #000;
+    background-color: #fff;
+    height: 24pt;
+    font-family: "ChicagoFLF";
+    font-size: 14pt;
+    padding: 0pt 20pt 0pt 20pt;
+}
+
+#desktop button.primary:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+/* Secondary: Same size as primary w/o double border */
+
+#desktop button.secondary {
+    border: 1pt solid #000;
+    border-radius: 4pt;
+    height: 24pt;
+    color: #000;
+    background-color: #fff;
+    font-family: "ChicagoFLF";
+    font-size: 14pt;
+    padding: 0pt 20pt 0pt 20pt;
+}
+
+#desktop button.secondary:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+#desktop button.secondary:disabled {
+    border: 1pt solid #000;
+    border-radius: 4pt;
+    height: 24pt;
+    color: #C0C0C0;
+    font-family: "ChicagoFLF";
+    font-size: 14pt;
+    padding: 0pt 20pt 0pt 20pt;
+}
+
+#desktop button.secondary:disabled:hover {
+    background-color: #fff;
+    color: #C0C0C0;
+}
+
+/* Tertiary: thinner and smaller */
+
+#desktop button.tertiary {
+    border: 1pt solid #000;
+    border-radius: 4pt;
+    height: 18pt;
+    color: #000;
+    background-color: #fff;
+    font-family: "ChicagoFLF";
+    font-size: 9pt;
+    padding: 0pt 18pt 0pt 18pt;
+}
+
+#desktop button.tertiary:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+#desktop button.tertiary:disabled {
+    border: 1pt solid #000;
+    border-radius: 4pt;
+    height: 18pt;
+    color: #C0C0C0;
+    font-family: "ChicagoFLF";
+    font-size: 9pt;
+    padding: 0pt 18pt 0pt 18pt;
+}
+
+#desktop button.tertiary:disabled:hover {
+    background-color: #fff;
+    color: #C0C0C0;
+}
+
+/* Text input */
+
+input[type=text], input[type=password] {
+    border: 1pt solid #000;
+    height: 20pt;
+    font-family: "Geneva";
+    font-size: 12pt;
+}
+
+/* Radio */
+
+input[type=radio] {
+    border: 1pt solid #000;
+    height: 12pt;
+    width: 12pt;
+    transform: translateY(1pt);
+    /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
+    accent-color: #000;
+}
+
+label.radio {
+    font-family: "ChicagoFLF";
+    font-size: 12pt;
+}
+
+input[type=checkbox] {
+    border: 1pt solid #000;
+    border-radius: 0pt;
+    height: 12pt;
+    width: 12pt;
+    transform: translate(1pt, 1pt);
+    /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
+    accent-color: #000;
+    /* FIXME: It's possible to change the checkbox shape. It requires hiding the checkbox and drawing a new one using `before`. */
+}
+
+label.checkbox {
+    font-family: "ChicagoFLF";
+    font-size: 12pt;
+}
+
+/* Pop-up Menu (select) */
+
+.popup-menu {
+    position: relative;
+    height: 13pt;
+}
+
+.popup-menu select {
+    display: none; /* Hide original select element */
+}
+
+/**
+ * In order for the content of the menu to display over other content, it must
+ * be positioned absolutely inside another container that is positioned relative.
+ */
+.popup-container {
+    position: absolute;
+    top: 0pt;
+    left: 0pt;
+    font-family: "ChicagoFLF";
+    font-size: 12pt;
+    border: 1pt solid #000;
+}
+
+/* This is the first option in select */
+.popup-choices-label { }
+
+/* Point arrow down by default */
+.popup-choices-label:after {
+  position: absolute;
+  content: "";
+  top: 10pt;
+  right: 10pt;
+  width: 0pt;
+  height: 0pt;
+  border: 5pt solid transparent;
+  border-color: #000 transparent transparent transparent;
+}
+
+.popup-choices-label.popup-arrow-active:after {
+  border-color: transparent transparent #000 transparent;
+  top: 5pt;
+}
+
+/* Contains the pop-up choices */
+.popup-choices { }
+
+.popup-choice, .popup-choices-label {
+    background-color: #fff;
+    color: #000;
+    padding: 4pt 8pt;
+    border: 1pt solid transparent;
+    cursor: pointer;
+}
+
+.popup-choice {
+    /* Why this needs to be set, I don't know. `absolute` has all elements
+     * overlay each other. `relative` ensures they stay in their respective
+     * position and above elements that are "below" them.
+     */
+    position: relative;
+    /* Inherit parent's z-index. This is required in order for element to be placed above others. */
+    z-index: inherit;
+}
+
+.popup-choice:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.popup-selected-choice {
+}
+
+/*
+ * the default primary button (double borders) should not allow itself to overlay other elements. add margin?
+ * add groups to options
+ * add box shadow on right & bottom of select */
+.popup-active {
+    z-index: 1000;
+}
+
+/* Hide select options when closed */
+.popup-inactive {
+    z-index: 0;
+    display: none;
+}
+
+/**
+ * Example using variables in CSS
+ *
+.rounded-corner {
+    --radius: 2pt;
+}
+
+select {
+    border-radius: var(--radius);
+}
+
+<select class="rounded-corner">
+    ...
+</select>
+*/
