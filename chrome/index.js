@@ -10,7 +10,16 @@ function styleFolders() {
     }
 }
 
-// Does this cause a memory leak?
+/**
+ * Provides folder behavior.
+ *
+ * @note Represents a `ul.folder` element.
+ * @note To provide collapsing behavior, place a `details` element within a `ul li`
+ * element.
+ *
+ * FIXME: Does this cause a memory leak? The `folder` instantiated outside of
+ * this function may or may not be held on to.
+ */
 function UIFolder(folder) {
     var selectedFile = null;
 
@@ -19,8 +28,7 @@ function UIFolder(folder) {
         var file = files[i];
         // Wrap content in a span. This allows only the text to be highlighted
         // when selected.
-        // firstElementChild on li will be `summary` for parent
-        // firstElementchild will be `null` on `li` that just has child
+        // - Child
         if (file.firstElementChild === null && file.firstChild.nodeName == "#text") {
             var li = file;
             var span = document.createElement("span");
@@ -28,6 +36,7 @@ function UIFolder(folder) {
             li.innerHTML = "";
             li.appendChild(span);
         }
+        // - Parent
         else if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
             // Get only the first summary.
             var summary = file.firstElementChild.getElementsByTagName("summary")[0];
@@ -49,7 +58,7 @@ function UIFolder(folder) {
             }
             selectedFile = this;
             var span = selectedFile.getElementsByTagName("span")[0];
-            if (span === undefined) {
+            if (span === undefined) { // This should never happen
                 console.error("li does not have required span");
                 return;
             }

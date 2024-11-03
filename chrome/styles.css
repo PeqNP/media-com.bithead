@@ -6,6 +6,10 @@
     font-family: "ChicagoFLF";
     src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
 }
+@font-face {
+    font-family: "FindersKeepers";
+    src: url("/chrome/FindersKeepers.ttf") format('truetype'); /* Safari, Android, iOS */
+}
 
 /** Used for: window titles */
 .medium-text {
@@ -91,8 +95,8 @@ html, body {
 }
 
 #desktop .window .metadata {
-    font-family: "Geneva";
-    font-size: 18pt;
+    font-family: "FindersKeepers";
+    font-size: 22pt;
     height: 30pt;
     /* - right - left */
     padding: 10pt 20pt 10pt 20pt;
@@ -194,8 +198,8 @@ html, body {
     padding: 20pt;
     overflow: scroll;
     resize: both;
-    font-family: "Geneva";
-    font-size: 20pt;
+    font-family: "FindersKeepers";
+    font-size: 22pt;
     scrollbar-gutter: stable;
     /* Prevents window from being resized down any further */
     min-width: 360pt;
@@ -300,8 +304,8 @@ html, body {
 input[type=text], input[type=password] {
     border: 1pt solid #000;
     height: 20pt;
-    font-family: "Geneva";
-    font-size: 12pt;
+    font-family: "FindersKeepers";
+    font-size: 22pt;
 }
 
 /* Radio */
@@ -459,8 +463,8 @@ ul.folder {
     padding-top: 3pt;
     padding-left: calc(2 * var(--spacing) - var(--radius) - 2pt);
     padding-bottom: 2pt;
-    font-family: "Geneva";
-    font-size: 14pt;
+    font-family: "FindersKeepers";
+    font-size: 22pt;
     cursor: pointer;
 }
 
