@@ -443,75 +443,86 @@ select {
 
 /* Folders */
 
-.tree {
-  --spacing: 2rem;
-  --radius: 7pt;
+.folder {
+    --spacing: 2rem;
+    --radius: 7pt;
 }
 
-.tree li {
-  display: block;
-  position: relative;
-  padding-top: 3pt;
-  padding-left: calc(2 * var(--spacing) - var(--radius) - 2pt);
-  padding-bottom: 2pt;
-  font-family: "Geneva";
-  font-size: 14pt;
+.folder li {
+    display: block;
+    position: relative;
+    padding-top: 3pt;
+    padding-left: calc(2 * var(--spacing) - var(--radius) - 2pt);
+    padding-bottom: 2pt;
+    font-family: "Geneva";
+    font-size: 14pt;
 }
 
-.tree ul {
-  margin-left: calc(var(--radius) - var(--spacing));
-  padding-left: 0pt;
+.folder ul {
+    padding-left: 0pt;
 }
 
-.tree ul li { }
-
-.tree ul li:last-child {
-  border-color: transparent;
+.folder ul li:last-child {
+    border-color: transparent;
 }
 
-.tree ul li::before {
-  content: '';
-  display: block;
-  position: absolute;
-  top: calc(var(--spacing) / -2);
-  left: -2pt;
-  width: calc(var(--spacing) + 2pt);
-  height: calc(var(--spacing) + 1pt);
+.folder ul li::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: calc(var(--spacing) / -2);
+    left: -2pt;
+    width: calc(var(--spacing) + 2pt);
+    height: calc(var(--spacing) + 1pt);
 }
 
-.tree summary {
-  display: block;
-  cursor: pointer;
+.folder summary {
+    display: block;
+    cursor: pointer;
 }
 
-.tree summary::marker,
-.tree summary::-webkit-details-marker {
-  display: none;
+.folder summary::marker,
+.folder summary::-webkit-details-marker {
+    display: none;
 }
 
-.tree summary:focus {
-  outline: none;
+.folder summary:focus {
+    outline: none;
 }
 
-.tree summary:focus-visible { }
+.folder summary:focus-visible { }
 
-.tree li::after,
-.tree summary::before {
-  content: '';
-  display: block;
-  position: absolute;
-  top: calc(var(--spacing) / 2 - var(--radius));
-  left: 20pt;
-  width: calc(2 * var(--radius));
-  height: calc(2 * var(--radius));
+.folder li::after,
+.folder summary::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: calc(var(--spacing) / 2 - var(--radius));
+    left: 20pt;
+    width: calc(2 * var(--radius));
+    height: calc(2 * var(--radius));
 }
 
-.tree summary::before {
-  z-index: 1;
-  background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
+.folder summary::before {
+    z-index: 1;
+    background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
 }
 
-.tree details[open] > summary::before {
-  top: 10pt;
-  background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
+.folder details[open] > summary::before {
+    top: 10pt;
+    background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
+}
+
+.folder li.folder::before {
+    width: 20pt;
+    top: 5pt;
+    left: 12pt;
+    background: transparent url('/chrome/folder.svg') 0pt 0pt no-repeat;
+}
+
+.folder li.server::before {
+    width: 20pt;
+    top: 10pt;
+    left: 12pt;
+    background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
 }
