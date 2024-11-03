@@ -443,6 +443,11 @@ select {
 
 /* Folders */
 
+ul.folder {
+    /* This ensures the folder is directly lined up within its parent */
+    margin-left: -20pt;
+}
+
 .folder {
     --spacing: 2rem;
     --radius: 7pt;
@@ -456,6 +461,7 @@ select {
     padding-bottom: 2pt;
     font-family: "Geneva";
     font-size: 14pt;
+    cursor: pointer;
 }
 
 .folder ul {
@@ -513,7 +519,7 @@ select {
     background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
 }
 
-.folder li.folder::before {
+.folder li.group::before {
     width: 20pt;
     top: 5pt;
     left: 12pt;
@@ -526,3 +532,9 @@ select {
     left: 12pt;
     background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
 }
+
+.folder li span.active {
+    background-color: #000;
+    color: #fff;
+}
+

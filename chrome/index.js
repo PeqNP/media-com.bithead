@@ -1,5 +1,63 @@
 function initUI() {
     stylePopupMenus();
+    styleFolders();
+}
+
+function styleFolders() {
+    var folders = document.getElementsByClassName("folder");
+    for (var i = 0; i < folders.length; i++) {
+        var folder = new UIFolder(folders[i]);
+    }
+}
+
+// Does this cause a memory leak?
+function UIFolder(folder) {
+    var selectedFile = null;
+
+    var files = folder.getElementsByTagName("li");
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        // Wrap content in a span. This allows only the text to be highlighted
+        // when selected.
+        // firstElementChild on li will be `summary` for parent
+        // firstElementchild will be `null` on `li` that just has child
+        if (file.firstElementChild === null && file.firstChild.nodeName == "#text") {
+            var li = file;
+            var span = document.createElement("span");
+            span.innerHTML = li.innerHTML;
+            li.innerHTML = "";
+            li.appendChild(span);
+        }
+        else if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
+            // Get only the first summary.
+            var summary = file.firstElementChild.getElementsByTagName("summary")[0];
+            var span = document.createElement("span");
+            span.innerHTML = summary.innerHTML;
+            summary.innerHTML = "";
+            summary.appendChild(span);
+        }
+
+        // Change selected li
+        files[i].addEventListener("click", function(e) {
+            e.stopPropagation();
+            if (selectedFile === this) {
+                return;
+            }
+            if (selectedFile !== null) {
+                var span = selectedFile.getElementsByTagName("span")[0];
+                span.classList.remove("active");
+            }
+            selectedFile = this;
+            var span = selectedFile.getElementsByTagName("span")[0];
+            if (span === undefined) {
+                console.error("li does not have required span");
+                return;
+            }
+            span.classList.add("active");
+        });
+    }
+
+    return this;
 }
 
 /**
@@ -99,6 +157,7 @@ function stylePopupMenus() {
             var choices = container.getElementsByClassName("popup-choices");
             for (var i = 0; i < choices.length; i++) {
                 if (choices[i].classList.contains("popup-inactive")) {
+                    console.log("Already selected");
                     continue;
                 }
                 choices[i].classList.remove("popup-active");
