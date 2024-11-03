@@ -340,7 +340,7 @@ label.checkbox {
 
 .popup-menu {
     position: relative;
-    height: 14pt;
+    height: 13pt;
 }
 
 .popup-menu select {
@@ -358,7 +358,6 @@ label.checkbox {
     font-family: "ChicagoFLF";
     font-size: 12pt;
     border: 1pt solid #000;
-    box-shadow: 1pt 1pt 0pt 0pt #000;
 }
 
 /* This is the first option in select */
@@ -441,3 +440,78 @@ select {
     ...
 </select>
 */
+
+/* Folders */
+
+.tree {
+  --spacing: 2rem;
+  --radius: 7pt;
+}
+
+.tree li {
+  display: block;
+  position: relative;
+  padding-top: 3pt;
+  padding-left: calc(2 * var(--spacing) - var(--radius) - 2pt);
+  padding-bottom: 2pt;
+  font-family: "Geneva";
+  font-size: 14pt;
+}
+
+.tree ul {
+  margin-left: calc(var(--radius) - var(--spacing));
+  padding-left: 0pt;
+}
+
+.tree ul li { }
+
+.tree ul li:last-child {
+  border-color: transparent;
+}
+
+.tree ul li::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: calc(var(--spacing) / -2);
+  left: -2pt;
+  width: calc(var(--spacing) + 2pt);
+  height: calc(var(--spacing) + 1pt);
+}
+
+.tree summary {
+  display: block;
+  cursor: pointer;
+}
+
+.tree summary::marker,
+.tree summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree summary:focus {
+  outline: none;
+}
+
+.tree summary:focus-visible { }
+
+.tree li::after,
+.tree summary::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: calc(var(--spacing) / 2 - var(--radius));
+  left: 20pt;
+  width: calc(2 * var(--radius));
+  height: calc(2 * var(--radius));
+}
+
+.tree summary::before {
+  z-index: 1;
+  background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
+}
+
+.tree details[open] > summary::before {
+  top: 10pt;
+  background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
+}
