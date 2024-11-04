@@ -461,7 +461,7 @@ ul.folder {
     display: block;
     position: relative;
     padding-top: 3pt;
-    padding-left: calc(2 * var(--spacing) - var(--radius) - 2pt);
+    padding-left: calc(2 * var(--spacing) - var(--radius) - 4pt);
     padding-bottom: 2pt;
     font-family: "FindersKeepers";
     font-size: 22pt;
@@ -482,7 +482,7 @@ ul.folder {
     position: absolute;
     /* This must be set to 10pt or the first option in the list will not be tappable. */
     top: 10pt;
-    left: -2pt;
+    left: 0pt;
     width: calc(var(--spacing) + 2pt);
     height: calc(var(--spacing) + 1pt);
 }
@@ -533,9 +533,13 @@ ul.folder {
 
 .folder li.server::before {
     width: 20pt;
-    top: 10pt;
+    top: 11pt;
     left: 12pt;
     background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
+}
+
+.folder li span {
+    padding: 0pt 1pt 0pt 2pt;
 }
 
 .folder li span.active {
