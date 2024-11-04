@@ -29,9 +29,9 @@ function UIFolder(folder) {
         // Wrap content in a span. This allows only the text to be highlighted
         // when selected.
         // - Child
+        var span = document.createElement("span");
         if (file.firstElementChild === null && file.firstChild.nodeName == "#text") {
             var li = file;
-            var span = document.createElement("span");
             span.innerHTML = li.innerHTML;
             li.innerHTML = "";
             li.appendChild(span);
@@ -39,30 +39,24 @@ function UIFolder(folder) {
         // - Parent
         else if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
             // Get only the first summary.
+            // FIXME: Should the click be on span?
             var summary = file.firstElementChild.getElementsByTagName("summary")[0];
-            var span = document.createElement("span");
             span.innerHTML = summary.innerHTML;
             summary.innerHTML = "";
             summary.appendChild(span);
         }
 
         // Change selected li
-        files[i].addEventListener("click", function(e) {
+        span.addEventListener("click", function(e) {
             e.stopPropagation();
-            if (selectedFile === this) {
+            if (selectedFile === e.target) {
                 return;
             }
             if (selectedFile !== null) {
-                var span = selectedFile.getElementsByTagName("span")[0];
-                span.classList.remove("active");
+                selectedFile.classList.remove("active");
             }
-            selectedFile = this;
-            var span = selectedFile.getElementsByTagName("span")[0];
-            if (span === undefined) { // This should never happen
-                console.error("li does not have required span");
-                return;
-            }
-            span.classList.add("active");
+            selectedFile = e.target;
+            e.target.classList.add("active");
         });
     }
 
@@ -142,6 +136,7 @@ function stylePopupMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
+            console.log("Clicked select (" + e.target + ")");
             var choices = this.parentNode.querySelector(".popup-choices");
             var isSelected = choices.classList.contains("popup-active");
             e.stopPropagation();
@@ -181,5 +176,5 @@ function stylePopupMenus() {
     /**
      * Close select box if user clicks outside of select
      */
-    document.addEventListener("click", closeAllPopupMenus);
+    //document.addEventListener("click", closeAllPopupMenus);
 }

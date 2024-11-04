@@ -480,7 +480,8 @@ ul.folder {
     content: '';
     display: block;
     position: absolute;
-    top: calc(var(--spacing) / -2);
+    /* This must be set to 10pt or the first option in the list will not be tappable. */
+    top: 10pt;
     left: -2pt;
     width: calc(var(--spacing) + 2pt);
     height: calc(var(--spacing) + 1pt);
