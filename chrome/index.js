@@ -30,20 +30,20 @@ function UIFolder(folder) {
         // when selected.
         // - Child
         var span = document.createElement("span");
-        if (file.firstElementChild === null && file.firstChild.nodeName == "#text") {
-            var li = file;
-            span.innerHTML = li.innerHTML;
-            li.innerHTML = "";
-            li.appendChild(span);
-        }
         // - Parent
-        else if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
+        if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
             // Get only the first summary.
             // FIXME: Should the click be on span?
             var summary = file.firstElementChild.getElementsByTagName("summary")[0];
             span.innerHTML = summary.innerHTML;
             summary.innerHTML = "";
             summary.appendChild(span);
+        }
+        else if (file.firstChild !== null && file.firstChild.nodeName == "#text") {
+            var li = file;
+            span.innerHTML = li.innerHTML;
+            li.innerHTML = "";
+            li.appendChild(span);
         }
 
         // Change selected li
@@ -155,15 +155,16 @@ function stylePopupMenus() {
      * Close all popup menus.
      */
     function closeAllPopupMenus() {
+        console.log("Closing all pop-up menus");
         var containers = document.getElementsByClassName("popup-container");
         for (var j = 0; j < containers.length; j++) {
             var container = containers[j];
             var choices = container.getElementsByClassName("popup-choices");
             for (var i = 0; i < choices.length; i++) {
                 if (choices[i].classList.contains("popup-inactive")) {
-                    console.log("Already selected");
                     continue;
                 }
+                console.log("Closing pop-up menu (" + choices[i] + ")");
                 choices[i].classList.remove("popup-active");
                 choices[i].classList.add("popup-inactive");
             }
@@ -176,5 +177,5 @@ function stylePopupMenus() {
     /**
      * Close select box if user clicks outside of select
      */
-    //document.addEventListener("click", closeAllPopupMenus);
+    document.addEventListener("click", closeAllPopupMenus);
 }

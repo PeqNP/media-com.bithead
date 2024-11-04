@@ -415,7 +415,7 @@ label.checkbox {
 
 .popup-choice-group {
     height: 1pt;
-    background-color: #000;
+    background-color: #aaa;
 }
 
 /* Show the popup menu above all other elements */
@@ -547,3 +547,7 @@ ul.folder {
     color: #fff;
 }
 
+/* Folder metadata */
+.folder .metadata, .folder .metadata-title {
+    display: none;
+}
