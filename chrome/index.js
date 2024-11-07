@@ -11,6 +11,32 @@ function styleFolders() {
 }
 
 /**
+ * Represents a metadata column title.
+ */
+function UIFolderMetadata(name, style) {
+    this.name = name;
+    this.style = style;
+    return this;
+}
+
+/**
+ * Extract metadata column name, and style info, from list of `li`s.
+ *
+ * @param [li] - List of `li`s to parse that provides metadata column title information
+ * @returns UIFolderMetadata
+ */
+function getFolderMetadata(lis) {
+    var metadata = Array();
+    for (var i = 0; i < lis.length; i++) {
+        var name = lis[i].innerHTML;
+        var style = lis[i].style;
+        var m = new UIFolderMetadata(name, style);
+        metadata.push(m);
+    }
+    return metadata;
+}
+
+/**
  * Provides folder behavior.
  *
  * @note Represents a `ul.folder` element.
@@ -19,16 +45,43 @@ function styleFolders() {
  *
  * FIXME: Does this cause a memory leak? The `folder` instantiated outside of
  * this function may or may not be held on to.
+ * @param [ul.folder] - List of `ul.folder` elements
+ * @returns UIFolder | null if error
  */
 function UIFolder(folder) {
+    // Previously selected file
     var selectedFile = null;
+
+    // Will contain all of the metadata information
+    var table = document.createElement("table");
+
+    // Get the metadata associated to the parent `ul` (folder)
+    var metadataTitle = folder.getElementsByClassName("metadata-title")[0];
+    if (metadataTitle === undefined) {
+        console.error("The parent folder must have an element `ul.metadata-title`");
+        return null;
+    }
+    var metadata = metadataTitle.getElementsByTagName("li");
+    if (metadata.length == 0) {
+        console.error("There must be at least one metadata value in `ul.metadata-title`");
+        return null;
+    }
+    this.metadata = getFolderMetadata(metadata);
 
     var files = folder.getElementsByTagName("li");
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
+        // We need to ignore the `li`s associated to metadata
+        if (file.parentNode.classList.contains("metadata-title") || file.parentNode.classList.contains("metadata")) {
+            // console.log("Ignoring metadata(-title) li");
+            continue;
+        }
+        if (file.id === "") {
+            console.warn("File (" + file.innerHTML  +") must have an ID");
+        }
+
         // Wrap content in a span. This allows only the text to be highlighted
         // when selected.
-        // - Child
         var span = document.createElement("span");
         // - Parent
         if (file.firstElementChild !== null && file.firstElementChild.nodeName == "DETAILS") {
@@ -39,11 +92,53 @@ function UIFolder(folder) {
             summary.innerHTML = "";
             summary.appendChild(span);
         }
+        // - Child
         else if (file.firstChild !== null && file.firstChild.nodeName == "#text") {
             var li = file;
-            span.innerHTML = li.innerHTML;
-            li.innerHTML = "";
+            span.innerHTML = li.childNodes[0].textContent.trim();
+            li.childNodes[0].remove();
             li.appendChild(span);
+        }
+
+        var tr = document.createElement("tr");
+        tr.id = file.id;
+
+        // Get the corresponding metadata for the child
+        var foundMetadata = false;
+        for (var j = 0; j < file.childNodes.length; j++) {
+            if (file.childNodes[j].classList === undefined) {
+                continue;
+            }
+            if (!file.childNodes[j].classList.contains("metadata")) {
+                continue;
+            }
+            foundMetadata = true;
+            // `ul` that contains metadata
+            var data = file.childNodes[j];
+            var metadata = data.getElementsByTagName("li");
+            // The metadata must have N-1 the number of metadata from parent. The reason being
+            // is that the first metadata column is the name of the node.
+            if (metadata.length != this.metadata.length - 1) {
+                console.warn("Invalid number of metadata in li (" + span.innerHTML + ") id (" + file.id + ")");
+            }
+            for (var k = 0; k < metadata.length; k++) {
+                var td = document.createElement("td");
+                td.innerHTML = metadata[k].innerHTML;
+                tr.appendChild(td);
+            }
+        }
+        if (!foundMetadata) {
+            console.warn("Found no metadata in li (" + span.innerHTML + ") id (" + file.id + ")");
+        }
+
+        table.appendChild(tr);
+
+        function hideMetadata(file) {
+            // Hide this `li` and all children under it
+
+        }
+
+        function showMetadata(file) {
         }
 
         // Change selected li
@@ -57,6 +152,8 @@ function UIFolder(folder) {
             }
             selectedFile = e.target;
             e.target.classList.add("active");
+
+            // Display the respective metadata for `li`s that are visible
         });
     }
 
