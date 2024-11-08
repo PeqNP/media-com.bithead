@@ -452,12 +452,12 @@ ul.folder {
     margin-left: -20pt;
 }
 
-.folder {
+ul.folder {
     --spacing: 2rem;
     --radius: 7pt;
 }
 
-.folder li {
+ul.folder li {
     display: block;
     position: relative;
     padding-top: 3pt;
@@ -468,15 +468,15 @@ ul.folder {
     cursor: pointer;
 }
 
-.folder ul {
+ul.folder ul {
     padding-left: 0pt;
 }
 
-.folder ul li:last-child {
+ul.folder ul li:last-child {
     border-color: transparent;
 }
 
-.folder ul li::before {
+ul.folder ul li::before {
     content: '';
     display: block;
     position: absolute;
@@ -487,24 +487,24 @@ ul.folder {
     height: calc(var(--spacing) + 1pt);
 }
 
-.folder summary {
+ul.folder summary {
     display: block;
     cursor: pointer;
 }
 
-.folder summary::marker,
-.folder summary::-webkit-details-marker {
+ul.folder summary::marker,
+ul.folder summary::-webkit-details-marker {
     display: none;
 }
 
-.folder summary:focus {
+ul.folder summary:focus {
     outline: none;
 }
 
-.folder summary:focus-visible { }
+ul.folder summary:focus-visible { }
 
-.folder li::after,
-.folder summary::before {
+ul.folder li::after,
+ul.folder summary::before {
     content: '';
     display: block;
     position: absolute;
@@ -514,43 +514,83 @@ ul.folder {
     height: calc(2 * var(--radius));
 }
 
-.folder summary::before {
+ul.folder summary::before {
     z-index: 1;
     background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
 }
 
-.folder details[open] > summary::before {
+ul.folder details[open] > summary::before {
     top: 10pt;
     background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
 }
 
-.folder li.group::before {
+ul.folder li.group::before {
     width: 20pt;
     top: 5pt;
     left: 12pt;
     background: transparent url('/chrome/folder.svg') 0pt 0pt no-repeat;
 }
 
-.folder li.server::before {
+ul.folder li.server::before {
     width: 20pt;
     top: 11pt;
     left: 12pt;
     background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
 }
 
-.folder li span {
+ul.folder li span {
     padding: 0pt 1pt 0pt 2pt;
 }
 
-.folder li span.active {
+ul.folder li span.active {
     background-color: #000;
     color: #fff;
 }
 
 /* Folder metadata */
-.folder .metadata, .folder .metadata-title {
+ul.folder .metadata, ul.folder .metadata-title {
     display: none;
 }
+
+/* The ul.folder contains the struct of the folder tree.
+ * The div.folder contains the ul.folder and displays the respective metadata for each folder
+ */
+
+/* Flexbox
+ * https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+ * https://css-tricks.com/snippets/css/complete-guide-grid/
+ */
+
+/*
+@mixin flexbox() {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+@mixin flex($values) {
+    -webkit-box-flex: $values;
+    -moz-box-flex:  $values;
+    -webkit-flex:  $values;
+    -ms-flex:  $values;
+    flex:  $values;
+}
+
+@mixin order($val) {
+    -webkit-box-ordinal-group: $val;
+    -moz-box-ordinal-group: $val;
+    -ms-flex-order: $val;
+    -webkit-order: $val;
+    order: $val;
+}
+
+div.folder {
+    @include flexbox();
+    flex-direction: row;
+}
+*/
 
 table tr {
     background-color: red;

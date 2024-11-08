@@ -67,6 +67,10 @@ function UIFolder(folder) {
         return null;
     }
     this.metadata = getFolderMetadata(metadata);
+    this.numFolders = 0;
+    // Contains the folder hiearchy table cell. The rowspan must be updated as
+    // children are added or removed from the table.
+    this.folderHierarchy = null;
 
     function hideMetadata(file) {
         // Hide this `li` and all children under it
@@ -89,6 +93,8 @@ function UIFolder(folder) {
         if (file.id === "") {
             console.warn("File (" + file.innerHTML  +") must have an ID");
         }
+
+        this.numFolders = this.numFolders + 1;
 
         // Wrap content in a span. This allows only the text to be highlighted
         // when selected.
@@ -113,11 +119,14 @@ function UIFolder(folder) {
         var tr = document.createElement("tr");
         tr.id = file.id;
 
+        // TODO: Set the width of the rows accordingly. Only the first columns should have widths
+        // The metadata in this `li` is the first one. Retrieve widths and assign to the first tds
+        // accordingly.
         if (!firstFileFound) {
             var td = document.createElement("td");
             td.appendChild(folder.cloneNode(true));
-            td.rowSpan = 0;
             tr.appendChild(td);
+            this.folderHierarchy = td;
             firstFileFound = true;
         }
 
@@ -169,6 +178,13 @@ function UIFolder(folder) {
 
     var parentNode = folder.parentNode;
     parentNode.replaceChild(table, folder);
+
+    if (this.folderHiearchy === null) {
+        console.warn("A folder hierarchy must exist");
+    }
+    else {
+        this.folderHierarchy.rowSpan = this.numFolders;
+    }
 
     return this;
 }
