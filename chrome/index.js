@@ -68,7 +68,17 @@ function UIFolder(folder) {
     }
     this.metadata = getFolderMetadata(metadata);
 
+    function hideMetadata(file) {
+        // Hide this `li` and all children under it
+    }
+
+    function showMetadata(file) {
+    }
+
     var files = folder.getElementsByTagName("li");
+    // Used to determine the first "real" file within the folder. The folder tree
+    // will be displayed in the first folder's row.
+    var firstFileFound = false;
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
         // We need to ignore the `li`s associated to metadata
@@ -103,6 +113,14 @@ function UIFolder(folder) {
         var tr = document.createElement("tr");
         tr.id = file.id;
 
+        if (!firstFileFound) {
+            var td = document.createElement("td");
+            td.appendChild(folder.cloneNode(true));
+            td.rowSpan = 0;
+            tr.appendChild(td);
+            firstFileFound = true;
+        }
+
         // Get the corresponding metadata for the child
         var foundMetadata = false;
         for (var j = 0; j < file.childNodes.length; j++) {
@@ -133,14 +151,6 @@ function UIFolder(folder) {
 
         table.appendChild(tr);
 
-        function hideMetadata(file) {
-            // Hide this `li` and all children under it
-
-        }
-
-        function showMetadata(file) {
-        }
-
         // Change selected li
         span.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -156,6 +166,9 @@ function UIFolder(folder) {
             // Display the respective metadata for `li`s that are visible
         });
     }
+
+    var parentNode = folder.parentNode;
+    parentNode.replaceChild(table, folder);
 
     return this;
 }

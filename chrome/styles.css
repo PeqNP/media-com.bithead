@@ -551,3 +551,10 @@ ul.folder {
 .folder .metadata, .folder .metadata-title {
     display: none;
 }
+
+table tr {
+    background-color: red;
+}
+table, td {
+    border: 1pt solid #000;
+}
