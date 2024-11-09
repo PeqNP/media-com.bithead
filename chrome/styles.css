@@ -552,6 +552,13 @@ ul.folder .metadata, ul.folder .metadata-title {
     display: none;
 }
 
+table tr.active {
+    display: block;
+}
+table tr.inactive {
+    display: none;
+}
+
 /* The ul.folder contains the struct of the folder tree.
  * The div.folder contains the ul.folder and displays the respective metadata for each folder
  */

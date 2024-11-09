@@ -68,18 +68,45 @@ function UIFolder(folder) {
     }
     this.metadata = getFolderMetadata(metadata);
     this.numFolders = 0;
+    // Represents the original folder element.
+    // All changes made to `folder` must be performed on this instance as the original
+    // `folder` element will be replaced later with the table that contains the folder
+    // hierarchy and the metadata.
+    this.folder = folder.cloneNode(true);
+    // Table contains hierarchy and metadata.
+    this.table = null;
     // Contains the folder hiearchy table cell. The rowspan must be updated as
     // children are added or removed from the table.
     this.folderHierarchy = null;
 
-    function hideMetadata(file) {
-        // Hide this `li` and all children under it
+    this.toggleMetadataRowVisibility = function() {
+        var rows = this.folderHierarchy.getElementsByClassName("metadata-row");
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            // There should only be one tr element with a class name with `row.id`
+            var tr = this.table.getElementsByClassName(row.id);
+            if (tr.length > 1) {
+                console.error("More than one element found with row ID (" + row.id + ") in position (" + i + "). Your folder ul.ids must be unique.");
+                continue;
+            }
+            tr = tr[0];
+            // https://coreui.io/blog/how-to-check-if-an-element-is-visible-in-javascript/#using-the-checkvisibility-method
+            // If the row is being rendered, even if off screen, display the
+            // table row.
+            if (row.checkVisibility()) {
+                if (tr.style.display != "table-row") {
+                    tr.style.display = "table-row";
+                }
+            }
+            else {
+                if (tr.style.display == "table-row") {
+                    tr.style.display = "none";
+                }
+            }
+        }
     }
 
-    function showMetadata(file) {
-    }
-
-    var files = folder.getElementsByTagName("li");
+    var files = this.folder.getElementsByTagName("li");
     // Used to determine the first "real" file within the folder. The folder tree
     // will be displayed in the first folder's row.
     var firstFileFound = false;
@@ -93,6 +120,9 @@ function UIFolder(folder) {
         if (file.id === "") {
             console.warn("File (" + file.innerHTML  +") must have an ID");
         }
+
+        // Makes it easier to find folders when toggling metadata visibility
+        file.classList.add("metadata-row");
 
         this.numFolders = this.numFolders + 1;
 
@@ -117,14 +147,17 @@ function UIFolder(folder) {
         }
 
         var tr = document.createElement("tr");
-        tr.id = file.id;
+        // Initialize default style so that it may be easily toggled later.
+        tr.style.display = "table-row";
+        tr.classList.add(file.id);
 
         // TODO: Set the width of the rows accordingly. Only the first columns should have widths
         // The metadata in this `li` is the first one. Retrieve widths and assign to the first tds
         // accordingly.
+        // TODO: The height of the cells in Safari are not equal
         if (!firstFileFound) {
             var td = document.createElement("td");
-            td.appendChild(folder.cloneNode(true));
+            td.appendChild(this.folder);
             tr.appendChild(td);
             this.folderHierarchy = td;
             firstFileFound = true;
@@ -172,19 +205,23 @@ function UIFolder(folder) {
             selectedFile = e.target;
             e.target.classList.add("active");
 
-            // Display the respective metadata for `li`s that are visible
+            this.toggleMetadataRowVisibility();
         });
     }
 
     var parentNode = folder.parentNode;
     parentNode.replaceChild(table, folder);
 
-    if (this.folderHiearchy === null) {
+    if (this.folderHierarchy === null) {
         console.warn("A folder hierarchy must exist");
     }
     else {
         this.folderHierarchy.rowSpan = this.numFolders;
     }
+
+    this.table = table;
+
+    this.toggleMetadataRowVisibility();
 
     return this;
 }
