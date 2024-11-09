@@ -552,56 +552,7 @@ ul.folder .metadata, ul.folder .metadata-title {
     display: none;
 }
 
-table tr.active {
-    display: block;
-}
-table tr.inactive {
-    display: none;
-}
-
-/* The ul.folder contains the struct of the folder tree.
- * The div.folder contains the ul.folder and displays the respective metadata for each folder
- */
-
 /* Flexbox
  * https://css-tricks.com/snippets/css/a-guide-to-flexbox/
  * https://css-tricks.com/snippets/css/complete-guide-grid/
  */
-
-/*
-@mixin flexbox() {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-}
-
-@mixin flex($values) {
-    -webkit-box-flex: $values;
-    -moz-box-flex:  $values;
-    -webkit-flex:  $values;
-    -ms-flex:  $values;
-    flex:  $values;
-}
-
-@mixin order($val) {
-    -webkit-box-ordinal-group: $val;
-    -moz-box-ordinal-group: $val;
-    -ms-flex-order: $val;
-    -webkit-order: $val;
-    order: $val;
-}
-
-div.folder {
-    @include flexbox();
-    flex-direction: row;
-}
-*/
-
-table tr {
-    background-color: red;
-}
-table, td {
-    border: 1pt solid #000;
-}

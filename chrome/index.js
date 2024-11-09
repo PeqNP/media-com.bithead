@@ -52,64 +52,11 @@ function UIFolder(folder) {
     // Previously selected file
     var selectedFile = null;
 
-    // Will contain all of the metadata information
-    var table = document.createElement("table");
-
-    // Get the metadata associated to the parent `ul` (folder)
-    var metadataTitle = folder.getElementsByClassName("metadata-title")[0];
-    if (metadataTitle === undefined) {
-        console.error("The parent folder must have an element `ul.metadata-title`");
-        return null;
-    }
-    var metadata = metadataTitle.getElementsByTagName("li");
-    if (metadata.length == 0) {
-        console.error("There must be at least one metadata value in `ul.metadata-title`");
-        return null;
-    }
-    this.metadata = getFolderMetadata(metadata);
     this.numFolders = 0;
-    // Represents the original folder element.
-    // All changes made to `folder` must be performed on this instance as the original
-    // `folder` element will be replaced later with the table that contains the folder
-    // hierarchy and the metadata.
-    this.folder = folder.cloneNode(true);
-    // Table contains hierarchy and metadata.
-    this.table = null;
-    // Contains the folder hiearchy table cell. The rowspan must be updated as
-    // children are added or removed from the table.
-    this.folderHierarchy = null;
 
-    this.toggleMetadataRowVisibility = function() {
-        var rows = this.folderHierarchy.getElementsByClassName("metadata-row");
-        for (var i = 0; i < rows.length; i++) {
-            var row = rows[i];
-            // There should only be one tr element with a class name with `row.id`
-            var tr = this.table.getElementsByClassName(row.id);
-            if (tr.length > 1) {
-                console.error("More than one element found with row ID (" + row.id + ") in position (" + i + "). Your folder ul.ids must be unique.");
-                continue;
-            }
-            tr = tr[0];
-            // https://coreui.io/blog/how-to-check-if-an-element-is-visible-in-javascript/#using-the-checkvisibility-method
-            // If the row is being rendered, even if off screen, display the
-            // table row.
-            if (row.checkVisibility()) {
-                if (tr.style.display != "table-row") {
-                    tr.style.display = "table-row";
-                }
-            }
-            else {
-                if (tr.style.display == "table-row") {
-                    tr.style.display = "none";
-                }
-            }
-        }
-    }
-
-    var files = this.folder.getElementsByTagName("li");
+    var files = folder.getElementsByTagName("li");
     // Used to determine the first "real" file within the folder. The folder tree
     // will be displayed in the first folder's row.
-    var firstFileFound = false;
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
         // We need to ignore the `li`s associated to metadata
@@ -120,9 +67,6 @@ function UIFolder(folder) {
         if (file.id === "") {
             console.warn("File (" + file.innerHTML  +") must have an ID");
         }
-
-        // Makes it easier to find folders when toggling metadata visibility
-        file.classList.add("metadata-row");
 
         this.numFolders = this.numFolders + 1;
 
@@ -146,53 +90,6 @@ function UIFolder(folder) {
             li.appendChild(span);
         }
 
-        var tr = document.createElement("tr");
-        // Initialize default style so that it may be easily toggled later.
-        tr.style.display = "table-row";
-        tr.classList.add(file.id);
-
-        // TODO: Set the width of the rows accordingly. Only the first columns should have widths
-        // The metadata in this `li` is the first one. Retrieve widths and assign to the first tds
-        // accordingly.
-        // TODO: The height of the cells in Safari are not equal
-        if (!firstFileFound) {
-            var td = document.createElement("td");
-            td.appendChild(this.folder);
-            tr.appendChild(td);
-            this.folderHierarchy = td;
-            firstFileFound = true;
-        }
-
-        // Get the corresponding metadata for the child
-        var foundMetadata = false;
-        for (var j = 0; j < file.childNodes.length; j++) {
-            if (file.childNodes[j].classList === undefined) {
-                continue;
-            }
-            if (!file.childNodes[j].classList.contains("metadata")) {
-                continue;
-            }
-            foundMetadata = true;
-            // `ul` that contains metadata
-            var data = file.childNodes[j];
-            var metadata = data.getElementsByTagName("li");
-            // The metadata must have N-1 the number of metadata from parent. The reason being
-            // is that the first metadata column is the name of the node.
-            if (metadata.length != this.metadata.length - 1) {
-                console.warn("Invalid number of metadata in li (" + span.innerHTML + ") id (" + file.id + ")");
-            }
-            for (var k = 0; k < metadata.length; k++) {
-                var td = document.createElement("td");
-                td.innerHTML = metadata[k].innerHTML;
-                tr.appendChild(td);
-            }
-        }
-        if (!foundMetadata) {
-            console.warn("Found no metadata in li (" + span.innerHTML + ") id (" + file.id + ")");
-        }
-
-        table.appendChild(tr);
-
         // Change selected li
         span.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -204,24 +101,8 @@ function UIFolder(folder) {
             }
             selectedFile = e.target;
             e.target.classList.add("active");
-
-            this.toggleMetadataRowVisibility();
         });
     }
-
-    var parentNode = folder.parentNode;
-    parentNode.replaceChild(table, folder);
-
-    if (this.folderHierarchy === null) {
-        console.warn("A folder hierarchy must exist");
-    }
-    else {
-        this.folderHierarchy.rowSpan = this.numFolders;
-    }
-
-    this.table = table;
-
-    this.toggleMetadataRowVisibility();
 
     return this;
 }
