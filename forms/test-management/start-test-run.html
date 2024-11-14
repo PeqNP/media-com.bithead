@@ -8,8 +8,11 @@
     <input type="text" name="name" placeholder="Name of your test run e.g. 2024-11-13 v1.6.0"> <span class="required">*</span>
 
     <fieldset>
-      <legend>Reverse look up test suites</legend>
-      This will add all test suites who are a parent to the test case IDs provided.
+      <legend>Add by test IDs</legend>
+      To add parent test suites for Test Case IDs, select `Add test suites by reverse lookup`. If you wish to add specific test cases to your test run, select `Add test cases only`.
+      <div>
+        <input type="radio"> Add test suites by reverse lookup <input type="radio"> Add test cases only
+      </div>
       <div>
         <input type="text" placeholder="Enter test case IDs">
         <button name="add">Add test suites</button>
