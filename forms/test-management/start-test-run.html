@@ -21,6 +21,11 @@
     <fieldset>
       <legend>Select test suites to run</legend>
       <div>
+        <!-- This doesn't need to show, or is automatically selected, if there is only one project. -->
+        <select name="project"> <span class="required">*</span>
+          <option>Select one</option>
+          <option selected>Badge</option>
+        </select>
         <select name="test-suite"> <span class="required">*</span>
           <option>Select one</option>
           <option>TS-1: Authentication</option>
