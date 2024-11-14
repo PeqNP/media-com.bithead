@@ -1,0 +1,70 @@
+<html>
+<head>
+</head>
+</html>
+<body>
+  <div>
+    Pending: 3
+    Passed: 1
+    Failed: 0
+    Skipped: 0
+  </div>
+  <div>
+    Status: 25% complete, with 3 tests remaining
+  </div>
+  <table id="test-run">
+    <thead>
+      <tr>
+        <th>Test Case</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">TS-1: Authentication</td>
+      </tr>
+      <tr>
+        <td colspan="2">Sign In</td>
+      </tr>
+      <tr class="selected">
+        <td>TC-1: User sees sign in form</td>
+        <td><button name="pass">Pass</button><button name="fail">Fail</button><button name="skip">Skip</button></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div span="header">User can see the sign in form</div>
+          <pre span="steps">
+          Given User is on "Home" page
+          When User taps on "Sign In" link
+          Then User ses the "Sign In" page
+          And User sees field to enter Username
+          And User sees field to enter Password
+          And User sees button to "Sign In"
+          </pre>
+          <div span="header">
+            Notes<br/>
+            <textarea>BUG-1234: "Sign In" button when viewing in Safari</textarea>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>TC-2: User provides invalid credentials</td>
+        <td><button name="pass">Pass</button><button name="fail">Fail</button><button name="skip">Skip</button></td>
+      </tr>
+      <tr>
+        <td>TC-3: User provides valid credentials</td>
+        <td><button name="pass">Pass</button><button name="fail">Fail</button><button name="skip">Skip</button></td>
+      </tr>
+      <tr>
+        <td>TC-4: System is down</td>
+        <td><button name="pass">Pass</button><button name="fail">Fail</button><button name="skip">Skip</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="controls">
+    <button name="cancel">Cancel</button>
+    <button name="cancel">Finish</button>
+  </div>
+</body>
+</html>

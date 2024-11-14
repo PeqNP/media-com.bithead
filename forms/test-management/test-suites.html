@@ -1,0 +1,70 @@
+<html>
+<head>
+</head>
+<script language="javascript">
+  function copy() {
+    console.log("copyied text to pasteboard");
+    // Change the icon to pasted (checkmark)
+    // Display a small message saying "Copied"?
+  }
+</script>
+</html>
+<body>
+  <button name="start-test-run">Start Test Run</button>
+  <button name="view-past-test-runs">Past Tast Runs</button>
+  <fieldset>
+    <legend>Search</legend>
+    <input type="text" name="search-term" placeholder="Search for test suite or test case">
+  </fieldset>
+
+  <button name="create-project">Create Test Suite</button>
+  <button name="create-project">Create Test Case</button>
+  <h2>Test Suites: Batch</h2>
+  <ul>
+    <li>
+      <details>
+        <summary><a href="./test-suite.html">TS-1: Authentication</a> <span class="copy" onclick="copy('TS-1: Authentication');">&#x29C9;</span></summary>
+        <ul class="test-case-groups">
+          <li>
+            <details>
+              <summary><a href="./group.html">Sign In</a> <a href="/test-case.html">Create Test Case</a></summary>
+              <ul>
+                <!-- TODO: Make it so the order of the tickets can be changed -->
+                <li><a href="./test-case.html">TC-1: User sees sign in form</a> <span class="copy" onclick="copy();">&#x29C9;</span></li>
+                <li><a href="./test-case.html">TC-2: User provides invalid credentials</a> <span class="copy" onclick="copy();">&#x29C9;</span></li>
+                <li><a href="./test-case.html">TC-3: User provides valid credentials</a> <span class="copy" onclick="copy();">&#x29C9;</span></li>
+                <li><a href="./test-case.html">TC-4: System is down</a> <span class="copy" onclick="copy();">&#x29C9;</span></li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><a href="./group.html">Create User</a> <a href="/test-case.html">Create Test Case</a></summary>
+              <ul>
+                <li>TC-5: New user sees create user form</li>
+                <li>TC-6: User fails to provide email</li>
+                <li>TC-7: User fails to provide password</li>
+                <li>TC-8: User submits all required fields</li>
+                <li>TC-9: System fails to save user</li>
+                <li>TC-10: System successfully creates user</li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details>
+        <summary><a href="./test-suite.html">TS-2: Batch Print</a> <span class="copy" onclick="copy();">&#x29C9;</span> <a href="/test-case.html">Create Test Case</a></summary>
+        <ul>
+          <li>TC-11: User sees the batch print process</li>
+          <li>TC-12: User searches for a records to print</li>
+          <li>TC-13: User prints selected records</li>
+          <li>TC-14: Records are successfully printed</li>
+          <li>TC-15: Two records fail to print</li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+</body>
+</html>

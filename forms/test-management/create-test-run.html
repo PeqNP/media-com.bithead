@@ -1,0 +1,44 @@
+<html>
+<head>
+</head>
+</html>
+<body>
+  <fieldset>
+    <legend>Test Run</legend>
+    <input type="text" name="name" placeholder="Name of your test run e.g. 2024-11-13 v1.6.0"> <span class="required">*</span>
+
+    <fieldset>
+      <legend>Reverse look up test suites</legend>
+      This will add all test suites who are a parent to the test case IDs provided.
+      <div>
+        <input type="text" placeholder="Enter test case IDs">
+        <button name="add">Add test suites</button>
+      </div>
+      <ul>
+        <li>TS-1: Authentication <a href="">Delete</a></li>
+      </ul>
+    </fieldset>
+    <fieldset>
+      <legend>Select test suites to run</legend>
+      <div>
+        <select name="test-suite"> <span class="required">*</span>
+          <option>Select one</option>
+          <option>TS-1: Authentication</option>
+          <option>TS-2: Batch Print</option>
+        </select>
+        <select name="group" disabled>
+          <option>Select one</option>
+          <option>Sign In</option>
+          <option>Create User</option>
+        </select>
+      </div>
+      <button name="create-project">Add test suite</button>
+    </fieldset>
+
+    <div>This will run 36 tests</div>
+
+    <button name="cancel">Cancel</button>
+    <button name="create-project">Start test run</button>
+  </fieldset>
+</body>
+</html>

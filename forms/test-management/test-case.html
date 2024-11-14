@@ -1,0 +1,71 @@
+<html>
+<head>
+</head>
+</html>
+<body>
+  <fieldset>
+    <legend>Test Case: TC-1</legend>
+    <input type="text" name="name" placeholder="Enter test case name" value="User sees sign in form"> <span class="required">*</span>
+    <div>
+      <select name="name"> <span class="required">*</span>
+        <option selected>TS-1: Authentication</option>
+        <option>TS-2: Batch Print</option>
+      </select>
+    </div>
+    <div>
+      <select name="group">
+        <option>Not Assigned</option>
+        <option selected>Sign In</option>
+        <option>Create User</option>
+      </select>
+    </div>
+    <div>
+      <select name="type"> <span class="required">*</span>
+        <option>Select one</option>
+        <option>Automated</option>
+        <option>Manual</option>
+      </select>
+    </div>
+
+    <div>
+      Description <span class="required">*</span><br/>
+      <textarea name="steps">Description of behavior at a high level</textarea>
+    </div>
+
+    <div>
+      Steps <span class="required">*</span><br/>
+      <textarea name="steps">Add your steps here using Gherkin</textarea>
+    </div>
+
+    <!-- Notes are designed to keep short-term information about a ticket related to bug tickets, issues with the feature, etc. -->
+    <div>
+      Notes<br/>
+      <textarea name="notes">Store information here during test runs such as the state of a feature, links to bug tickets, etc.</textarea>
+    </div>
+
+    <details open>
+      <summary>Attachments</summary>
+      <img src="https://cataas.com/cat?width=50&height=50">
+      <img src="https://cataas.com/cat?width=50&height=50">
+      <input type="file" name="upload">
+    </details>
+    <details open>
+      <summary>Links</summary>
+      <ul>
+        <li><a href="">Selinum test</a> <a href="">Edit</a> <a href="">Delete</a></li>
+      </ul>
+      <!-- When adding known system links, such as JIRA, it will automatically derive the ticket number as the name for the URL.
+           All other cases the user will need to provide the name. -->
+      <button name="add-link">Add link</button>
+    </details>
+
+    <div class="controls">
+      <button name="cancel">Cancel</button>
+      <!-- Delete visible only if record exists -->
+      <button name="delete">Delete</button>
+      <button name="save">Save</button>
+    </div>
+  </fieldset>
+
+</body>
+</html>
