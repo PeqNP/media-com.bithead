@@ -286,13 +286,7 @@ function styleOSMenus() {
             var choice = document.createElement("div");
             choice.setAttribute("class", "popup-choice");
             choice.innerHTML = option.innerHTML;
-            choice.click = option.click;
-
-            /**
-            choice.addEventListener("click", function(e) {
-                option.click();
-            });
-            */
+            choice.setAttribute("onclick", option.getAttribute("onclick"));
             choices.appendChild(choice);
         }
         // Required to display border around options
