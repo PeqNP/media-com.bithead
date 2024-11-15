@@ -672,3 +672,19 @@ ul.folder .metadata, ul.folder .metadata-title {
  * https://css-tricks.com/snippets/css/a-guide-to-flexbox/
  * https://css-tricks.com/snippets/css/complete-guide-grid/
  */
+
+/** Fieldset **/
+
+#desktop fieldset {
+  border: none;
+  border: 1pt solid #000;
+}
+
+#desktop fieldset legend {
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+  color: #000;
+  margin-left: 14pt;
+  padding-left: 5pt;
+  padding-right: 5pt;
+}
