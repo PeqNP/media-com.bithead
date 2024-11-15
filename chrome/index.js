@@ -26,7 +26,7 @@ function UIFolderMetadata(name, style) {
 }
 
 function closeMenuType(className) {
-    console.log("Closing all (" + className + ")s");
+    // console.log("Closing all (" + className + ")s");
     var containers = document.getElementsByClassName(className + "-container");
     for (var j = 0; j < containers.length; j++) {
         var container = containers[j];
@@ -34,7 +34,7 @@ function closeMenuType(className) {
         if (subContainer.classList.contains("popup-inactive")) {
             continue;
         }
-        console.log("Closing menu (" + container + ")");
+        // console.log("Closing menu (" + container + ")");
         subContainer.classList.remove("popup-active");
         subContainer.classList.add("popup-inactive");
         // Reset arrow
@@ -216,7 +216,7 @@ function stylePopupMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
-            console.log("Clicked select (" + e.target + ")");
+            // console.log("Clicked select (" + e.target + ")");
             var container = this.parentNode.getElementsByClassName("sub-container")[0];
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
@@ -307,7 +307,7 @@ function styleOSMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
-            console.log("Clicked select (" + e.target + ")");
+            // console.log("Clicked select (" + e.target + ")");
             var container = this.parentNode.getElementsByClassName("sub-container")[0];
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();

@@ -35,6 +35,21 @@ html, body {
   background-color: #ebebeb;
 }
 
+#footer {
+  position: absolute;
+  bottom: 10pt;
+  right: 10pt;
+  font-family: "Geneva";
+  font-size: 11pt;
+  color: #444;
+}
+#footer a {
+  color: #000;
+  font-weight: bold;
+}
+
+/** Window **/
+
 #desktop .window {
   border: 1pt solid #000;
   background-color: #fff;
@@ -95,10 +110,10 @@ html, body {
 }
 
 #desktop .window .metadata {
-  font-family: "FindersKeepers";
-  font-size: 22pt;
+  font-family: "Geneva";
+  font-size: 20pt;
   height: 30pt;
-  /* - right - left */
+  /* top right bottom left */
   padding: 10pt 20pt 10pt 20pt;
   border-bottom: 1pt solid #000;
 }
@@ -198,7 +213,7 @@ html, body {
   padding: 20pt;
   overflow: scroll;
   resize: both;
-  font-family: "FindersKeepers";
+  font-family: "Geneva";
   font-size: 22pt;
   scrollbar-gutter: stable;
   /* Prevents window from being resized down any further */
