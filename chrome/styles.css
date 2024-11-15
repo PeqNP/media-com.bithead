@@ -48,6 +48,40 @@ html, body {
   font-weight: bold;
 }
 
+/** Modal **/
+
+#desktop .modal {
+  border: 3pt solid #000;
+  outline: 1pt solid #000;
+  outline-offset: 2pt;
+  /* Ensures the outline does not overlap elements that are beside it */
+  margin: 2pt;
+  /* Fills in the space between border and outline */
+  box-shadow: 0pt 0pt 0pt 2pt #fff;
+  background-color: #fff;
+  position: absolute;
+  /** For testing. This is set by OS.
+  left: 10pt;
+  top: 200pt;
+  width: 200pt;
+  height: 200pt;
+  */
+}
+
+#desktop .modal .top {
+  text-align: center;
+  font-family: "ChicagoFLF";
+  font-size: 24pt;
+  font-weight: bold;
+  color: #000;
+}
+
+#desktop .modal .container {
+  padding: 20pt;
+  font-family: "Geneva";
+  font-size: 22pt;
+}
+
 /** Window **/
 
 #desktop .window {
@@ -55,8 +89,10 @@ html, body {
   background-color: #fff;
   box-shadow: 1pt 1pt 0pt 0pt #000;
   position: absolute;
+  /** For testing. This is set by OS.
   left: 10pt;
   top: 10pt;
+  */
   display: flex;
   flex-direction: column;
 }
@@ -233,7 +269,8 @@ html, body {
 #os-bar {
   display: flex;
   align-items: stretch;
-  padding: 4pt 20pt 4pt 20pt;
+  /* left padding accounts for padding already added by menu */
+  padding: 4pt 20pt 4pt 12pt;
   background-color: #fff;
   border-top-left-radius: 5pt;
   border-top-right-radius: 5pt;
