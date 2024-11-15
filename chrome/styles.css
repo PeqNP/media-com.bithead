@@ -11,12 +11,6 @@
   src: url("/chrome/FindersKeepers.ttf") format('truetype'); /* Safari, Android, iOS */
 }
 
-/** Used for: window titles */
-.medium-text {
-  font-family: "ChicagoFLF";
-  font-size: 28pt;
-}
-
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
   margin: 0pt;
   padding: 0pt;
@@ -26,6 +20,20 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 html, body {
   /* transform: scale(0.7); /* 150% scale */
   transform-origin: 0 0; /* Ensure scaling from top-left corner */
+}
+
+a {
+  font-family: "Geneva";
+  font-size: 16pt;
+  color: #222;
+}
+
+/** Used for: window titles */
+
+/* TODO: It's not necessary to do this. Move this into the respective location. */
+.medium-text {
+  font-family: "ChicagoFLF";
+  font-size: 28pt;
 }
 
 #desktop {
@@ -44,8 +52,9 @@ html, body {
   color: #444;
 }
 #footer a {
-  color: #000;
+  color: #222;
   font-weight: bold;
+  font-size: 11pt;
 }
 
 /** Modal **/
@@ -298,7 +307,7 @@ html, body {
   flex: 0 1 auto;
 }
 
-/** UI Components **/
+/** Buttons **/
 
 /* Primary: The default button option. Will activate when return key tapped. */
 
@@ -388,11 +397,25 @@ html, body {
   color: #C0C0C0;
 }
 
-/* Text input */
+/**
+ * Position controls to the bottom right of the view.
+ *
+ * This is the common location for buttons for modal / CRUD ops / etc.
+ */
+#desktop .controls {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10pt;
+  padding-bottom: 10pt;
+  gap: 10pt;
+}
+
+/** Inputs **/
 
 input[type=text], input[type=password] {
   border: 1pt solid #000;
   height: 20pt;
+  width: 100%;
   font-family: "FindersKeepers";
   font-size: 22pt;
 }
@@ -408,11 +431,6 @@ input[type=radio] {
   accent-color: #000;
 }
 
-label.radio {
-  font-family: "ChicagoFLF";
-  font-size: 12pt;
-}
-
 input[type=checkbox] {
   border: 1pt solid #000;
   border-radius: 0pt;
@@ -422,11 +440,6 @@ input[type=checkbox] {
   /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
   accent-color: #000;
   /* FIXME: It's possible to change the checkbox shape. It requires hiding the checkbox and drawing a new one using `before`. */
-}
-
-label.checkbox {
-  font-family: "ChicagoFLF";
-  font-size: 12pt;
 }
 
 /* Pop-up Menu (select) */
@@ -678,13 +691,13 @@ ul.folder .metadata, ul.folder .metadata-title {
 #desktop fieldset {
   border: none;
   border: 1pt solid #000;
+  padding: 20pt;
 }
 
 #desktop fieldset legend {
   font-family: "ChicagoFLF";
   font-size: 14pt;
   color: #000;
-  margin-left: 14pt;
   padding-left: 5pt;
   padding-right: 5pt;
 }
@@ -707,3 +720,29 @@ ul.folder .metadata, ul.folder .metadata-title {
   height: 10pt;
   background-color: #000;
 }
+
+/** Common Utility **/
+
+.center-control {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/** Form Fields **/
+
+label {
+  font-family: "Geneva";
+  font-size: 14pt;
+}
+
+.text-field.add-margin {
+  margin-top: 10pt;
+}
+.text-field label {
+  display: block;
+}
+
+.checkbox-field { }
+.radio-field { }
