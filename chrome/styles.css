@@ -688,3 +688,22 @@ ul.folder .metadata, ul.folder .metadata-title {
   padding-left: 5pt;
   padding-right: 5pt;
 }
+
+/** Progress bar **/
+
+#desktop .progress-bar {
+  /** The OS is responsible for positioning, if any. **/
+}
+#desktop .progress-bar .top {
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
+  color: #000;
+}
+#desktop .progress-bar .container {
+  border: 1pt solid #000;
+}
+#desktop .progress-bar .progress {
+  width: 10%;
+  height: 10pt;
+  background-color: #000;
+}
