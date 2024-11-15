@@ -1,6 +1,12 @@
 function initUI() {
+    styleOSMenus();
     stylePopupMenus();
     styleFolders();
+
+    /**
+     * Close all menus when user clicks outside of `select`.
+     */
+    document.addEventListener("click", closeAllMenus);
 }
 
 function styleFolders() {
@@ -17,6 +23,32 @@ function UIFolderMetadata(name, style) {
     this.name = name;
     this.style = style;
     return this;
+}
+
+function closeMenuType(className) {
+    console.log("Closing all (" + className + ")s");
+    var containers = document.getElementsByClassName(className + "-container");
+    for (var j = 0; j < containers.length; j++) {
+        var container = containers[j];
+        var subContainer = container.getElementsByClassName("sub-container")[0];
+        if (subContainer.classList.contains("popup-inactive")) {
+            continue;
+        }
+        console.log("Closing menu (" + container + ")");
+        subContainer.classList.remove("popup-active");
+        subContainer.classList.add("popup-inactive");
+        // Reset arrow
+        var choicesLabel = container.querySelector("." + className + "-choices-label");
+        choicesLabel.classList.remove("popup-arrow-active");
+    }
+}
+
+/**
+ * Close all popup menus.
+ */
+function closeAllMenus() {
+    closeMenuType("os-menu");
+    closeMenuType("popup");
 }
 
 /**
@@ -133,7 +165,7 @@ function stylePopupMenus() {
 
         // Container for all choices
         var choices = document.createElement("div");
-        choices.setAttribute("class", "popup-choices popup-inactive");
+        choices.setAttribute("class", "popup-choices");
 
         // Create choices
         // NOTE: This skips the first choice, which is used as the label for the menu.
@@ -153,10 +185,11 @@ function stylePopupMenus() {
              * Select a (new) choice.
              */
             choice.addEventListener("click", function(e) {
+                // TODO: This is broken
                 // The select element, which represents the source of truth.
-                var s = this.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
+                var s = this.parentNode.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
                 // This is the div that displays the "selected" option
-                var sibling = this.parentNode.previousSibling;
+                var sibling = this.parentNode.parentNode.previousSibling;
                 for (var z = 0; z < s.length; z++) {
                     if (s.options[z].innerHTML == this.innerHTML) {
                         s.selectedIndex = z;
@@ -164,11 +197,14 @@ function stylePopupMenus() {
                         break;
                     }
                 }
-                closeAllPopupMenus();
+                closeAllMenus();
             });
             choices.appendChild(choice);
         }
-        container.appendChild(choices);
+        var subContainer = document.createElement("div");
+        subContainer.setAttribute("class", "sub-container popup-inactive");
+        subContainer.appendChild(choices);
+        container.appendChild(subContainer);
 
         /**
          * Toggle the popup-menu's state.
@@ -181,45 +217,122 @@ function stylePopupMenus() {
          */
         choicesLabel.addEventListener("click", function(e) {
             console.log("Clicked select (" + e.target + ")");
-            var choices = this.parentNode.querySelector(".popup-choices");
-            var isSelected = choices.classList.contains("popup-active");
+            var container = this.parentNode.getElementsByClassName("sub-container")[0];
+            var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
-            closeAllPopupMenus();
+            closeAllMenus();
+            // Show menu
+            if (!isActive) {
+                container.classList.remove("popup-inactive");
+                container.classList.add("popup-active");
+                this.classList.add("popup-arrow-active");
+            }
             // User tapped on pop-up menu when it was active. This means they wish to collapse
             // (toggle) the menu's activate state.
-            if (!isSelected) {
-                choices.classList.remove("popup-inactive");
-                choices.classList.add("popup-active");
-                this.classList.add("popup-arrow-active");
+            else {
+                container.classList.remove("popup-active");
+                container.classList.add("popup-inactive");
+                this.classList.remove("popup-arrow-active");
             }
         });
     }
+}
 
-    /**
-     * Close all popup menus.
-     */
-    function closeAllPopupMenus() {
-        console.log("Closing all pop-up menus");
-        var containers = document.getElementsByClassName("popup-container");
-        for (var j = 0; j < containers.length; j++) {
-            var container = containers[j];
-            var choices = container.getElementsByClassName("popup-choices");
-            for (var i = 0; i < choices.length; i++) {
-                if (choices[i].classList.contains("popup-inactive")) {
-                    continue;
-                }
-                console.log("Closing pop-up menu (" + choices[i] + ")");
-                choices[i].classList.remove("popup-active");
-                choices[i].classList.add("popup-inactive");
+/**
+ * Style menus displayed in the OS bar.
+ */
+function styleOSMenus() {
+    // FIX: Does not select respective select menu. Probably because it has to be reselected.
+    var menus = document.getElementsByClassName("os-menu");
+    for (var i = 0; i < menus.length; i++) {
+        var selectElement = menus[i].getElementsByTagName("select")[0];
+
+        // The container is positioned absolute so that when a selection is made it overlays
+        // the content instead of pushing it down.
+        var container = document.createElement("div");
+        container.setAttribute("class", "os-menu-container");
+        menus[i].appendChild(container);
+
+        // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
+        var choicesLabel = document.createElement("div");
+        choicesLabel.setAttribute("class", "os-menu-choices-label");
+        // FIXME: This _should_ always be the `0`th element
+        choicesLabel.innerHTML = selectElement.options[selectElement.selectedIndex].innerHTML;
+        container.appendChild(choicesLabel);
+
+        // Container for all choices
+        var choices = document.createElement("div");
+        choices.setAttribute("class", "popup-choices");
+
+        // Create choices
+        // NOTE: This skips the first choice, which is used as the label for the menu.
+        for (var j = 1; j < selectElement.length; j++) {
+            var option = selectElement.options[j];
+            if (option.classList.contains("group")) {
+                var group = document.createElement("div");
+                group.setAttribute("class", "popup-choice-group");
+                choices.appendChild(group);
+                continue;
             }
-            // Reset arrow
-            var choicesLabel = container.querySelector(".popup-choices-label");
-            choicesLabel.classList.remove("popup-arrow-active");
-        }
-    }
+            var choice = document.createElement("div");
+            choice.setAttribute("class", "popup-choice");
+            choice.innerHTML = option.innerHTML;
 
-    /**
-     * Close select box if user clicks outside of select
-     */
-    document.addEventListener("click", closeAllPopupMenus);
+            /**
+             * Select a (new) choice.
+             */
+            choice.addEventListener("click", function(e) {
+                // TODO: This is broken
+                // The select element, which represents the source of truth.
+                var s = this.parentNode.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
+                // This is the div that displays the "selected" option
+                var sibling = this.parentNode.parentNode.previousSibling;
+                for (var z = 0; z < s.length; z++) {
+                    if (s.options[z].innerHTML == this.innerHTML) {
+                        s.selectedIndex = z;
+                        sibling.innerHTML = this.innerHTML;
+                        break;
+                    }
+                }
+                closeAllMenus();
+            });
+            choices.appendChild(choice);
+        }
+        // Required to display border around options
+        var subContainer = document.createElement("div");
+        subContainer.setAttribute("class", "sub-container popup-inactive");
+        // Inherit the parent's width (style)
+        subContainer.setAttribute("style", menus[i].getAttribute("style"));
+        subContainer.appendChild(choices);
+        container.appendChild(subContainer);
+
+        /**
+         * Toggle the menu's state.
+         *
+         * If the state is inactive, the menu will be displayed. If active,
+         * the menu will become hidden.
+         *
+         * NOTE: Only the first div in the container should have the click
+         * event associated to the toggle state.
+         */
+        choicesLabel.addEventListener("click", function(e) {
+            console.log("Clicked select (" + e.target + ")");
+            var container = this.parentNode.getElementsByClassName("sub-container")[0];
+            var isActive = container.classList.contains("popup-active");
+            e.stopPropagation();
+            closeAllMenus();
+            // User tapped on pop-up menu when it was active. This means they wish to collapse
+            // (toggle) the menu's activate state.
+            if (!isActive) {
+                container.classList.remove("popup-inactive");
+                container.classList.add("popup-active");
+                this.classList.add("popup-arrow-active");
+            }
+            else {
+                container.classList.remove("popup-active");
+                container.classList.add("popup-inactive");
+                this.classList.remove("popup-arrow-active");
+            }
+        });
+    }
 }

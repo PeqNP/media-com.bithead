@@ -3,189 +3,189 @@
 /* padding: top right bottom left; */
 
 @font-face {
-    font-family: "ChicagoFLF";
-    src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
+  font-family: "ChicagoFLF";
+  src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
 }
 @font-face {
-    font-family: "FindersKeepers";
-    src: url("/chrome/FindersKeepers.ttf") format('truetype'); /* Safari, Android, iOS */
+  font-family: "FindersKeepers";
+  src: url("/chrome/FindersKeepers.ttf") format('truetype'); /* Safari, Android, iOS */
 }
 
 /** Used for: window titles */
 .medium-text {
-    font-family: "ChicagoFLF";
-    font-size: 28pt;
+  font-family: "ChicagoFLF";
+  font-size: 28pt;
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
-    margin: 0pt;
-    padding: 0pt;
-    border: 0pt;
+  margin: 0pt;
+  padding: 0pt;
+  border: 0pt;
 }
 
 html, body {
-    /* transform: scale(0.7); /* 150% scale */
-    transform-origin: 0 0; /* Ensure scaling from top-left corner */
+  /* transform: scale(0.7); /* 150% scale */
+  transform-origin: 0 0; /* Ensure scaling from top-left corner */
 }
 
 #desktop {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background-color: #ebebeb;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #ebebeb;
 }
 
 #desktop .window {
-    border: 1pt solid #000;
-    background-color: #fff;
-    box-shadow: 1pt 1pt 0pt 0pt #000;
-    position: absolute;
-    left: 10pt;
-    top: 10pt;
-    display: flex;
-    flex-direction: column;
+  border: 1pt solid #000;
+  background-color: #fff;
+  box-shadow: 1pt 1pt 0pt 0pt #000;
+  position: absolute;
+  left: 10pt;
+  top: 10pt;
+  display: flex;
+  flex-direction: column;
 }
 
 #desktop .window .top {
-    height: 36pt;
-    display: -webkit-flex;
-    display: flex;
-    border-bottom: 1pt solid #000;
-    background-position: center;
-    background-image: url("/chrome/window-shade.svg");
-    background-repeat: repeat-x;
-    flex-shrink: 0;
+  height: 36pt;
+  display: -webkit-flex;
+  display: flex;
+  border-bottom: 1pt solid #000;
+  background-position: center;
+  background-image: url("/chrome/window-shade.svg");
+  background-repeat: repeat-x;
+  flex-shrink: 0;
 }
 
 #desktop .window .close-button {
-    top: 3pt;
-    left: 10pt;
-    width: 30pt;
-    height: 30pt;
-    background-image: url("/chrome/close-button.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    position: relative;
+  top: 3pt;
+  left: 10pt;
+  width: 30pt;
+  height: 30pt;
+  background-image: url("/chrome/close-button.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 }
 
 #desktop .window .title {
-    height: 30pt;
-    -webkit-flex: 1;
-    flex: 1;
-    position: relative;
-    text-align: center;
+  height: 30pt;
+  -webkit-flex: 1;
+  flex: 1;
+  position: relative;
+  text-align: center;
 }
 
 #desktop .window .title .medium-text {
-    background-color: #fff;
-    display: inline-block;
-    /* left and right padding */
-    padding: 0pt 10pt 0pt 10pt;
+  background-color: #fff;
+  display: inline-block;
+  /* left and right padding */
+  padding: 0pt 10pt 0pt 10pt;
 }
 
 #desktop .window .collapse-button {
-    top: 3pt;
-    right: 10pt;
-    width: 30pt;
-    height: 30pt;
-    background-image: url("/chrome/collapse-button.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    position: relative;
+  top: 3pt;
+  right: 10pt;
+  width: 30pt;
+  height: 30pt;
+  background-image: url("/chrome/collapse-button.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 }
 
 #desktop .window .metadata {
-    font-family: "FindersKeepers";
-    font-size: 22pt;
-    height: 30pt;
-    /* - right - left */
-    padding: 10pt 20pt 10pt 20pt;
-    border-bottom: 1pt solid #000;
+  font-family: "FindersKeepers";
+  font-size: 22pt;
+  height: 30pt;
+  /* - right - left */
+  padding: 10pt 20pt 10pt 20pt;
+  border-bottom: 1pt solid #000;
 }
 
 #desktop .window .metadata-bottom {
-    height: 20pt;
-    border-bottom: 1pt solid #000;
+  height: 20pt;
+  border-bottom: 1pt solid #000;
 }
 
 /** Scroll Bar **/
 
 ::-webkit-scrollbar {
-    width: 50pt;
-    height: 50pt;
+  width: 50pt;
+  height: 50pt;
 }
 ::-webkit-scrollbar-thumb {
-    height: 50pt;
-    background-color: #fff;
-    border: 1pt solid #000;
+  height: 50pt;
+  background-color: #fff;
+  border: 1pt solid #000;
 }
 ::-webkit-scrollbar-track {
-    background-color: #ededed;
+  background-color: #ededed;
 }
 /* Part of the track not covered by thumb */
 ::-webkit-scrollbar-track-piece {
 }
 ::-webkit-scrollbar-track:horizontal {
-    border-top: 1pt solid #000;
+  border-top: 1pt solid #000;
 }
 ::-webkit-scrollbar-track:vertical {
-    border-left: 1pt solid #000;
+  border-left: 1pt solid #000;
 }
 /* Where the two scrollbars meet */
 ::-webkit-scrollbar-corner {
-    /* Add corner image */
+  /* Add corner image */
 }
 ::-webkit-scrollbar-button {
-    background-color: #fff;
-    display: block;
-    border-bottom: 1pt solid #000;
-    height: 50pt;
-    width: 50pt;
+  background-color: #fff;
+  display: block;
+  border-bottom: 1pt solid #000;
+  height: 50pt;
+  width: 50pt;
 }
 ::-webkit-scrollbar-button:vertical:start {
-    background-image: url("/chrome/up-arrow.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    border-left: 1pt solid #000;
+  background-image: url("/chrome/up-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  border-left: 1pt solid #000;
 }
 ::-webkit-scrollbar-button:vertical:end {
-    background-image: url("/chrome/down-arrow.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    border-top: 1pt solid #000;
-    border-left: 1pt solid #000;
+  background-image: url("/chrome/down-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  border-top: 1pt solid #000;
+  border-left: 1pt solid #000;
 }
 ::-webkit-scrollbar-button:horizontal:start {
-    background-image: url("/chrome/left-arrow.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    border-top: 1pt solid #000;
-    border-right: 1pt solid #000;
-    border-bottom: 0pt;
+  background-image: url("/chrome/left-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  border-top: 1pt solid #000;
+  border-right: 1pt solid #000;
+  border-bottom: 0pt;
 }
 ::-webkit-scrollbar-button:horizontal:end {
-    background-image: url("/chrome/right-arrow.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    border-top: 1pt solid #000;
-    border-left: 1pt solid #000;
-    border-right: 1pt solid #000;
-    border-bottom: 0pt;
+  background-image: url("/chrome/right-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  border-top: 1pt solid #000;
+  border-left: 1pt solid #000;
+  border-right: 1pt solid #000;
+  border-bottom: 0pt;
 }
 ::-webkit-resizer {
-    background-image: url("/chrome/scrollbar-resize-button.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    /*
-    border-top: 1pt solid #000;
-    border-left: 1pt solid #000;*/
+  background-image: url("/chrome/scrollbar-resize-button.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  /*
+  border-top: 1pt solid #000;
+  border-left: 1pt solid #000;*/
 }
 /* Prevent showing double buttons */
 ::-webkit-scrollbar-button:vertical:start:increment,
 ::-webkit-scrollbar-button:vertical:end:decrement,
 ::-webkit-scrollbar-button:horizontal:start:increment,
 ::-webkit-scrollbar-button:horizontal:end:decrement {
-    display: none;
+  display: none;
 }
 
 /** Container **/
@@ -195,18 +195,18 @@ html, body {
  */
 
 #desktop .window .container {
-    padding: 20pt;
-    overflow: scroll;
-    resize: both;
-    font-family: "FindersKeepers";
-    font-size: 22pt;
-    scrollbar-gutter: stable;
-    /* Prevents window from being resized down any further */
-    min-width: 360pt;
-    min-height: 250pt;
-    /* Setting the initial width and height prevents the window from being the size of the parent's viewport */
-    width: 360pt;
-    height: 250pt;
+  padding: 20pt;
+  overflow: scroll;
+  resize: both;
+  font-family: "FindersKeepers";
+  font-size: 22pt;
+  scrollbar-gutter: stable;
+  /* Prevents window from being resized down any further */
+  min-width: 360pt;
+  min-height: 250pt;
+  /* Setting the initial width and height prevents the window from being the size of the parent's viewport */
+  width: 360pt;
+  height: 250pt;
 }
 
 /** UI Components **/
@@ -214,158 +214,179 @@ html, body {
 /* Primary: The default button option. Will activate when return key tapped. */
 
 #desktop button.primary {
-    border: 1pt solid #000;
-    border-radius: 4pt;
-    outline: 2pt solid #000;
-    outline-offset: 1pt;
-    /* Ensures the outline does not overlap elements that are beside it */
-    margin: 2pt;
-    color: #000;
-    background-color: #fff;
-    height: 24pt;
-    font-family: "ChicagoFLF";
-    font-size: 14pt;
-    padding: 0pt 20pt 0pt 20pt;
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  outline: 2pt solid #000;
+  outline-offset: 1pt;
+  /* Ensures the outline does not overlap elements that are beside it */
+  margin: 2pt;
+  color: #000;
+  background-color: #fff;
+  height: 24pt;
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+  padding: 0pt 20pt 0pt 20pt;
 }
 
 #desktop button.primary:hover {
-    background-color: #000;
-    color: #fff;
+  background-color: #000;
+  color: #fff;
 }
 
 /* Secondary: Same size as primary w/o double border */
 
 #desktop button.secondary {
-    border: 1pt solid #000;
-    border-radius: 4pt;
-    height: 24pt;
-    color: #000;
-    background-color: #fff;
-    font-family: "ChicagoFLF";
-    font-size: 14pt;
-    padding: 0pt 20pt 0pt 20pt;
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 24pt;
+  color: #000;
+  background-color: #fff;
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+  padding: 0pt 20pt 0pt 20pt;
 }
 
 #desktop button.secondary:hover {
-    background-color: #000;
-    color: #fff;
+  background-color: #000;
+  color: #fff;
 }
 
 #desktop button.secondary:disabled {
-    border: 1pt solid #000;
-    border-radius: 4pt;
-    height: 24pt;
-    color: #C0C0C0;
-    font-family: "ChicagoFLF";
-    font-size: 14pt;
-    padding: 0pt 20pt 0pt 20pt;
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 24pt;
+  color: #C0C0C0;
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+  padding: 0pt 20pt 0pt 20pt;
 }
 
 #desktop button.secondary:disabled:hover {
-    background-color: #fff;
-    color: #C0C0C0;
+  background-color: #fff;
+  color: #C0C0C0;
 }
 
 /* Tertiary: thinner and smaller */
 
 #desktop button.tertiary {
-    border: 1pt solid #000;
-    border-radius: 4pt;
-    height: 18pt;
-    color: #000;
-    background-color: #fff;
-    font-family: "ChicagoFLF";
-    font-size: 9pt;
-    padding: 0pt 18pt 0pt 18pt;
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 18pt;
+  color: #000;
+  background-color: #fff;
+  font-family: "ChicagoFLF";
+  font-size: 9pt;
+  padding: 0pt 18pt 0pt 18pt;
 }
 
 #desktop button.tertiary:hover {
-    background-color: #000;
-    color: #fff;
+  background-color: #000;
+  color: #fff;
 }
 
 #desktop button.tertiary:disabled {
-    border: 1pt solid #000;
-    border-radius: 4pt;
-    height: 18pt;
-    color: #C0C0C0;
-    font-family: "ChicagoFLF";
-    font-size: 9pt;
-    padding: 0pt 18pt 0pt 18pt;
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 18pt;
+  color: #C0C0C0;
+  font-family: "ChicagoFLF";
+  font-size: 9pt;
+  padding: 0pt 18pt 0pt 18pt;
 }
 
 #desktop button.tertiary:disabled:hover {
-    background-color: #fff;
-    color: #C0C0C0;
+  background-color: #fff;
+  color: #C0C0C0;
 }
 
 /* Text input */
 
 input[type=text], input[type=password] {
-    border: 1pt solid #000;
-    height: 20pt;
-    font-family: "FindersKeepers";
-    font-size: 22pt;
+  border: 1pt solid #000;
+  height: 20pt;
+  font-family: "FindersKeepers";
+  font-size: 22pt;
 }
 
 /* Radio */
 
 input[type=radio] {
-    border: 1pt solid #000;
-    height: 12pt;
-    width: 12pt;
-    transform: translateY(1pt);
-    /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
-    accent-color: #000;
+  border: 1pt solid #000;
+  height: 12pt;
+  width: 12pt;
+  transform: translateY(1pt);
+  /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
+  accent-color: #000;
 }
 
 label.radio {
-    font-family: "ChicagoFLF";
-    font-size: 12pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
 }
 
 input[type=checkbox] {
-    border: 1pt solid #000;
-    border-radius: 0pt;
-    height: 12pt;
-    width: 12pt;
-    transform: translate(1pt, 1pt);
-    /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
-    accent-color: #000;
-    /* FIXME: It's possible to change the checkbox shape. It requires hiding the checkbox and drawing a new one using `before`. */
+  border: 1pt solid #000;
+  border-radius: 0pt;
+  height: 12pt;
+  width: 12pt;
+  transform: translate(1pt, 1pt);
+  /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
+  accent-color: #000;
+  /* FIXME: It's possible to change the checkbox shape. It requires hiding the checkbox and drawing a new one using `before`. */
 }
 
 label.checkbox {
-    font-family: "ChicagoFLF";
-    font-size: 12pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
 }
 
 /* Pop-up Menu (select) */
 
+.os-menu,
 .popup-menu {
-    position: relative;
-    height: 13pt;
+  position: relative;
+  height: 13pt;
 }
 
+.os-menu select,
 .popup-menu select {
-    display: none; /* Hide original select element */
+  display: none; /* Hide original select element */
 }
 
 /**
  * In order for the content of the menu to display over other content, it must
  * be positioned absolutely inside another container that is positioned relative.
  */
+.os-menu-container,
 .popup-container {
-    position: absolute;
-    top: 0pt;
-    left: 0pt;
-    font-family: "ChicagoFLF";
-    font-size: 12pt;
-    border: 1pt solid #000;
+  position: absolute;
+  top: 0pt;
+  left: 0pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
+}
+.popup-container {
+  border: 1pt solid #000;
 }
 
 /* This is the first option in select */
+.os-menu-choices-label {
+  width: fit-content;
+  padding: 6pt 10pt 6pt 10pt;
+}
 .popup-choices-label { }
+
+.os-menu-choices-label.popup-arrow-active {
+  background-color: #000;
+  color: #fff;
+}
+.os-menu .sub-container {
+  border: 1pt solid #000;
+}
+.os-menu .sub-container,
+.popup-container .sub-container {
+  position: relative;
+}
 
 /* Point arrow down by default */
 .popup-choices-label:after {
@@ -388,168 +409,161 @@ label.checkbox {
 .popup-choices { }
 
 .popup-choice, .popup-choices-label {
-    background-color: #fff;
-    color: #000;
-    padding: 4pt 8pt;
-    border: 1pt solid transparent;
-    cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  padding: 4pt 8pt;
+  border: 1pt solid transparent;
+  cursor: pointer;
 }
 
-.popup-choice {
-    /* Why this needs to be set, I don't know. `absolute` has all elements
-     * overlay each other. `relative` ensures they stay in their respective
-     * position and above elements that are "below" them.
-     */
-    position: relative;
-    /* Inherit parent's z-index. This is required in order for element to be placed above others. */
-    z-index: inherit;
-}
+/* Represents an individual choice in the menu */
+.popup-choice { }
 
 .popup-choice:hover {
-    background-color: #000;
-    color: #fff;
+  background-color: #000;
+  color: #fff;
 }
 
 .popup-selected-choice {
 }
 
 .popup-choice-group {
-    height: 1pt;
-    background-color: #aaa;
+  height: 1pt;
+  background-color: #aaa;
 }
 
 /* Show the popup menu above all other elements */
 .popup-active {
-    z-index: 1000;
+  z-index: 1000;
 }
 
 /* Hide select options when closed */
 .popup-inactive {
-    z-index: 0;
-    display: none;
+  z-index: 0;
+  display: none;
 }
 
 /**
  * Example using variables in CSS
  *
 .rounded-corner {
-    --radius: 2pt;
+  --radius: 2pt;
 }
 
 select {
-    border-radius: var(--radius);
+  border-radius: var(--radius);
 }
 
 <select class="rounded-corner">
-    ...
+  ...
 </select>
 */
 
 /* Folders */
 
 ul.folder {
-    /* This ensures the folder is directly lined up within its parent */
-    margin-left: -20pt;
+  /* This ensures the folder is directly lined up within its parent */
+  margin-left: -20pt;
 }
 
 ul.folder {
-    --spacing: 2rem;
-    --radius: 7pt;
+  --spacing: 2rem;
+  --radius: 7pt;
 }
 
 ul.folder li {
-    display: block;
-    position: relative;
-    padding-top: 3pt;
-    padding-left: calc(2 * var(--spacing) - var(--radius) - 4pt);
-    padding-bottom: 2pt;
-    font-family: "FindersKeepers";
-    font-size: 22pt;
-    cursor: pointer;
+  display: block;
+  position: relative;
+  padding-top: 3pt;
+  padding-left: calc(2 * var(--spacing) - var(--radius) - 4pt);
+  padding-bottom: 2pt;
+  font-family: "FindersKeepers";
+  font-size: 22pt;
+  cursor: pointer;
 }
 
 ul.folder ul {
-    padding-left: 0pt;
+  padding-left: 0pt;
 }
 
 ul.folder ul li:last-child {
-    border-color: transparent;
+  border-color: transparent;
 }
 
 ul.folder ul li::before {
-    content: '';
-    display: block;
-    position: absolute;
-    /* This must be set to 10pt or the first option in the list will not be tappable. */
-    top: 10pt;
-    left: 0pt;
-    width: calc(var(--spacing) + 2pt);
-    height: calc(var(--spacing) + 1pt);
+  content: '';
+  display: block;
+  position: absolute;
+  /* This must be set to 10pt or the first option in the list will not be tappable. */
+  top: 10pt;
+  left: 0pt;
+  width: calc(var(--spacing) + 2pt);
+  height: calc(var(--spacing) + 1pt);
 }
 
 ul.folder summary {
-    display: block;
-    cursor: pointer;
+  display: block;
+  cursor: pointer;
 }
 
 ul.folder summary::marker,
 ul.folder summary::-webkit-details-marker {
-    display: none;
+  display: none;
 }
 
 ul.folder summary:focus {
-    outline: none;
+  outline: none;
 }
 
 ul.folder summary:focus-visible { }
 
 ul.folder li::after,
 ul.folder summary::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: calc(var(--spacing) / 2 - var(--radius));
-    left: 20pt;
-    width: calc(2 * var(--radius));
-    height: calc(2 * var(--radius));
+  content: '';
+  display: block;
+  position: absolute;
+  top: calc(var(--spacing) / 2 - var(--radius));
+  left: 20pt;
+  width: calc(2 * var(--radius));
+  height: calc(2 * var(--radius));
 }
 
 ul.folder summary::before {
-    z-index: 1;
-    background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
+  z-index: 1;
+  background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
 }
 
 ul.folder details[open] > summary::before {
-    top: 10pt;
-    background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
+  top: 10pt;
+  background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
 }
 
 ul.folder li.group::before {
-    width: 20pt;
-    top: 5pt;
-    left: 12pt;
-    background: transparent url('/chrome/folder.svg') 0pt 0pt no-repeat;
+  width: 20pt;
+  top: 5pt;
+  left: 12pt;
+  background: transparent url('/chrome/folder.svg') 0pt 0pt no-repeat;
 }
 
 ul.folder li.server::before {
-    width: 20pt;
-    top: 11pt;
-    left: 12pt;
-    background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
+  width: 20pt;
+  top: 11pt;
+  left: 12pt;
+  background: transparent url('/chrome/server.svg') 0pt 0pt no-repeat;
 }
 
 ul.folder li span {
-    padding: 0pt 1pt 0pt 2pt;
+  padding: 0pt 1pt 0pt 2pt;
 }
 
 ul.folder li span.active {
-    background-color: #000;
-    color: #fff;
+  background-color: #000;
+  color: #fff;
 }
 
 /* Folder metadata */
 ul.folder .metadata, ul.folder .metadata-title {
-    display: none;
+  display: none;
 }
 
 /* Flexbox
