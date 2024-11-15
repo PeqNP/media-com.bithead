@@ -216,11 +216,34 @@ html, body {
  * with the OS.
  **/
 #os-bar {
-  height: 20pt;
-  padding: 2pt 20pt 2pt 20pt;
+  display: flex;
+  align-items: stretch;
+  padding: 4pt 20pt 4pt 20pt;
   background-color: #fff;
   border-top-left-radius: 5pt;
   border-top-right-radius: 5pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
+}
+
+/* All images must be the same size */
+#os-bar img {
+  width: 14pt;
+  height: 14pt;
+}
+/* Displays all menus for OS or the active application */
+#menus {
+  flex-grow: 1;
+  display: flex;
+}
+/* Displays list of application icons that are running in the background */
+#applications {
+  flex: 0 1 auto;
+  width: 40pt;
+}
+/* System clock */
+#clock {
+  flex: 0 1 auto;
 }
 
 /** UI Components **/
@@ -359,6 +382,11 @@ label.checkbox {
 .os-menu,
 .popup-menu {
   position: relative;
+}
+.os-menu {
+  flex: 0 1 auto;
+}
+.popup-menu {
   height: 13pt;
 }
 
@@ -368,25 +396,30 @@ label.checkbox {
 }
 
 /**
+ * The containers contain the label and the options for the select.
+ *
  * In order for the content of the menu to display over other content, it must
- * be positioned absolutely inside another container that is positioned relative.
+ * be positioned absolutely inside another container that it is positioned
+ * relative to.
  */
 .os-menu-container,
 .popup-container {
-  position: absolute;
-  top: 0pt;
-  left: 0pt;
   font-family: "ChicagoFLF";
   font-size: 12pt;
 }
+.os-menu-container {
+}
 .popup-container {
+  position: absolute;
+  left: 0pt;
+  top: 0pt;
   border: 1pt solid #000;
 }
 
 /* This is the first option in select */
 .os-menu-choices-label {
   width: fit-content;
-  padding: 6pt 10pt 6pt 10pt;
+  padding: 2pt 10pt 2pt 10pt;
 }
 .popup-choices-label { }
 
@@ -395,10 +428,12 @@ label.checkbox {
   color: #fff;
 }
 .os-menu .sub-container {
+  position: absolute;
+  left: 0pt;
+  top: 17pt;
   border: 1pt solid #000;
   box-shadow: 1pt 1pt 0pt 0pt #000;
 }
-.os-menu .sub-container,
 .popup-container .sub-container {
   position: relative;
 }

@@ -3,15 +3,48 @@
   <head>
     <title>Network</title>
     <script type="text/javascript" src="/chrome/index.js"></script>
+    <script type="text/javascript" src="/chrome/os.js"></script>
     <link rel="stylesheet" type="text/css" href="/chrome/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script language="javascript">
-
+      function startOS() {
+        initUI();
+        window.os = OS();
+      }
     </script>
   </head>
-  <body onload="initUI();">
+  <body onload="startOS();">
     <div id="desktop">
-      <div id="os-bar"></div>
+      <div id="os-bar">
+        <div id="menus">
+          <div class="os-menu" style="width: 200pt;"> <!-- Select -->
+            <select>
+              <option>img:/chrome/logo.png</option>
+              <option onclick="window.os.showVersion();">About Bithead OS</option>
+              <option class="group"></option>
+              <option onclick="window.os.logOut();">Log Out</option>
+            </select>
+          </div>
+          <div class="os-menu" style="width: 200pt;"> <!-- Select -->
+            <select>
+              <option>File</option>
+              <option>Open</option>
+              <option>Save</option>
+              <option class="group"></option>
+              <option>Print</option>
+            </select>
+          </div>
+        </div>
+        <div id="applications">
+          <div class="os-menu" style="width: 200pt;"> <!-- Select -->
+            <select>
+              <option>img:/chrome/logo.png</option>
+              <option>Status: Healthy</option>
+            </select>
+          </div>
+        </div>
+        <div id="clock">Fri Nov 15 8:07 AM</div>
+      </div>
       <div> <!-- Buttons -->
         <button type="submit" class="secondary">Submit</button>
         <button type="submit" class="secondary" disabled>Submit</button>
@@ -25,14 +58,6 @@
         <label class="radio"><input type="radio" name="serialize" value="xml">XML</label><br/>
         <label class="radio"><input type="radio" name="serialize" value="json">JSON</label><br/>
         <label class="checkbox"><input type="checkbox" name="color" value="red">Red</label>
-      </div>
-      <div class="os-menu" style="width: 200pt;"> <!-- Select -->
-        <select>
-          <option>Menu</option>
-          <option value="opt1">About Bithead OS</option>
-          <option class="group"></option>
-          <option value="opt2">Log Out</option>
-        </select>
       </div>
       <br/>
       <br/>

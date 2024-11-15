@@ -159,6 +159,7 @@ function stylePopupMenus() {
         choicesLabel.setAttribute("class", "popup-choices-label");
         // Inherit the parent's width (style)
         choicesLabel.setAttribute("style", menus[i].getAttribute("style"));
+        menus[i].removeAttribute("style");
         // FIXME: This _should_ always be the `0`th element
         choicesLabel.innerHTML = selectElement.options[selectElement.selectedIndex].innerHTML;
         container.appendChild(choicesLabel);
@@ -257,7 +258,15 @@ function styleOSMenus() {
         var choicesLabel = document.createElement("div");
         choicesLabel.setAttribute("class", "os-menu-choices-label");
         // FIXME: This _should_ always be the `0`th element
-        choicesLabel.innerHTML = selectElement.options[selectElement.selectedIndex].innerHTML;
+        var label = selectElement.options[selectElement.selectedIndex].innerHTML;
+        if (label.startsWith("img:")) {
+            var img = document.createElement("img");
+            img.src = label.split(":")[1];
+            choicesLabel.appendChild(img);
+        }
+        else {
+            choicesLabel.innerHTML = label;
+        }
         container.appendChild(choicesLabel);
 
         // Container for all choices
@@ -277,25 +286,13 @@ function styleOSMenus() {
             var choice = document.createElement("div");
             choice.setAttribute("class", "popup-choice");
             choice.innerHTML = option.innerHTML;
+            choice.click = option.click;
 
             /**
-             * Select a (new) choice.
-             */
             choice.addEventListener("click", function(e) {
-                // TODO: This is broken
-                // The select element, which represents the source of truth.
-                var s = this.parentNode.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
-                // This is the div that displays the "selected" option
-                var sibling = this.parentNode.parentNode.previousSibling;
-                for (var z = 0; z < s.length; z++) {
-                    if (s.options[z].innerHTML == this.innerHTML) {
-                        s.selectedIndex = z;
-                        sibling.innerHTML = this.innerHTML;
-                        break;
-                    }
-                }
-                closeAllMenus();
+                option.click();
             });
+            */
             choices.appendChild(choice);
         }
         // Required to display border around options
@@ -303,6 +300,7 @@ function styleOSMenus() {
         subContainer.setAttribute("class", "sub-container popup-inactive");
         // Inherit the parent's width (style)
         subContainer.setAttribute("style", menus[i].getAttribute("style"));
+        menus[i].removeAttribute("style");
         subContainer.appendChild(choices);
         container.appendChild(subContainer);
 
