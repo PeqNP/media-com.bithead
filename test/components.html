@@ -7,22 +7,19 @@
     <link rel="stylesheet" type="text/css" href="/chrome/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <script language="javascript">
-      function startOS() {
-        initUI();
-        window.os = OS();
-      }
+      var os = OS();
     </script>
   </head>
-  <body onload="startOS();">
+  <body onload="initUI();">
     <div id="desktop">
       <div id="os-bar">
         <div id="menus">
           <div class="os-menu" style="width: 200pt;"> <!-- Select -->
             <select>
               <option>img:/chrome/logo.png</option>
-              <option onclick="window.os.showVersion();">About Bithead OS</option>
+              <option onclick="os.showVersion();">About Bithead OS</option>
               <option class="group"></option>
-              <option onclick="window.os.logOut();">Log Out</option>
+              <option onclick="os.logOut();">Log Out</option>
             </select>
           </div>
           <div class="os-menu" style="width: 200pt;"> <!-- Select -->

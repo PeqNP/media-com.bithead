@@ -198,7 +198,6 @@ function stylePopupMenus() {
                         break;
                     }
                 }
-                closeAllMenus();
             });
             choices.appendChild(choice);
         }
