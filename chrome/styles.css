@@ -416,6 +416,7 @@ a {
   padding-top: 10pt;
   padding-bottom: 10pt;
   gap: 10pt;
+  align-items: center;
 }
 
 /**
