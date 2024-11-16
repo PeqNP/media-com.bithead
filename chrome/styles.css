@@ -33,7 +33,7 @@ a {
 /* TODO: It's not necessary to do this. Move this into the respective location. */
 .medium-text {
   font-family: "ChicagoFLF";
-  font-size: 18pt;
+  font-size: 14pt;
 }
 
 #desktop {
@@ -112,30 +112,31 @@ a {
 }
 
 #desktop .window .top {
-  height: 24pt;
+  height: 22pt;
   display: -webkit-flex;
   display: flex;
   border-bottom: 1pt solid #000;
   background-position: center;
   /* TODO: The shade is too big */
   background-image: url("/chrome/window-shade.svg");
+  background-size: auto 15pt;
   background-repeat: repeat-x;
   flex-shrink: 0;
 }
 
 #desktop .window .close-button {
+  position: relative;
   top: 3pt;
   left: 10pt;
-  width: 30pt;
-  height: 30pt;
+  width: 17pt;
+  height: 17pt;
   background-image: url("/chrome/close-button.svg");
   background-position: center;
   background-repeat: no-repeat;
-  position: relative;
 }
 
 #desktop .window .title {
-  height: 24pt;
+  height: 22pt;
   -webkit-flex: 1;
   flex: 1;
   position: relative;
@@ -146,14 +147,14 @@ a {
   background-color: #fff;
   display: inline-block;
   /* left and right padding */
-  padding: 0pt 10pt 0pt 10pt;
+  padding: 1pt 10pt 0pt 10pt;
 }
 
 #desktop .window .collapse-button {
   top: 3pt;
   right: 10pt;
-  width: 24pt;
-  height: 30pt;
+  width: 17pt;
+  height: 17pt;
   background-image: url("/chrome/collapse-button.svg");
   background-position: center;
   background-repeat: no-repeat;
@@ -162,15 +163,15 @@ a {
 
 #desktop .window .metadata {
   font-family: "Geneva";
-  font-size: 20pt;
-  height: 24pt;
+  font-size: 10pt;
+  height: 14pt;
   /* top right bottom left */
   padding: 5pt 10pt 5pt 10pt;
   border-bottom: 1pt solid #000;
 }
 
 #desktop .window .metadata-bottom {
-  height: 10pt;
+  height: 2pt;
   border-bottom: 1pt solid #000;
 }
 
