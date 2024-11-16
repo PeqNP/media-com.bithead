@@ -55,14 +55,48 @@ function OS() {
     }
 
     /**
+     * Get the current time formatted in DDD MMM dd HH:MM AA.
+     *
+     * e.g. Fri Nov 15 9:24 PM
+     */
+    function getCurrentFormattedTime() {
+        const date = new Date();
+
+        // Get parts of the date
+        const day = date.toLocaleString('default', { weekday: 'short' });  // Short day name
+        const month = date.toLocaleString('default', { month: 'short' });  // Short month name
+        const dayOfMonth = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+
+        // Determine AM or PM
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert to 12-hour format
+        let formattedHours = hours % 12 || 12;
+
+        // 9:23 PM
+        const time = `${formattedHours}:${minutes < 10 ? '0' + minutes : minutes} ${ampm}`;
+
+        // e.g. Fri Nov 15 9:23 PM
+        return `${day} ${month} ${dayOfMonth} ${time}`;
+    }
+
+    /**
      * Update the clocks time.
      */
     this.updateClock = function() {
-        // TODO: Get time
-        // TODO: Format time
-        var time = "Fri Nov 15 10:23 AM";
+        var time = getCurrentFormattedTime(); // "Fri Nov 15 10:23 AM";
         var option = document.getElementById("clock");
         option.innerHTML = time;
+    }
+
+    /**
+     * Start updating clock.
+     */
+    this.startClock = function() {
+        this.updateClock();
+        setInterval(this.updateClock, 2000);
     }
 
     // TODO: updateClock every second
