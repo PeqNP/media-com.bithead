@@ -1,3 +1,14 @@
+
+/**
+ * Bithead OS
+ *
+ * Provides system-level features
+ * - OS bar menus
+ * - Signing in and out
+ * - App and window management
+ * - Making network requests
+ * - Clock
+ */
 function OS() {
 
     // Displayed in OS menu, settings, etc.
@@ -36,6 +47,10 @@ function OS() {
 
         // Update the OS bar
         var option = document.getElementById("log-out-of-system");
+        if (option === null) {
+            console.warn("Signed in but not showing OS bar");
+            return;
+        }
         option.innerHTML = "Log out " + username + "...";
     }
 
@@ -88,6 +103,10 @@ function OS() {
     this.updateClock = function() {
         var time = getCurrentFormattedTime(); // "Fri Nov 15 10:23 AM";
         var option = document.getElementById("clock");
+        if (option === null) {
+            console.warn("Attemping to update clock when OS bar is not visible.");
+            return;
+        }
         option.innerHTML = time;
     }
 
@@ -99,7 +118,36 @@ function OS() {
         setInterval(this.updateClock, 2000);
     }
 
-    // TODO: updateClock every second
+    /**
+     * Close a (modal) window.
+     *
+     * Removes the window from the view hierarchy.
+     *
+     * - Parameter win: The window to close.
+     */
+    function closeWindow(win) {
+        const parent = win.parentNode;
+        parent.removeChild(win);
+    }
+
+    /**
+     * Show an error modal above all other content.
+     */
+    this.showErrorModal = function(error) {
+        var fragment = document.getElementById("error-modal");
+        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var message = modal.querySelector("p.message");
+        message.innerHTML = error;
+        var button = modal.querySelector("button.default");
+        button.addEventListener("click", function() {
+            closeWindow(modal);
+        });
+        // Center modal in the middle of the screen.
+        modal.classList.add("center-control");
+        // Display modal in desktop container
+        var desktop = document.getElementById("desktop-container");
+        desktop.appendChild(modal);
+    }
 
     return this;
 }

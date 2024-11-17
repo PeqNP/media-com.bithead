@@ -28,12 +28,9 @@ a {
   color: #222;
 }
 
-/** Used for: window titles */
-
-/* TODO: It's not necessary to do this. Move this into the respective location. */
-.medium-text {
-  font-family: "ChicagoFLF";
-  font-size: 14pt;
+/* Fragments are used as templates. Hide them all by default. */
+fragment {
+  display: none;
 }
 
 #desktop {
@@ -82,10 +79,10 @@ a {
   */
 }
 
-#desktop .modal .top {
+#desktop .modal .title {
   text-align: center;
   font-family: "ChicagoFLF";
-  font-size: 24pt;
+  font-size: 22pt;
   font-weight: bold;
   color: #000;
 }
@@ -93,7 +90,12 @@ a {
 #desktop .modal .container {
   padding: 20pt;
   font-family: "Geneva";
-  font-size: 22pt;
+  font-size: 16pt;
+}
+
+/* Add space between messages in modal. */
+#desktop .modal .container p.add-margin {
+  margin-top: 20pt;
 }
 
 /** Window **/
@@ -143,11 +145,13 @@ a {
   text-align: center; /* TODO: shouldn't this use flex content adjust center? */
 }
 
-#desktop .window .title .medium-text {
+#desktop .window .title span {
   background-color: #fff;
   display: inline-block;
   /* left and right padding */
   padding: 1pt 10pt 0pt 10pt;
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
 }
 
 #desktop .window .collapse-button {
@@ -317,9 +321,9 @@ a {
 
 /** Buttons **/
 
-/* Primary: The default button option. Will activate when return key tapped. */
+/* Default: The default button option. Will activate when return key tapped. */
 
-#desktop button.primary {
+#desktop button.default {
   border: 1pt solid #000;
   border-radius: 4pt;
   outline: 2pt solid #000;
@@ -334,14 +338,14 @@ a {
   padding: 0pt 20pt 0pt 20pt;
 }
 
-#desktop button.primary:hover {
+#desktop button.default:hover {
   background-color: #000;
   color: #fff;
 }
 
-/* Secondary: Same size as primary w/o double border */
+/* Primary: Same size as default w/o double border */
 
-#desktop button.secondary {
+#desktop button.primary {
   border: 1pt solid #000;
   border-radius: 4pt;
   height: 24pt;
@@ -350,6 +354,39 @@ a {
   font-family: "ChicagoFLF";
   font-size: 14pt;
   padding: 0pt 20pt 0pt 20pt;
+}
+
+#desktop button.primary:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+#desktop button.primary:disabled {
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 24pt;
+  color: #C0C0C0;
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+  padding: 0pt 20pt 0pt 20pt;
+}
+
+#desktop button.primary:disabled:hover {
+  background-color: #fff;
+  color: #C0C0C0;
+}
+
+/* Secondary: Thinner and smaller then primary button. */
+
+#desktop button.secondary {
+  border: 1pt solid #000;
+  border-radius: 4pt;
+  height: 18pt;
+  color: #000;
+  background-color: #fff;
+  font-family: "ChicagoFLF";
+  font-size: 9pt;
+  padding: 0pt 18pt 0pt 18pt;
 }
 
 #desktop button.secondary:hover {
@@ -360,47 +397,14 @@ a {
 #desktop button.secondary:disabled {
   border: 1pt solid #000;
   border-radius: 4pt;
-  height: 24pt;
+  height: 18pt;
   color: #C0C0C0;
   font-family: "ChicagoFLF";
-  font-size: 14pt;
-  padding: 0pt 20pt 0pt 20pt;
+  font-size: 9pt;
+  padding: 0pt 18pt 0pt 18pt;
 }
 
 #desktop button.secondary:disabled:hover {
-  background-color: #fff;
-  color: #C0C0C0;
-}
-
-/* Tertiary: thinner and smaller */
-
-#desktop button.tertiary {
-  border: 1pt solid #000;
-  border-radius: 4pt;
-  height: 18pt;
-  color: #000;
-  background-color: #fff;
-  font-family: "ChicagoFLF";
-  font-size: 9pt;
-  padding: 0pt 18pt 0pt 18pt;
-}
-
-#desktop button.tertiary:hover {
-  background-color: #000;
-  color: #fff;
-}
-
-#desktop button.tertiary:disabled {
-  border: 1pt solid #000;
-  border-radius: 4pt;
-  height: 18pt;
-  color: #C0C0C0;
-  font-family: "ChicagoFLF";
-  font-size: 9pt;
-  padding: 0pt 18pt 0pt 18pt;
-}
-
-#desktop button.tertiary:disabled:hover {
   background-color: #fff;
   color: #C0C0C0;
 }
@@ -434,8 +438,8 @@ input[type=text], input[type=password] {
   border: 1pt solid #000;
   height: 20pt;
   width: 100%;
-  font-family: "FindersKeepers";
-  font-size: 22pt;
+  font-family: "Geneva";
+  font-size: 12pt;
 }
 
 /* Radio */
