@@ -388,12 +388,12 @@ fragment {
 #desktop button.secondary {
   border: 1pt solid #000;
   border-radius: 4pt;
-  height: 18pt;
+  height: 14pt;
   color: #000;
   background-color: #fff;
   font-family: "ChicagoFLF";
   font-size: 9pt;
-  padding: 0pt 18pt 0pt 18pt;
+  padding: 0pt 16pt 0pt 16pt;
 }
 
 #desktop button.secondary:hover {
@@ -777,8 +777,20 @@ ul.simple-list li::before {
 
 /** Form Fields **/
 
-label {
+/* A read-only label value */
+div.read-only {
   font-family: "Geneva";
+  font-size: 14pt;
+}
+
+/* The `span` inside `div.read-only` is the field name */
+div.read-only span {
+  font-family: "ChicagoFLF";
+  font-size: 14pt;
+}
+
+label {
+  font-family: "ChicagoFLF";
   font-size: 14pt;
 }
 
