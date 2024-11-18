@@ -121,7 +121,7 @@ fragment {
   background-position: center;
   /* TODO: The shade is too big */
   background-image: url("/chrome/window-shade.svg");
-  background-size: auto 15pt;
+  background-size: auto 38pt;
   background-repeat: repeat-x;
   flex-shrink: 0;
 }
@@ -143,6 +143,7 @@ fragment {
   flex: 1;
   position: relative;
   text-align: center; /* TODO: shouldn't this use flex content adjust center? */
+  cursor: pointer;
 }
 
 #desktop .window .title span {
@@ -274,7 +275,7 @@ fragment {
   scrollbar-gutter: stable;
   /* Prevents window from being resized down any further */
   min-width: 360pt;
-  min-height: 250pt;
+  /* min-height: 250pt; */
   /* For testing - Setting the initial width and height prevents the window from being the size of the parent's viewport
   width: 360pt;
   height: 250pt;
@@ -344,6 +345,12 @@ fragment {
 }
 
 /* Primary: Same size as default w/o double border */
+
+#desktop button.default,
+#desktop button.primary,
+#desktop button.secondary {
+  cursor: pointer;
+}
 
 #desktop button.primary {
   border: 1pt solid #000;
@@ -469,6 +476,7 @@ input[type=checkbox] {
 .os-menu,
 .popup-menu {
   position: relative;
+  cursor: pointer;
 }
 .os-menu {
   flex: 0 1 auto;
