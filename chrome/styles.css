@@ -88,7 +88,9 @@ fragment {
 }
 
 #desktop .modal .container {
-  padding: 20pt;
+  /* Bottom is 10pt because all `modal`s have `controls` on the bottom,
+    `controls` have 10pt padding on bottom. */
+  padding: 20pt 20pt 10pt 20pt;
   font-family: "Geneva";
   font-size: 16pt;
 }
@@ -280,6 +282,14 @@ fragment {
   width: 360pt;
   height: 250pt;
    */
+}
+
+/**
+ * OS "About" menu which shows OS name and version.
+ */
+#os-about {
+  display: none;
+  position: absolute;
 }
 
 /**
@@ -773,6 +783,10 @@ ul.simple-list li::before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.center-text {
+  text-align: center;
 }
 
 /** Form Fields **/

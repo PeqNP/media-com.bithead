@@ -38,8 +38,29 @@ function OS() {
     /**
      * Show Bithead OS version.
      */
-    this.showVersion = function() {
-        console.log("Version 1.0");
+    this.showAbout = function() {
+        var modal = document.getElementById("os-about");
+        if (modal === null) {
+            console.warn("OS About modal not found");
+            return;
+        }
+        if (modal.style.display == "block") {
+            return;
+        }
+        modal.style.display = "block";
+    }
+
+    this.hideAbout = function() {
+        var modal = document.getElementById("os-about");
+        if (modal === null) {
+            console.warn("OS About modal not found");
+            return;
+        }
+        if (modal.style.display == "none") {
+            return;
+        }
+        modal.style.display = "none";
+        return false;
     }
 
     this.signIn = function(username) {
