@@ -659,7 +659,7 @@ ul.folder {
 ul.folder li {
   display: block;
   position: relative;
-  padding-top: 5pt;
+  padding-top: 2pt;
   padding-left: calc(2 * var(--spacing) - var(--radius) - 4pt);
   padding-bottom: 2pt;
   font-family: "ChicagoFLF";
@@ -715,11 +715,12 @@ ul.folder summary::before {
 
 ul.folder summary::before {
   z-index: 1;
+  top: 2pt;
   background: transparent url('/chrome/folder-closed.svg') 0pt 0pt no-repeat;
 }
 
 ul.folder details[open] > summary::before {
-  top: 10pt;
+  top: 6pt;
   background: transparent url('/chrome/folder-open.svg') 0pt 0pt no-repeat;
 }
 
@@ -789,18 +790,25 @@ ul.folder .metadata, ul.folder .metadata-title {
 /** Little controls (up and down arrow control) **/
 
 #desktop div.little-controls {
+  display: inline-block;
   border: 1pt solid #000;
-  width: 14pt;
-  height: 34pt;
+  width: 8pt;
+  height: 16pt;
+  padding: 0pt;
+  margin: 0pt;
 }
 #desktop div.little-controls .up,
 #desktop div.little-controls .down {
+  cursor: pointer;
   height: 50%;
   width: 100%;
   border: none;
+  padding: 0pt;
+  margin: 0pt;
   background-color: #fff;
 }
 #desktop div.little-controls .up {
+  display: block;
   background-image: url("/chrome/up-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
@@ -817,6 +825,13 @@ ul.folder .metadata, ul.folder .metadata-title {
 #desktop div.little-controls .up:disabled,
 #desktop div.little-controls .down:disabled {
   filter: invert(20%);
+}
+/**
+ * This is required when the little-controls are in `div`s where it should _not_ affect the parent's height.
+ * This vertically centers the control w/o affecting the size of the parent's height.
+ */
+#desktop div.little-controls.add-vertical-center {
+  vertical-align: middle;
 }
 
 /** Progress bar **/
