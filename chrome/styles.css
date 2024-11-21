@@ -28,6 +28,35 @@ a {
   color: #222;
 }
 
+h1 {
+  font-size: 20pt;
+  font-family: "ChicagoFLF";
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1pt solid #000;
+}
+table th {
+  font-size: 12pt;
+  font-family: "ChicagoFLF";
+  text-align: left;
+  padding: 4pt;
+  border-bottom: 1pt solid #000;
+}
+table th.first {
+  width: 80%;
+}
+table tr.boundary td {
+  height: 3pt;
+  padding: 0pt;
+  border-bottom: 1pt solid #000;
+}
+table tbody td {
+  padding: 4pt;
+}
+
 /* Fragments are used as templates. Hide them all by default. */
 fragment {
   display: none;
@@ -732,6 +761,15 @@ ul.folder .metadata, ul.folder .metadata-title {
   border: none;
   border: 1pt solid #000;
   padding: 10pt 20pt 20pt 20pt;
+}
+
+#desktop #search {
+  padding: 0pt 10pt 10pt 10pt;
+  margin-bottom: 20pt;
+}
+
+#desktop #search input[type=text] {
+  width: 82%;
 }
 
 #desktop fieldset legend {
