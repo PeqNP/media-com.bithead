@@ -760,12 +760,14 @@ ul.folder .metadata, ul.folder .metadata-title {
 #desktop fieldset {
   border: none;
   border: 1pt solid #000;
-  padding: 10pt 20pt 20pt 20pt;
+  /* top and bottom are 10 as 10 is too much between first component. 10 is added on bottom as the controls
+     already have 10pt bottom padding. */
+  padding: 10pt 20pt 10pt 20pt;
+  margin-bottom: 20pt;
 }
 
 #desktop #search {
   padding: 0pt 10pt 10pt 10pt;
-  margin-bottom: 20pt;
 }
 
 #desktop #search input[type=text] {
