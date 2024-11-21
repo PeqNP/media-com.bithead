@@ -78,7 +78,8 @@ function OS() {
     /**
      * Make a network request.
      */
-    this.request = function(url) {
+    this.request = function(url, redirectTo) {
+        // TODO: If `redirectTo` provided, URL encode the value and add it as a GET parameter to the URL
         window.location = url;
     }
 
@@ -168,6 +169,21 @@ function OS() {
         // Display modal in desktop container
         var desktop = document.getElementById("desktop-container");
         desktop.appendChild(modal);
+    }
+
+    /**
+     * Copy string `item` to clipboard.
+     *
+     * - Parameter button: The button invoking the copy action
+     * - Parameter item: The string item to copy to clipboard.
+     */
+    this.copyToClipboard = function(button, item) {
+        navigator.clipboard.writeText(item);
+        let originalHTML = button.innerHTML;
+        button.innerHTML = "Copied!";
+        setInterval(function() {
+            button.innerHTML = originalHTML;
+        }, 2000);
     }
 
     return this;

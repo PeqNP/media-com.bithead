@@ -118,8 +118,8 @@ function UIFolder(folder) {
         // - Child
         else if (file.firstChild !== null && file.firstChild.nodeName == "#text") {
             var li = file;
-            span.innerHTML = li.childNodes[0].textContent.trim();
-            li.childNodes[0].remove();
+            span.innerHTML = li.innerHTML;
+            li.innerHTML = ""
             li.appendChild(span);
         }
 
