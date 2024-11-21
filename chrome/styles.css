@@ -6,10 +6,6 @@
   font-family: "ChicagoFLF";
   src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
 }
-@font-face {
-  font-family: "FindersKeepers";
-  src: url("/chrome/FindersKeepers.ttf") format('truetype'); /* Safari, Android, iOS */
-}
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
   margin: 0pt;
@@ -658,11 +654,11 @@ ul.folder {
 ul.folder li {
   display: block;
   position: relative;
-  padding-top: 3pt;
+  padding-top: 5pt;
   padding-left: calc(2 * var(--spacing) - var(--radius) - 4pt);
   padding-bottom: 2pt;
-  font-family: "FindersKeepers";
-  font-size: 22pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
   cursor: pointer;
 }
 
