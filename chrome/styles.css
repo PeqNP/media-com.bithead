@@ -299,11 +299,12 @@ fragment {
 
 #desktop .window .container {
   padding: 20pt;
-  overflow: scroll;
-  resize: both;
   font-family: "Geneva";
   font-size: 22pt;
-  scrollbar-gutter: stable;
+  /* Re-enable, if needed
+  overflow: scroll;
+  resize: both;
+  scrollbar-gutter: stable; */
   /* Prevents window from being resized down any further */
   min-width: 360pt;
   /* min-height: 250pt; */
@@ -785,12 +786,45 @@ ul.folder .metadata, ul.folder .metadata-title {
   padding-right: 5pt;
 }
 
+/** Little controls (up and down arrow control) **/
+
+#desktop div.little-controls {
+  border: 1pt solid #000;
+  width: 14pt;
+  height: 34pt;
+}
+#desktop div.little-controls .up,
+#desktop div.little-controls .down {
+  height: 50%;
+  width: 100%;
+  border: none;
+  background-color: #fff;
+}
+#desktop div.little-controls .up {
+  background-image: url("/chrome/up-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#desktop div.little-controls .down {
+  background-image: url("/chrome/down-arrow.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#desktop div.little-controls .up:hover,
+#desktop div.little-controls .down:hover {
+  filter: invert(100%);
+}
+#desktop div.little-controls .up:disabled,
+#desktop div.little-controls .down:disabled {
+  filter: invert(20%);
+}
+
 /** Progress bar **/
 
 #desktop .progress-bar {
   /** The OS is responsible for positioning, if any. **/
 }
-#desktop .progress-bar .top {
+#desktop .progress-bar .title {
   font-family: "ChicagoFLF";
   font-size: 12pt;
   color: #000;
