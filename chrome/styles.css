@@ -181,7 +181,7 @@ fragment {
   background-color: #fff;
   display: inline-block;
   /* left and right padding */
-  padding: 1pt 10pt 0pt 10pt;
+  padding: 2pt 10pt 0pt 10pt;
   font-family: "ChicagoFLF";
   font-size: 14pt;
 }
