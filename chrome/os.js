@@ -188,3 +188,42 @@ function OS() {
 
     return this;
 }
+
+/**
+ * Provides protocol definition for a Controller.
+ *
+ * A Controller allows a `div.window` to receive life-cycle events from the OS.
+ *
+ * All functions are optional. Therefore, implement only the functions needed.
+ *
+ * A Controller is defined on a `div.window` with the `id` attribute.
+ * e.g. <div class="window" id="my_controller">
+ *
+ * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.window`.
+ * The `script` tag must have a function with the same name as its `id`.
+ * This `script` is used to send view life-cycle signals to the respective controller.
+ *
+ * e.g.
+ * ```
+ * function my_controller() {
+ *     this.viewDidAppear = function() {
+ *         // Do something when the view appears
+ *     }
+ *
+ *     // Return an instance to this object
+ *     return this;
+ * }
+ * ```
+ */
+function Controller() {
+    /**
+     * Called directly before the window is rendered.
+     *
+     * TODO: Not yet implemented.
+     */
+    function viewDidLoad() { }
+    /**
+     * Called after the window has been rendered.
+     */
+    function viewDidAppear() { }
+}
