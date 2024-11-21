@@ -2,7 +2,6 @@ function initUI() {
     styleOSMenus();
     stylePopupMenus();
     styleFolders();
-    registerWindows();
 
     /**
      * Close all menus when user clicks outside of `select`.
@@ -331,38 +330,4 @@ function styleOSMenus() {
             }
         });
     }
-}
-
-/**
- * Register all windows with the OS.
- *
- * This allows for window menus to be displayed in the OS bar.
- */
-function registerWindows() {
-    var windows = document.getElementsByClassName("window");
-    for (var i = 0; i < windows.length; i++) {
-        registerWindow(windows[i]);
-    }
-}
-
-/**
- * Register a window with the OS.
- *
- * This allows the OS to display the window's menus in the OS bar.
- */
-function registerWindow(win) {
-    var osMenus = win.getElementsByClassName("os-menus");
-    if (osMenus.length < 1) {
-        return;
-    }
-    osMenus = osMenus[0];
-
-    var menus = osMenus.getElementsByClassName("os-menu");
-    for (;menus.length > 0;) {
-        var menu = menus[0];
-        menu.parentNode.removeChild(menu);
-        // FIXME: Obviously this will need to change in the future. The chrome may need to merge with OS.
-        OS().addOSBarMenu(menu);
-    }
-    osMenus.parentNode.removeChild(osMenus);
 }

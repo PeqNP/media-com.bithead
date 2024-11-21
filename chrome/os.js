@@ -14,6 +14,9 @@ function OS() {
     // Displayed in OS menu, settings, etc.
     this.username = "";
 
+    // List of "open" window controllers.
+    this.controllers = [];
+
     /**
      * Execute an OS bar system action.
      */
@@ -169,6 +172,60 @@ function OS() {
         // Display modal in desktop container
         var desktop = document.getElementById("desktop-container");
         desktop.appendChild(modal);
+    }
+
+    /**
+     * Register all windows with the OS.
+     *
+     * This allows for window menus to be displayed in the OS bar.
+     */
+    this.registerWindows = function() {
+        var windows = document.getElementsByClassName("window");
+        for (var i = 0; i < windows.length; i++) {
+            registerWindow(windows[i]);
+        }
+    }
+
+    /**
+     * Register a window with the OS.
+     *
+     * This allows the OS to display the window's menus in the OS bar.
+     */
+    function registerWindow(win) {
+        // Register window for life-cycle events
+        var id = win.getAttribute("id");
+        if (id !== null && id.length > 0) {
+            var controller = eval("window." + id + "();");
+            console.log(controller);
+            if (controller !== null && controller !== "undefined") {
+                // TODO: Eventually the controller will be registered and life-cycle events passed.
+                // TODO: Eventually an instance of the controller will be created, container
+                // content rendered, and then viewDidLoad called before it is visible in the #desktop.
+                if (controller.viewDidLoad !== undefined) {
+                    controller.viewDidLoad();
+                }
+                // For now, only the viewDidAppear life-cycle event is relevant
+                // as everything is rendered at once.
+                if (controller.viewDidAppear !== undefined) {
+                    controller.viewDidAppear();
+                }
+            }
+        }
+
+        var osMenus = win.getElementsByClassName("os-menus");
+        if (osMenus.length < 1) {
+            return;
+        }
+        osMenus = osMenus[0];
+
+        var menus = osMenus.getElementsByClassName("os-menu");
+        for (;menus.length > 0;) {
+            var menu = menus[0];
+            menu.parentNode.removeChild(menu);
+            // FIXME: Obviously this will need to change in the future. The chrome may need to merge with OS.
+            OS().addOSBarMenu(menu);
+        }
+        osMenus.parentNode.removeChild(osMenus);
     }
 
     /**
