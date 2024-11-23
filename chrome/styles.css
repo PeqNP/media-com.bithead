@@ -45,6 +45,7 @@ table th {
   padding: 4pt;
   border-bottom: 1pt solid #000;
 }
+table th.add-eighty-width,
 table th.first {
   width: 80%;
 }
