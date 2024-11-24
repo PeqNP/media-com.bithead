@@ -33,6 +33,19 @@ h1.add-margin {
   margin-bottom: 10pt;
 }
 
+h2 {
+  font-size: 18pt;
+  font-family: "ChicagoFLF";
+}
+h3 {
+  font-size: 16pt;
+  font-family: "ChicagoFLF";
+}
+h4 {
+  font-size: 14pt;
+  font-family: "ChicagoFLF";
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -514,6 +527,13 @@ input[type=checkbox] {
 
 /* Pop-up Menu (select) */
 
+/* The size of the `select` is expected to be 140pt */
+.align-vertically {
+  display: flex;
+  gap: 165pt;
+  justify-content: flex-start;
+}
+
 .os-menu,
 .popup-menu {
   position: relative;
@@ -523,12 +543,16 @@ input[type=checkbox] {
   flex: 0 1 auto;
 }
 .popup-menu {
-  height: 13pt;
+  height: 24pt;
 }
 
 .os-menu select,
 .popup-menu select {
   display: none; /* Hide original select element */
+}
+
+.popup-menu.add-margin {
+  margin-bottom: 10pt;
 }
 
 /**
@@ -854,6 +878,56 @@ ul.folder .metadata, ul.folder .metadata-title {
   background-color: #000;
 }
 
+/** Bullet list of items **/
+
+ul.bullet-list {
+  padding-left: 0pt;
+  list-style: none;
+}
+
+ul.bullet-list.add-margin {
+  margin-bottom: 10pt;
+}
+ul.bullet-list.add-more-margin {
+  margin-bottom: 20pt;
+}
+
+ul.bullet-list li {
+  margin-left: 10pt;
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
+}
+
+ul.bullet-list li:last-child {
+}
+
+ul.bullet-list li::before {
+  content: ""; /* Empty content */
+  display: block;
+  position: relative;
+  left: -0.7em; /* Position the triangle at the start of the list item */
+  top: 1em; /* Center the triangle vertically */
+  width: 0;
+  height: 0;
+  border-color: transparent #111;
+  border-style: solid;
+  border-width: 0.35em 0 0.35em 0.45em;
+  /* transform: translateY(-50%); /* Adjust vertical centering */
+}
+
+/** Common Utility **/
+
+.center-control {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.center-text {
+  text-align: center;
+}
+
 /** List of items **/
 
 ul.simple-list {
@@ -866,6 +940,11 @@ ul.simple-list.add-margin {
 }
 ul.simple-list.add-more-margin {
   margin-bottom: 20pt;
+}
+
+ul.simple-list li {
+  font-family: "ChicagoFLF";
+  font-size: 12pt;
 }
 
 ul.simple-list li:last-child {
@@ -902,13 +981,17 @@ div.read-only span {
   font-size: 14pt;
 }
 
+div.add-margin {
+  margin-bottom: 10pt;
+}
+
 label {
   font-family: "ChicagoFLF";
   font-size: 14pt;
 }
 
 .text-field.add-margin {
-  margin-top: 10pt;
+  margin-bottom: 10pt;
 }
 .text-field label {
   display: block;
