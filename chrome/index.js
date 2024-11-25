@@ -173,6 +173,12 @@ function stylePopupMenus() {
             menus[i].classList.add("disabled");
         }
 
+        // Assign action to every option if onchange is set on parent
+        // NOTE: This must be a let so that the closure below doesn't reference
+        // the last `select`'s `onchange`.
+        let onchange = selectElement.onchange;
+        console.log(onchange);
+
         // Create choices
         // NOTE: This skips the first choice, which is used as the label for the menu.
         for (var j = 1; j < selectElement.length; j++) {
@@ -202,6 +208,9 @@ function stylePopupMenus() {
                         sibling.innerHTML = this.innerHTML;
                         break;
                     }
+                }
+                if (onchange !== null) {
+                    onchange();
                 }
             });
             choices.appendChild(choice);

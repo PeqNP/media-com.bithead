@@ -15,33 +15,38 @@ function OS() {
     this.username = "";
 
     // List of "open" window controllers.
-    this.controllers = [];
+    let controllers = {};
 
     /**
      * Execute an OS bar system action.
      */
-    this.executeSystemOption = function(option) {
+    function executeSystemOption(option) {
         if (option == "logOut") {
-            this.logOut();
+            logOut();
         }
         else if (option == "showVersion") {
-            this.showVersion();
+            showVersion();
         }
         else {
             console.log("Invalid system option (" + option + ")");
         }
     }
+
+    this.executeSystemOption = executeSystemOption;
+
     /**
      * Log user out of system.
      */
-    this.logOut = function() {
+    function logout() {
         console.log("Log out user");
     }
+
+    this.logout = logout;
 
     /**
      * Show Bithead OS version.
      */
-    this.showAbout = function() {
+    function showAbout() {
         var modal = document.getElementById("os-about");
         if (modal === null) {
             console.warn("OS About modal not found");
@@ -53,7 +58,9 @@ function OS() {
         modal.style.display = "block";
     }
 
-    this.hideAbout = function() {
+    this.showAbout = showAbout;
+
+    function hideAbout() {
         var modal = document.getElementById("os-about");
         if (modal === null) {
             console.warn("OS About modal not found");
@@ -66,7 +73,9 @@ function OS() {
         return false;
     }
 
-    this.signIn = function(username) {
+    this.hideAbout = hideAbout;
+
+    function signIn(username) {
         this.username = username;
 
         // Update the OS bar
@@ -78,21 +87,27 @@ function OS() {
         option.innerHTML = "Log out " + username + "...";
     }
 
+    this.signIn = signIn;
+
     /**
      * Make a network request.
      */
-    this.request = function(url, redirectTo) {
+    function request(url, redirectTo) {
         // TODO: If `redirectTo` provided, URL encode the value and add it as a GET parameter to the URL
         window.location = url;
     }
 
+    this.request = request;
+
     /**
      * Add a menu to the OS bar.
      */
-    this.addOSBarMenu = function(menu) {
+    function addOSBarMenu(menu) {
         var p = document.getElementById("menus");
         p.appendChild(menu);
     }
+
+    this.addOSBarMenu = addOSBarMenu
 
     /**
      * Get the current time formatted in DDD MMM dd HH:MM AA.
@@ -125,7 +140,7 @@ function OS() {
     /**
      * Update the clocks time.
      */
-    this.updateClock = function() {
+    function updateClock() {
         var time = getCurrentFormattedTime(); // "Fri Nov 15 10:23 AM";
         var option = document.getElementById("clock");
         if (option === null) {
@@ -138,10 +153,12 @@ function OS() {
     /**
      * Start updating clock.
      */
-    this.startClock = function() {
-        this.updateClock();
+    function startClock() {
+        updateClock();
         setInterval(this.updateClock, 2000);
     }
+
+    this.startClock = startClock;
 
     /**
      * Close a (modal) window.
@@ -158,7 +175,7 @@ function OS() {
     /**
      * Show an error modal above all other content.
      */
-    this.showErrorModal = function(error) {
+    function showErrorModal(error) {
         var fragment = document.getElementById("error-modal");
         var modal = fragment.querySelector("div.modal").cloneNode(true);
         var message = modal.querySelector("p.message");
@@ -174,17 +191,21 @@ function OS() {
         desktop.appendChild(modal);
     }
 
+    this.showErrorModal = showErrorModal;
+
     /**
      * Register all windows with the OS.
      *
      * This allows for window menus to be displayed in the OS bar.
      */
-    this.registerWindows = function() {
+    function registerWindows() {
         var windows = document.getElementsByClassName("window");
         for (var i = 0; i < windows.length; i++) {
             registerWindow(windows[i]);
         }
     }
+
+    this.registerWindows = registerWindows;
 
     /**
      * Register a window with the OS.
@@ -193,9 +214,10 @@ function OS() {
      */
     function registerWindow(win) {
         // Register window for life-cycle events
-        var id = win.getAttribute("id");
+        let id = win.getAttribute("id");
         if (id !== null && id.length > 0) {
-            var controller = eval("window." + id + "();");
+            let code = "new window." + id + "();";
+            let controller = eval(code);
             console.log(controller);
             if (controller !== null && controller !== "undefined") {
                 // TODO: Eventually the controller will be registered and life-cycle events passed.
@@ -209,6 +231,7 @@ function OS() {
                 if (controller.viewDidAppear !== undefined) {
                     controller.viewDidAppear();
                 }
+                controllers[id] = controller;
             }
         }
 
@@ -222,8 +245,7 @@ function OS() {
         for (;menus.length > 0;) {
             var menu = menus[0];
             menu.parentNode.removeChild(menu);
-            // FIXME: Obviously this will need to change in the future. The chrome may need to merge with OS.
-            OS().addOSBarMenu(menu);
+            addOSBarMenu(menu);
         }
         osMenus.parentNode.removeChild(osMenus);
     }
@@ -234,7 +256,7 @@ function OS() {
      * - Parameter button: The button invoking the copy action
      * - Parameter item: The string item to copy to clipboard.
      */
-    this.copyToClipboard = function(button, item) {
+    function copyToClipboard(button, item) {
         navigator.clipboard.writeText(item);
         let originalHTML = button.innerHTML;
         button.innerHTML = "Copied!";
@@ -243,7 +265,21 @@ function OS() {
         }, 2000);
     }
 
-    return this;
+    this.copyToClipboard = copyToClipboard;
+
+    /**
+     * Return instance of resgistered controller, given its `controllerID`.
+     */
+    function controller(controllerID) {
+        let controller = controllers[controllerID];
+        if (controller === null || controller === undefined) {
+            console.error("No controller has been registerd with ID: " + controllerID);
+            return null;
+        }
+        return controller;
+    }
+
+    this.controller = controller;
 }
 
 /**
