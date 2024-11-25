@@ -216,6 +216,15 @@ function stylePopupMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
+            var popupMenu = this.parentNode.parentNode;
+            if (!popupMenu.classList.contains("popup-menu")) {
+                console.error("Expected parent to be a popup-menu")
+                return;
+            }
+            // Do nothing if the control is disabled
+            if (popupMenu.classList.contains("disabled")) {
+                return;
+            }
             // console.log("Clicked select (" + e.target + ")");
             var container = this.parentNode.getElementsByClassName("sub-container")[0];
             var isActive = container.classList.contains("popup-active");

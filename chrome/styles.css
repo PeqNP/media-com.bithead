@@ -576,6 +576,9 @@ input[type=checkbox] {
   top: 0pt;
   border: 1pt solid #000;
 }
+.disabled .popup-container {
+  border: 1pt solid #aaa;
+}
 
 /* This is the first option in select */
 .os-menu-choices-label {
@@ -610,15 +613,25 @@ input[type=checkbox] {
   border: 5pt solid transparent;
   border-color: #000 transparent transparent transparent;
 }
+.disabled .popup-choices-label:after {
+  border-color: #ddd transparent transparent transparent;
+}
 
 .popup-choices-label.popup-arrow-active:after {
   border-color: transparent transparent #000 transparent;
   top: 5pt;
 }
+.disabled .popup-choices-label.popup-arrow-active:after {
+  border-color: transparent transparent #aaa transparent;
+}
 
 /* Contains the pop-up choices */
 .popup-choices { }
 
+.disabled .popup-choice,
+.disabled .popup-choices-label {
+  color: #ddd;
+}
 .popup-choice, .popup-choices-label {
   background-color: #fff;
   color: #000;
