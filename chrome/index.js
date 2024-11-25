@@ -140,6 +140,108 @@ function UIFolder(folder) {
 }
 
 /**
+ * Add new choices into pop-up menu.
+ *
+ * - Parameter select: The `select` `HTMLElement`
+ * - Parameter choices: Array of dictionaries, where each dictionary has an `id` and `name`.
+ */
+function addNewOptionsToPopupMenu(select, choices) {
+    if (select === null || select === undefined) {
+        console.error("select does not exist");
+        return;
+    }
+
+    // Remove all options but the first one
+    for (;select.options < 2;) {
+        select.removeChild(select.lastElementChild);
+    }
+
+    for (let i = 0; i < choices.length; i++) {
+      var option = document.createElement('option');
+      var choice = choices[i];
+      option.value = choice["id"];
+      option.text = choice["name"];
+      select.appendChild(option);
+    }
+    styleChoicesInPopupMenu(select);
+}
+
+/**
+ * Enable a pop-up menu.
+ */
+function enablePopupMenu(select) {
+    select.disabled = false;
+    let node = select.parentNode;
+    if (node.classList.contains("disabled")) {
+        node.classList.remove("disabled");
+    }
+}
+
+/**
+ * Disable a pop-up meu.
+ */
+function disablePopupMenu() {
+    select.disabled = true;
+    let node = select.parentNode;
+    if (!node.classList.contains("disabled")) {
+        node.classList.add("disabled");
+    }
+}
+
+/**
+ * Adds, and styles, all choices within the `select` element into the
+ * `div.popup-choices`.
+ */
+function styleChoicesInPopupMenu(select) {
+    // Find the container for the popup-menu
+    var container = select.parentNode.querySelector(".popup-choices");
+    if (container === undefined || container === null) {
+        console.error("Could not find .popup-choices in select " + select);
+        return;
+    }
+
+    // Assign action to every option if onchange is set on parent
+    // NOTE: This must be a let so that the closure below doesn't reference
+    // the last `select`'s `onchange`.
+    let onchange = select.onchange;
+
+    // Create choices
+    // NOTE: This skips the first choice, which is used as the label for the menu.
+    for (var j = 1; j < select.length; j++) {
+        var option = select.options[j];
+        if (option.classList.contains("group")) {
+            var group = document.createElement("div");
+            group.setAttribute("class", "popup-choice-group");
+            container.appendChild(group);
+            continue;
+        }
+        var choice = document.createElement("div");
+        choice.setAttribute("class", "popup-choice");
+        choice.innerHTML = option.innerHTML;
+
+        /**
+         * Select a (new) choice.
+         */
+        choice.addEventListener("click", function(e) {
+            // var s = this.parentNode.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
+            // This is the div that displays the "selected" option
+            var sibling = this.parentNode.parentNode.previousSibling;
+            for (var z = 0; z < select.length; z++) {
+                if (select.options[z].innerHTML == this.innerHTML) {
+                    select.selectedIndex = z;
+                    sibling.innerHTML = this.innerHTML;
+                    break;
+                }
+            }
+            if (onchange !== null) {
+                onchange();
+            }
+        });
+        container.appendChild(choice);
+    }
+}
+
+/**
  * Style all popup menu elements.
  */
 function stylePopupMenus() {
@@ -173,52 +275,12 @@ function stylePopupMenus() {
             menus[i].classList.add("disabled");
         }
 
-        // Assign action to every option if onchange is set on parent
-        // NOTE: This must be a let so that the closure below doesn't reference
-        // the last `select`'s `onchange`.
-        let onchange = selectElement.onchange;
-        console.log(onchange);
-
-        // Create choices
-        // NOTE: This skips the first choice, which is used as the label for the menu.
-        for (var j = 1; j < selectElement.length; j++) {
-            var option = selectElement.options[j];
-            if (option.classList.contains("group")) {
-                var group = document.createElement("div");
-                group.setAttribute("class", "popup-choice-group");
-                choices.appendChild(group);
-                continue;
-            }
-            var choice = document.createElement("div");
-            choice.setAttribute("class", "popup-choice");
-            choice.innerHTML = option.innerHTML;
-
-            /**
-             * Select a (new) choice.
-             */
-            choice.addEventListener("click", function(e) {
-                // TODO: This is broken
-                // The select element, which represents the source of truth.
-                var s = this.parentNode.parentNode.parentNode.parentNode.getElementsByTagName("select")[0];
-                // This is the div that displays the "selected" option
-                var sibling = this.parentNode.parentNode.previousSibling;
-                for (var z = 0; z < s.length; z++) {
-                    if (s.options[z].innerHTML == this.innerHTML) {
-                        s.selectedIndex = z;
-                        sibling.innerHTML = this.innerHTML;
-                        break;
-                    }
-                }
-                if (onchange !== null) {
-                    onchange();
-                }
-            });
-            choices.appendChild(choice);
-        }
         var subContainer = document.createElement("div");
         subContainer.setAttribute("class", "sub-container popup-inactive");
         subContainer.appendChild(choices);
         container.appendChild(subContainer);
+
+        styleChoicesInPopupMenu(selectElement);
 
         /**
          * Toggle the popup-menu's state.
