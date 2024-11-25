@@ -168,6 +168,11 @@ function stylePopupMenus() {
         var choices = document.createElement("div");
         choices.setAttribute("class", "popup-choices");
 
+        // Disable drop-down if select element is disabled
+        if (selectElement.disabled) {
+            menus[i].classList.add("disabled");
+        }
+
         // Create choices
         // NOTE: This skips the first choice, which is used as the label for the menu.
         for (var j = 1; j < selectElement.length; j++) {
