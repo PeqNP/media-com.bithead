@@ -814,10 +814,6 @@ ul.folder .metadata, ul.folder .metadata-title {
   padding: 0pt 10pt 10pt 10pt;
 }
 
-#desktop #search input[type=text] {
-  width: 82%;
-}
-
 #desktop fieldset legend {
   font-family: "ChicagoFLF";
   font-size: 14pt;
