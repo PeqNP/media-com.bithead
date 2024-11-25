@@ -154,8 +154,7 @@ fragment {
   left: 10pt;
   top: 10pt;
   */
-  display: flex;
-  flex-direction: column;
+  display: inline-block;
 }
 
 #desktop .window .top {
@@ -315,13 +314,15 @@ fragment {
   padding: 20pt;
   font-family: "Geneva";
   font-size: 22pt;
-  /* Re-enable, if needed
   overflow: scroll;
   resize: both;
+  /* Re-enable, if needed
   scrollbar-gutter: stable; */
   /* Prevents window from being resized down any further */
   min-width: 360pt;
-  /* min-height: 250pt; */
+  min-height: 250pt;
+  max-width: 600pt;
+  max-height: 500pt;
   /* For testing - Setting the initial width and height prevents the window from being the size of the parent's viewport
   width: 360pt;
   height: 250pt;
