@@ -142,7 +142,7 @@ function UIFolder(folder) {
 /**
  * Extensions added to a `select.popup-menu.
  */
-function PopupMenu(select) {
+function UIPopupMenu(select) {
 
     // Represents the parent view container (div.popup-menu)
     let node = select.parentNode;
@@ -164,17 +164,19 @@ function PopupMenu(select) {
      * - Parameter select: The `select` `HTMLElement`
      * - Parameter choices: Array of dictionaries, where each dictionary has an `id` and `name`.
      */
-    function addNewOptions(choices) {
-        // Remove all options but the first one
-        for (;select.options < 2;) {
+    function addNewOptions(options) {
+        let container = select.parentNode.querySelector(".popup-choices");
+        // Remove all options from the select, and facade, except for first option
+        for (;select.options.length > 1;) {
             select.removeChild(select.lastElementChild);
+            container.removeChild(container.lastElementChild);
         }
 
-        for (let i = 0; i < choices.length; i++) {
+        for (let i = 0; i < options.length; i++) {
           var option = document.createElement('option');
-          var choice = choices[i];
-          option.value = choice["id"];
-          option.text = choice["name"];
+          var opt = options[i];
+          option.value = opt["id"];
+          option.text = opt["name"];
           select.appendChild(option);
         }
         styleOptions();
@@ -264,7 +266,7 @@ function stylePopupMenus() {
     var menus = document.getElementsByClassName("popup-menu");
     for (var i = 0; i < menus.length; i++) {
         let selectElement = menus[i].getElementsByTagName("select")[0];
-        selectElement.ui = new PopupMenu(selectElement);
+        selectElement.ui = new UIPopupMenu(selectElement);
 
         // The container is positioned absolute so that when a selection is made it overlays
         // the content instead of pushing it down.
