@@ -569,19 +569,16 @@ input[type=checkbox] {
   font-size: 12pt;
 }
 .os-menu-container {
+  position: relative;
 }
 .popup-container {
   position: absolute;
   left: 0pt;
   top: 0pt;
   border: 1pt solid #000;
-  /* Active drop-down containers will appear "below" a disabled drop-down
-   * for some reason. This resolves the issue. */
-  z-index: 1;
 }
 .disabled .popup-container {
   border: 1pt solid #aaa;
-  z-index: 0;
 }
 
 /* This is the first option in select */
@@ -668,6 +665,8 @@ input[type=checkbox] {
 /* Hide select options when closed */
 .popup-inactive {
   z-index: 0;
+}
+.popup-inactive .sub-container {
   display: none;
 }
 

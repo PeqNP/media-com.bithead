@@ -27,16 +27,16 @@ function UIFolderMetadata(name, style) {
 
 function closeMenuType(className) {
     // console.log("Closing all (" + className + ")s");
-    var containers = document.getElementsByClassName(className + "-container");
+    let parentClassName = className + "-container";
+    var containers = document.getElementsByClassName(parentClassName);
     for (var j = 0; j < containers.length; j++) {
         var container = containers[j];
-        var subContainer = container.getElementsByClassName("sub-container")[0];
-        if (subContainer.classList.contains("popup-inactive")) {
+        if (container.classList.contains("popup-inactive")) {
             continue;
         }
         // console.log("Closing menu (" + container + ")");
-        subContainer.classList.remove("popup-active");
-        subContainer.classList.add("popup-inactive");
+        container.classList.remove("popup-active");
+        container.classList.add("popup-inactive");
         // Reset arrow
         var choicesLabel = container.querySelector("." + className + "-choices-label");
         choicesLabel.classList.remove("popup-arrow-active");
@@ -269,7 +269,7 @@ function stylePopupMenus() {
         // The container is positioned absolute so that when a selection is made it overlays
         // the content instead of pushing it down.
         let container = document.createElement("div");
-        container.setAttribute("class", "popup-container");
+        container.setAttribute("class", "popup-container popup-inactive");
         menus[i].appendChild(container);
 
         // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
@@ -292,7 +292,7 @@ function stylePopupMenus() {
         }
 
         var subContainer = document.createElement("div");
-        subContainer.setAttribute("class", "sub-container popup-inactive");
+        subContainer.setAttribute("class", "sub-container");
         subContainer.appendChild(choices);
         container.appendChild(subContainer);
 
@@ -317,8 +317,7 @@ function stylePopupMenus() {
             if (popupMenu.classList.contains("disabled")) {
                 return;
             }
-            // console.log("Clicked select (" + e.target + ")");
-            var container = this.parentNode.getElementsByClassName("sub-container")[0];
+            var container = popupMenu.querySelector(".popup-container");
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
             closeAllMenus();
@@ -351,7 +350,7 @@ function styleOSMenus() {
         // The container is positioned absolute so that when a selection is made it overlays
         // the content instead of pushing it down.
         var container = document.createElement("div");
-        container.setAttribute("class", "os-menu-container");
+        container.setAttribute("class", "os-menu-container popup-inactive");
         menus[i].appendChild(container);
 
         // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
@@ -395,7 +394,7 @@ function styleOSMenus() {
         }
         // Required to display border around options
         var subContainer = document.createElement("div");
-        subContainer.setAttribute("class", "sub-container popup-inactive");
+        subContainer.setAttribute("class", "sub-container");
         // Inherit the parent's width (style)
         subContainer.setAttribute("style", menus[i].getAttribute("style"));
         menus[i].removeAttribute("style");
@@ -412,8 +411,7 @@ function styleOSMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
-            // console.log("Clicked select (" + e.target + ")");
-            var container = this.parentNode.getElementsByClassName("sub-container")[0];
+            var container = this.parentNode; // os-menu-container
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
             closeAllMenus();
