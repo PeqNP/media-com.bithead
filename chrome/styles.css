@@ -665,8 +665,10 @@ disabled .popup-choice,
 .popup-active .sub-container {
   display: block;
   position: absolute;
-  left: -0.5pt;
-  width: calc(100% - 0.5pt);
+  /* TODO: The `left` and `width` may need to change depending on width of container.
+   * This only works for containers that are 160pts wide. */
+  left: -0.75pt;
+  width: calc(100%);
   border-left: 1pt solid #000;
   border-right: 1pt solid #000;
   border-bottom: 1pt solid #000;
