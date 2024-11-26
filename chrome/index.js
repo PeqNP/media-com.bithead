@@ -154,16 +154,74 @@ function UIPopupMenu(select) {
     // Represents the parent view container (div.popup-menu)
     let node = select.parentNode;
 
+    function updateSelectedOptionLabel() {
+        let label = select.parentNode.querySelector(".popup-choices-label");
+        label.innerHTML = select.options[select.selectedIndex].innerHTML;
+    }
+
+    function selectOption(index) {
+        select.selectedIndex = index;
+        updateSelectedOptionLabel();
+    }
+
+    this.selectOption = selectOption;
+
+    /**
+     * Returns the selected option.
+     */
+    function selectedOption(disabled) {
+        // Disabled selects are not allowed to have a selected value
+        if (disabled !== true && select.disabled) {
+            return null;
+        }
+        // The option label is not a selectable value
+        if (select.selectedIndex == 0) {
+            return null;
+        }
+        let idx = select.selectedIndex;
+        return select.options[idx]
+    }
+
+    this.selectedOption = selectedOption;
+
     /**
      * Returns the selected option's value.
      */
-    function selectedValue() {
+    function selectedValue(disabled) {
+        // Disabled selects are not allowed to have a selected value
+        if (disabled !== true && select.disabled) {
+            return null;
+        }
+        // The option label is not a selectable value
+        if (select.selectedIndex == 0) {
+            return null;
+        }
         let idx = select.selectedIndex;
         let value = select.options[idx].value;
         return value;
     }
 
     this.selectedValue = selectedValue;
+
+    function _removeAllOptions() {
+        let container = select.parentNode.querySelector(".popup-choices");
+        // Remove all options from the select and facade except first option
+        for (;select.options.length > 1;) {
+            select.removeChild(select.lastElementChild);
+            container.removeChild(container.lastElementChild);
+        }
+    }
+
+    /**
+     * Remove all `option`s from `select`.
+     */
+    function removeAllOptions() {
+        _removeAllOptions();
+        styleOptions();
+        updateSelectedOptionLabel();
+    }
+
+    this.removeAllOptions = removeAllOptions;
 
     /**
      * Add new choices into pop-up menu.
@@ -172,12 +230,7 @@ function UIPopupMenu(select) {
      * - Parameter choices: Array of dictionaries, where each dictionary has an `id` and `name`.
      */
     function addNewOptions(options) {
-        let container = select.parentNode.querySelector(".popup-choices");
-        // Remove all options from the select and facade except first option
-        for (;select.options.length > 1;) {
-            select.removeChild(select.lastElementChild);
-            container.removeChild(container.lastElementChild);
-        }
+        _removeAllOptions();
 
         for (let i = 0; i < options.length; i++) {
           var option = document.createElement('option');

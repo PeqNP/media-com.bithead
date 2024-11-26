@@ -471,6 +471,10 @@ fragment {
   color: #C0C0C0;
 }
 
+#desktop button.secondary.add-left-margin {
+  margin-left: 5pt;
+}
+
 /**
  * Position controls to the bottom right of the view.
  *
