@@ -510,7 +510,7 @@ input[type=radio] {
   border: 1pt solid #000;
   height: 12pt;
   width: 12pt;
-  transform: translateY(1pt);
+  transform: translateY(2pt);
   /* Not supported in older browsers. I'm not about to use the crazy hacks to make it work in all browsers. */
   accent-color: #000;
 }
@@ -847,12 +847,12 @@ ul.folder .metadata, ul.folder .metadata-title {
 }
 #desktop div.little-controls .up {
   display: block;
-  background-image: url("/chrome/up-arrow.svg");
+  background-image: url("/chrome/filled-up-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
 }
 #desktop div.little-controls .down {
-  background-image: url("/chrome/down-arrow.svg");
+  background-image: url("/chrome/filled-down-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -1000,7 +1000,7 @@ div.add-margin {
 
 label {
   font-family: "ChicagoFLF";
-  font-size: 14pt;
+  font-size: 10pt;
 }
 
 .text-field.add-margin {

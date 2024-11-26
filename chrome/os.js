@@ -155,7 +155,7 @@ function OS() {
      */
     function startClock() {
         updateClock();
-        setInterval(this.updateClock, 2000);
+        setInterval(updateClock, 2000);
     }
 
     this.startClock = startClock;
