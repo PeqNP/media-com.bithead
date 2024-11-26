@@ -140,7 +140,14 @@ function UIFolder(folder) {
 }
 
 /**
- * Extensions added to a `select.popup-menu.
+ * Represents a Pop-up menu.
+ *
+ * Provides extensions to a `.popup-menu select`.
+ *
+ * The first option in the `select` provides information about what
+ * is in the drop-down. This option is unfortunately necessary if
+ * no options exist in the `select`. Otherwise, the height of the
+ * drop-down will be 0, causing the `.popup-menu` to collapse.
  */
 function UIPopupMenu(select) {
 
@@ -166,7 +173,7 @@ function UIPopupMenu(select) {
      */
     function addNewOptions(options) {
         let container = select.parentNode.querySelector(".popup-choices");
-        // Remove all options from the select, and facade, except for first option
+        // Remove all options from the select and facade except first option
         for (;select.options.length > 1;) {
             select.removeChild(select.lastElementChild);
             container.removeChild(container.lastElementChild);
@@ -220,8 +227,7 @@ function UIPopupMenu(select) {
             return;
         }
 
-        // Create choices
-        // NOTE: This skips the first choice, which is used as the label for the menu.
+        // Create choices - ignore first choice
         for (var j = 1; j < select.length; j++) {
             var option = select.options[j];
             if (option.classList.contains("group")) {
@@ -234,11 +240,9 @@ function UIPopupMenu(select) {
             choice.setAttribute("class", "popup-choice");
             choice.innerHTML = option.innerHTML;
 
-            /**
-             * Select a (new) choice.
-             */
+            // Select a choice
             choice.addEventListener("click", function(e) {
-                // This is the div that displays the "selected" option
+                // This div displays the "selected" option
                 var sibling = this.parentNode.parentNode.previousSibling;
                 for (var z = 0; z < select.length; z++) {
                     if (select.options[z].innerHTML == this.innerHTML) {
@@ -272,15 +276,15 @@ function stylePopupMenus() {
         // the content instead of pushing it down.
         let container = document.createElement("div");
         container.setAttribute("class", "popup-container popup-inactive");
+        // Inherit the parent's width (style)
+        container.setAttribute("style", menus[i].getAttribute("style"));
+        menus[i].removeAttribute("style");
         menus[i].appendChild(container);
 
-        // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
+        // Displays the selected option when the pop-up is inactive
         let choicesLabel = document.createElement("div");
         choicesLabel.setAttribute("class", "popup-choices-label");
-        // Inherit the parent's width (style)
-        choicesLabel.setAttribute("style", menus[i].getAttribute("style"));
-        menus[i].removeAttribute("style");
-        // FIXME: This _should_ always be the `0`th element
+        // Display the selected default option
         choicesLabel.innerHTML = selectElement.options[selectElement.selectedIndex].innerHTML;
         container.appendChild(choicesLabel);
 

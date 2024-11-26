@@ -560,6 +560,8 @@ input[type=checkbox] {
   margin-top: 6pt;
   margin-right: 5pt;
   font-size: 11pt;
+  /* This value may need to be configurable */
+  width: 70pt;
 }
 
 /**
