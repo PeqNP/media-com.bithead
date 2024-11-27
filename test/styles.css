@@ -51,3 +51,13 @@ table.test-run tr.test-steps textarea {
 .CodeMirror {
   height: auto;
 }
+table.test-run tr.test-result.active {
+}
+table.test-run tr.test-result.inactive {
+}
+table.test-run tr.test-steps.active,
+table.test-run tr.notes.active { }
+table.test-run tr.test-steps.inactive,
+table.test-run tr.notes.inactive {
+  display: none;
+}
