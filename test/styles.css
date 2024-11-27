@@ -48,7 +48,6 @@ table.test-run tr.test-steps textarea {
   resize: none;
   cursor: not-allowed;
 }
-
 .CodeMirror {
   height: auto;
 }

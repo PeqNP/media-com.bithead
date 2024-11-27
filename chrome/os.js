@@ -19,6 +19,32 @@ function OS() {
     // List of "open" window controllers.
     let controllers = {};
 
+    // Provides a way to access an instance of a controller and call a function
+    // on the instance.
+    //
+    // e.g. `os.controller.ActiveTestRun_0000.fn()`
+    //
+    // The reason this was done, was to avoid creating a `controller()` function
+    // which required the ID to be passed in a string. The quotes would be escaped
+    // when interpolated by Vapor/Leaf backend renderer. Luckily, this provides a
+    // more succint, and clean, way to get access to controller instance.
+    //
+    // Furthermore, this still ensures the `controller`s variable is not being
+    // leaked.
+    const controller = {};
+    const handler = {
+        // `prop` is the `id` of the `window`
+        get: function(obj, prop) {
+            return controllers[prop];
+        },
+        set: function(obj, prop, value) {
+            console.warn(`It is not possible to assign ${value} to ${prop}`);
+            return false; // Not supported
+        }
+    };
+
+    this.controller = new Proxy(controller, handler);
+
     /**
      * Execute an OS bar system action.
      */
@@ -209,21 +235,21 @@ function OS() {
         let id = win.getAttribute("id");
         if (id !== null && id.length > 0) {
             let code = "new window." + id + "();";
-            let controller = eval(code);
-            console.log(controller);
-            if (controller !== null && controller !== "undefined") {
+            let ctrl = eval(code);
+            console.log(ctrl);
+            if (ctrl !== null && ctrl !== "undefined") {
                 // TODO: Eventually the controller will be registered and life-cycle events passed.
                 // TODO: Eventually an instance of the controller will be created, container
                 // content rendered, and then viewDidLoad called before it is visible in the #desktop.
-                if (controller.viewDidLoad !== undefined) {
-                    controller.viewDidLoad();
+                if (ctrl.viewDidLoad !== undefined) {
+                    ctrl.viewDidLoad();
                 }
                 // For now, only the viewDidAppear life-cycle event is relevant
                 // as everything is rendered at once.
-                if (controller.viewDidAppear !== undefined) {
-                    controller.viewDidAppear();
+                if (ctrl.viewDidAppear !== undefined) {
+                    ctrl.viewDidAppear();
                 }
-                controllers[id] = controller;
+                controllers[id] = ctrl;
             }
         }
 
@@ -261,17 +287,17 @@ function OS() {
 
     /**
      * Return instance of resgistered controller, given its `controllerID`.
-     */
     function controller(controllerID) {
-        let controller = controllers[controllerID];
-        if (controller === null || controller === undefined) {
+        let ctrl = controllers[controllerID];
+        if (ctrl === null || ctrl === undefined) {
             console.error("No controller has been registerd with ID: " + controllerID);
             return null;
         }
-        return controller;
+        return ctrl;
     }
 
     this.controller = controller;
+     */
 }
 
 /**
