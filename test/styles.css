@@ -2,13 +2,11 @@
  * Also, when the test-steps are _not_ shown, and the row
  * is "inactive", show a border. */
 table.test-run tr.notes td,
-table.test-run tr.inactive td,
 table.test-run tr.test-suite td,
 table.test-run tr.test-suite-group td {
   border-bottom: 1pt solid #000;
 }
-table.test-run tr.notes:last-child td,
-table.test-run tr.inactive:last-child {
+table.test-run tr.notes:last-child td {
   border-bottom: none;
 }
 
@@ -60,4 +58,8 @@ table.test-run tr.notes.active { }
 table.test-run tr.test-steps.inactive,
 table.test-run tr.notes.inactive {
   display: none;
+}
+/* When a test case becomes inactive, show the border */
+table.test-run tr.test-case.inactive {
+  border-bottom: 1pt solid #000;
 }
