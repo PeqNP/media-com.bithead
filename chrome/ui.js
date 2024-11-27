@@ -489,3 +489,18 @@ function styleOSMenus() {
         });
     }
 }
+
+/**
+ * Finds the next sibling given a class name.
+ */
+function findNextSiblingWithClass(element, className) {
+    let sibling = element.nextElementSibling;
+
+    while (sibling) {
+        if (sibling.classList && sibling.classList.contains(className)) {
+            return sibling;
+        }
+        sibling = sibling.nextElementSibling;
+    }
+    return null;
+}
