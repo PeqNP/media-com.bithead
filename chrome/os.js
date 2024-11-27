@@ -367,4 +367,31 @@ function Network(os) {
     }
 
     this.json = json;
+
+    function stylesheet(href) {
+        return new Promise((resolve, reject) => {
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.onload = resolve;
+            link.onerror = reject;
+            link.href = '/codemirror/lib/codemirror.css';
+            document.head.appendChild(link);
+        });
+    }
+
+    this.stylesheet = stylesheet;
+
+    function javascript(href) {
+        return new Promise((resolve, reject) => {
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = href;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    this.javascript = javascript;
 }

@@ -2,22 +2,53 @@
  * Also, when the test-steps are _not_ shown, and the row
  * is "inactive", show a border. */
 table.test-run tr.notes td,
-table.test-run tr.inactive td {
+table.test-run tr.inactive td,
+table.test-run tr.test-suite td,
+table.test-run tr.test-suite-group td {
   border-bottom: 1pt solid #000;
 }
 table.test-run tr.notes:last-child td,
 table.test-run tr.inactive:last-child {
   border-bottom: none;
 }
+
 table.test-run tr.notes textarea {
   width: 100%;
   height: 30pt;
 }
-table.test-run .test-suite {
-  background-color: #aaa;
+textarea.notes {
+  width: 100%;
+  height: 50pt;
 }
-table.test-run .test-suite-group {
+table.test-run tr.test-suite {
   background-color: #ddd;
 }
-table.test-run .test-case {
+table.test-run tr.test-suite-group {
+  background-color: #eee;
+}
+table.test-run tr.test-suite-group td {
+  padding-left: 10pt;
+}
+table.test-run tr.test-suite,
+table.test-run tr.test-suite-group {
+  font-family: "ChicagoFLF";
+  font-size: 10pt;
+}
+table.test-run tr.test-case {
+  font-family: "Geneva";
+  font-size: 10pt;
+  font-weight: bold;
+}
+
+table.test-run tr.test-steps textarea {
+  margin: 5pt 5pt 5pt 15pt;
+  border: none;
+  height: auto;
+  width: 90%;
+  resize: none;
+  cursor: not-allowed;
+}
+
+.CodeMirror {
+  height: auto;
 }
