@@ -1,0 +1,19 @@
+/* When test-steps are displayed, show a border underneath.
+ * Also, when the test-steps are _not_ shown, and the row
+ * is "inactive", show a border. */
+table.test-run tr.test-steps td,
+table.test-run tr.inactive td {
+  border-bottom: 1pt solid #000;
+}
+table.test-run tr.test-steps:last-child td,
+table.test-run tr.inactive:last-child {
+  border-bottom: none;
+}
+table.test-run .test-suite {
+  background-color: #aaa;
+}
+table.test-run .test-suite-group {
+  background-color: #ddd;
+}
+table.test-run .test-case {
+}
