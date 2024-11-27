@@ -335,7 +335,10 @@ function Network(os) {
      * Returns a JSON object.
      */
     function json(url, body, fn) {
-        if (body !== null) {
+        if (body === null || body.length < 1) {
+            body = '{}';
+        }
+        else {
             body = JSON.stringify(body);
         }
         fetch(url, {
