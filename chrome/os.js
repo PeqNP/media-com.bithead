@@ -14,6 +14,8 @@ function OS() {
     // Displayed in OS menu, settings, etc.
     this.username = "";
 
+    this.network = new Network(this);
+
     // List of "open" window controllers.
     let controllers = {};
 
@@ -319,4 +321,46 @@ function Controller() {
      * Called after the window has been rendered.
      */
     function viewDidAppear() { }
+}
+
+/**
+ * Provides network functions.
+ */
+function Network(os) {
+    /**
+     * Make a POST request with an object that can be converted into JSON.
+     *
+     * Displays an error model if an error occurred.
+     * Returns a JSON object.
+     */
+    function json(url, body, fn) {
+        if (body !== null) {
+            body = JSON.stringify(body);
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: body
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request unexpectedly failed");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If there is an `error` struct, the response is considered to be in error
+                if (data.error !== undefined) {
+                    throw new Error(data.error.message);
+                }
+                fn(data);
+            })
+            .catch(error => {
+                os.showErrorModal(error.message);
+            });
+    }
+
+    this.json = json;
 }
