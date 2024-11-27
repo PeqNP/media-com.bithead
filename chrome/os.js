@@ -92,16 +92,6 @@ function OS() {
     this.signIn = signIn;
 
     /**
-     * Make a network request.
-     */
-    function request(url, redirectTo) {
-        // TODO: If `redirectTo` provided, URL encode the value and add it as a GET parameter to the URL
-        window.location = url;
-    }
-
-    this.request = request;
-
-    /**
      * Add a menu to the OS bar.
      */
     function addOSBarMenu(menu) {
@@ -327,6 +317,17 @@ function Controller() {
  * Provides network functions.
  */
 function Network(os) {
+
+    /**
+     * Redirect via a GET request.
+     */
+    function request(url, redirectTo) {
+        // TODO: If `redirectTo` provided, URL encode the value and add it as a GET parameter to the URL
+        window.location = url;
+    }
+
+    this.request = request;
+
     /**
      * Make a POST request with an object that can be converted into JSON.
      *
