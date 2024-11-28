@@ -63,3 +63,16 @@ table.test-run tr.notes.inactive {
 table.test-run tr.test-case.inactive {
   border-bottom: 1pt solid #000;
 }
+/* When active, display options and hide status name. Do the inverse when inactive. */
+table.test-run tr.test-case.active .options {
+  display: block;
+}
+table.test-run tr.test-case.active .status-name {
+  display: none;
+}
+table.test-run tr.test-case.inactive .options {
+  display: none;
+}
+table.test-run tr.test-case.inactive .status-name {
+  display: block;
+}
