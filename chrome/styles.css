@@ -964,6 +964,16 @@ ul.bullet-list li::before {
   transform: translate(-50%, -50%);
 }
 
+/* Used to center images in the middle of a container
+ * The image must be contained within a `div.center-image` */
+.center-image {
+  text-align: center;
+}
+.center-image img {
+  display: inline-block
+  vertical-align: center;
+}
+
 .center-text {
   text-align: center;
 }

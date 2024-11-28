@@ -504,3 +504,42 @@ function findNextSiblingWithClass(element, className) {
     }
     return null;
 }
+
+function UIImageViewer() {
+
+    let element = {};
+
+    /**
+     * Close a (modal) window.
+     *
+     * Removes the window from the view hierarchy.
+     *
+     * - Parameter win: The window to close.
+     */
+    function closeWindow(win) {
+        const parent = win.parentNode;
+        parent.removeChild(win);
+    }
+
+    function showImage(href) {
+        let img = element.querySelector("img");
+        img.src = href;
+        var desktop = document.getElementById("desktop-container");
+        desktop.appendChild(element);
+    }
+
+    this.showImage = showImage;
+
+    function make() {
+        var fragment = document.getElementById("image-viewer");
+        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var button = modal.querySelector("button.default");
+        button.addEventListener("click", function() {
+            closeWindow(modal);
+        });
+        modal.classList.add("center-control");
+        return modal;
+    }
+
+    element = make();
+}
