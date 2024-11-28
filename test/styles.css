@@ -77,17 +77,21 @@ table.test-run tr.test-case.inactive .status-name {
   display: block;
 }
 
-table.test-run td.metadata {
-  background-color: #aaa;
+table.test-run td.resources {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 10pt;
 }
-table.test-run td.metadata .images {
+table.test-run td.resources .images {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 10pt;
 }
-table.test-run td.metadata .images img {
+table.test-run td.resources .images img {
   flex: 1 1 calc(50% - 10pt);
   width: 70pt;
   max-width: 100%;
