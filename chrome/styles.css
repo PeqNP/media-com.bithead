@@ -29,7 +29,10 @@ h1 {
   font-family: "ChicagoFLF";
 }
 
-h1.add-margin {
+h1.add-margin,
+h2.add-margin,
+h3.add-margin,
+h4.add-margin {
   margin-bottom: 10pt;
 }
 
@@ -967,26 +970,36 @@ ul.bullet-list li::before {
 
 /** List of items **/
 
+ul.flat-list li {
+  display: inline-block;
+}
+
+ul.flat-list,
 ul.simple-list {
   padding-left: 0pt;
   list-style: none;
 }
 
+ul.flat-list,
 ul.simple-list.add-margin {
   margin-bottom: 10pt;
 }
+ul.flat-list,
 ul.simple-list.add-more-margin {
   margin-bottom: 20pt;
 }
 
+ul.flat-list,
 ul.simple-list li {
   font-family: "ChicagoFLF";
   font-size: 12pt;
 }
 
+ul.flat-list,
 ul.simple-list li:last-child {
 }
 
+ul.flat-list,
 ul.simple-list li::before {
   content: '';
 }
