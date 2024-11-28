@@ -82,6 +82,10 @@ fragment {
   display: none;
 }
 
+body {
+  background-color: #ebebeb;
+}
+
 #desktop {
   position: relative;
   width: 100%;
@@ -160,7 +164,7 @@ fragment {
   left: 10pt;
   top: 10pt;
   */
-  display: inline-block;
+  display: block;
 }
 
 #desktop .window .top {
@@ -328,7 +332,9 @@ fragment {
   min-width: 360pt;
   min-height: 250pt;
   max-width: 600pt;
-  max-height: 500pt;
+  /* This must be relative to the size of the #desktop - 20pt so that it never
+   * exceeds the bottom. May require JS option. */
+  max-height: 440pt;
   /* For testing - Setting the initial width and height prevents the window from being the size of the parent's viewport
   width: 360pt;
   height: 250pt;
