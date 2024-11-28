@@ -76,3 +76,21 @@ table.test-run tr.test-case.inactive .options {
 table.test-run tr.test-case.inactive .status-name {
   display: block;
 }
+
+table.test-run td.metadata {
+  background-color: #aaa;
+}
+table.test-run td.metadata .images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10pt;
+}
+table.test-run td.metadata .images img {
+  flex: 1 1 calc(50% - 10pt);
+  width: 70pt;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
