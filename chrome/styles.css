@@ -1035,16 +1035,23 @@ ul.simple-list li::before {
 
 /** Form Fields **/
 
-/* A read-only label value */
-div.read-only {
-  font-family: "Geneva";
-  font-size: 14pt;
+/* A read-only label field */
+div.read-only label {
+  font-family: "ChicagoFLF";
+  font-size: 11pt;
+  display: inline-block;
+  /* Should match the .popup-menu label width */
+  width: 70pt;
 }
 
-/* The `span` inside `div.read-only` is the field name */
+/* The `span` inside `div.read-only` is the value for the field name */
 div.read-only span {
-  font-family: "ChicagoFLF";
-  font-size: 14pt;
+  font-family: "Geneva";
+  font-size: 11pt;
+}
+
+div.read-only.add-margin {
+  margin-bottom: 10pt;
 }
 
 div.add-margin {
@@ -1054,11 +1061,6 @@ div.add-margin {
 label {
   font-family: "ChicagoFLF";
   font-size: 10pt;
-}
-
-/* Use when enclosing `input`s or `read-only` values */
-label.add-margin {
-  margin-bottom: 10pt;
 }
 
 .text-field.add-margin {
