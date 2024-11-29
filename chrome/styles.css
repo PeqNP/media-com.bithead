@@ -1056,6 +1056,11 @@ label {
   font-size: 10pt;
 }
 
+/* Use when enclosing `input`s or `read-only` values */
+label.add-margin {
+  margin-bottom: 10pt;
+}
+
 .text-field.add-margin {
   margin-bottom: 10pt;
 }
