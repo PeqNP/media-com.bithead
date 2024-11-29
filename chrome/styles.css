@@ -18,6 +18,13 @@ html, body {
   transform-origin: 0 0; /* Ensure scaling from top-left corner */
 }
 
+hr {
+  border: none;
+  height: 1px;
+  background-color: #000;
+  margin: 20px 0px;
+}
+
 a {
   font-family: "Geneva";
   font-size: 14pt;
@@ -415,7 +422,8 @@ body {
 
 #desktop button.default,
 #desktop button.primary,
-#desktop button.secondary {
+#desktop button.secondary,
+::file-selector-button {
   cursor: pointer;
 }
 
@@ -452,6 +460,7 @@ body {
 
 /* Secondary: Thinner and smaller then primary button. */
 
+::file-selector-button,
 #desktop button.secondary {
   border: 1pt solid #000;
   border-radius: 4pt;
@@ -463,11 +472,13 @@ body {
   padding: 0pt 16pt 0pt 16pt;
 }
 
+::file-selector-button:hover,
 #desktop button.secondary:hover {
   background-color: #000;
   color: #fff;
 }
 
+::file-selector-button:disabled,
 #desktop button.secondary:disabled {
   border: 1pt solid #000;
   border-radius: 4pt;
@@ -478,6 +489,7 @@ body {
   padding: 0pt 18pt 0pt 18pt;
 }
 
+::file-selector-button:disabled:hover,
 #desktop button.secondary:disabled:hover {
   background-color: #fff;
   color: #C0C0C0;
@@ -512,6 +524,7 @@ body {
 
 /** Inputs **/
 
+textarea,
 input[type=text], input[type=password] {
   border: 1pt solid #000;
   height: 20pt;
@@ -1060,7 +1073,7 @@ div.add-margin {
 
 label {
   font-family: "ChicagoFLF";
-  font-size: 10pt;
+  font-size: 14px;
 }
 
 .text-field.add-margin {
@@ -1069,6 +1082,15 @@ label {
 .text-field label {
   display: block;
 }
+.textarea-field.add-margin {
+  margin-bottom: 10pt;
+}
+.textarea-field label {
+  display: block;
+}
 
-.checkbox-field { }
+.checkbox-field label {
+  position: relative;
+  top: -2px;
+}
 .radio-field { }

@@ -98,3 +98,45 @@ table.test-run td.resources .images img {
   height: auto;
   display: block;
 }
+
+.resources {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10pt;
+}
+
+.resources .images {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.resources .image {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.resources .image figure {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  width: 80px;
+  margin: 0px;
+}
+.resources .image figcaption {
+  background-color: #000;
+  font-family: "Geneva";
+  font-size: 10px;
+  color: #fff;
+  text-align: center;
+}
+.resources .image .crud-controls {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  gap: 10px;
+}
