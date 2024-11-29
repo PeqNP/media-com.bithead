@@ -234,7 +234,7 @@ function OS() {
         // Register window for life-cycle events
         let id = win.getAttribute("id");
         if (id !== null && id.length > 0) {
-            let code = "new window." + id + "();";
+            let code = "new window." + id + "(win);";
             let ctrl = eval(code);
             console.log(ctrl);
             if (ctrl !== null && ctrl !== "undefined") {
@@ -316,7 +316,7 @@ function OS() {
  *
  * e.g.
  * ```
- * function my_controller() {
+ * function my_controller(view) {
  *     this.viewDidAppear = function() {
  *         // Do something when the view appears
  *     }
@@ -325,6 +325,8 @@ function OS() {
  *     return this;
  * }
  * ```
+ *
+ * The respective `Controller`'s `view` is provided as the first parameter.
  */
 function Controller() {
     /**
@@ -392,7 +394,41 @@ function Network(os) {
             });
     }
 
+    // @deprecated - Use `post` instead
     this.json = json;
+    this.post = json;
+
+    /**
+     * Make a DELETE request.
+     *
+     * This expects response to be JSON.
+     *
+     * Displays an error model if an error occurred.
+     * @returns JSON object.
+     */
+    function delete(url, fn) {
+        fetch(url, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request unexpectedly failed");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If there is an `error` struct, the response is considered to be in error
+                if (data.error !== undefined) {
+                    throw new Error(data.error.message);
+                }
+                fn(data);
+            })
+            .catch(error => {
+                os.showErrorModal(error.message);
+            });
+    }
+
+    this.delete = delete;
 
     function stylesheet(href) {
         return new Promise((resolve, reject) => {
