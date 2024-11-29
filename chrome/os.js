@@ -406,7 +406,7 @@ function Network(os) {
      * Displays an error model if an error occurred.
      * @returns JSON object.
      */
-    function delete(url, fn) {
+    function _delete(url, fn) {
         fetch(url, {
             method: "DELETE"
         })
@@ -428,7 +428,7 @@ function Network(os) {
             });
     }
 
-    this.delete = delete;
+    this.delete = _delete;
 
     function stylesheet(href) {
         return new Promise((resolve, reject) => {
