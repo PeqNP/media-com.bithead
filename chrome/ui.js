@@ -298,6 +298,7 @@ function UIPopupMenu(select) {
                 // This div displays the "selected" option
                 var sibling = this.parentNode.parentNode.previousSibling;
                 for (var z = 0; z < select.length; z++) {
+                    // Update `select` w/ selected option
                     if (select.options[z].innerHTML == this.innerHTML) {
                         select.selectedIndex = z;
                         sibling.innerHTML = this.innerHTML;
