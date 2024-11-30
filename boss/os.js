@@ -1,7 +1,7 @@
 /// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
 /**
- * Bithead OS
+ * Bithead OS aka BOSS
  *
  * Provides system-level features
  * - Access to UI API
@@ -30,36 +30,6 @@ function OS() {
         console.log("Log out user");
     }
     this.logOut = logOut;
-
-    /**
-     * Show Bithead OS version.
-     */
-    function showAbout() {
-        var modal = document.getElementById("os-about");
-        if (modal === null) {
-            console.warn("OS About modal not found");
-            return;
-        }
-        if (modal.style.display == "block") {
-            return;
-        }
-        modal.style.display = "block";
-    }
-    this.showAbout = showAbout;
-
-    function hideAbout() {
-        var modal = document.getElementById("os-about");
-        if (modal === null) {
-            console.warn("OS About modal not found");
-            return;
-        }
-        if (modal.style.display == "none") {
-            return;
-        }
-        modal.style.display = "none";
-        return false;
-    }
-    this.hideAbout = hideAbout;
 
     function signIn(username) {
         this.username = username;

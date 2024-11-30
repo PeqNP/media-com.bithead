@@ -130,6 +130,43 @@ function UI(os) {
         p.appendChild(menu);
     }
     this.addOSBarMenu = addOSBarMenu
+
+    /**
+     * Show Bithead OS About menu.
+     *
+     * FIXME: This needs to use the latest patterns to instantiate, show,
+     * and hide windows/modals.
+     */
+    function showAbout() {
+        var modal = document.getElementById("os-about");
+        if (modal === null) {
+            console.warn("OS About modal not found");
+            return;
+        }
+        if (modal.style.display == "block") {
+            return;
+        }
+        modal.style.display = "block";
+    }
+    this.showAbout = showAbout;
+
+    /**
+     * Hide Bithead OS About.
+     */
+    function hideAbout() {
+        var modal = document.getElementById("os-about");
+        if (modal === null) {
+            console.warn("OS About modal not found");
+            return;
+        }
+        if (modal.style.display == "none") {
+            return;
+        }
+        modal.style.display = "none";
+        return false;
+    }
+    this.hideAbout = hideAbout;
+
 }
 
 /**
