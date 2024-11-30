@@ -949,7 +949,7 @@ ul.folder .metadata, ul.folder .metadata-title {
 
 ul.bullet-list {
   padding-left: 0px;
-  list-style: none;
+  list-style-type: circle;
 }
 
 ul.bullet-list.add-margin {
@@ -969,17 +969,6 @@ ul.bullet-list li:last-child {
 }
 
 ul.bullet-list li::before {
-  content: ""; /* Empty content */
-  display: block;
-  position: relative;
-  left: -0.7em; /* Position the triangle at the start of the list item */
-  top: 14px; /* Center the triangle vertically */
-  width: 0;
-  height: 0;
-  border-color: transparent #111;
-  border-style: solid;
-  border-width: 0.35em 0 0.35em 0.45em;
-  /* transform: translateY(-50%); /* Adjust vertical centering */
 }
 
 /** Common Utility **/

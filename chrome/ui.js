@@ -159,6 +159,16 @@ function UIPopupMenu(select) {
         label.innerHTML = select.options[select.selectedIndex].innerHTML;
     }
 
+    function selectValue(value) {
+        for (let idx = 0; idx < select.options.length; idx++) {
+            if (select.options[idx].value == `${value}`) {
+                selectOption(idx);
+                return;
+            }
+        }
+    }
+    this.selectValue = selectValue;
+
     function selectOption(index) {
         select.selectedIndex = index;
         updateSelectedOptionLabel();
