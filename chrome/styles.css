@@ -592,9 +592,9 @@ input[type=checkbox] {
 .popup-menu label {
   margin-top: 6px;
   margin-right: 5px;
-  font-size: 11px;
+  font-size: 14px;
   /* This value may need to be configurable */
-  width: 70px;
+  width: 90px;
 }
 
 /**
@@ -1059,16 +1059,16 @@ ul.simple-list li::before {
 /* A read-only label field */
 div.read-only label {
   font-family: "ChicagoFLF";
-  font-size: 11px;
+  font-size: 14px;
   display: inline-block;
   /* Should match the .popup-menu label width */
-  width: 70px;
+  width: 90px;
 }
 
 /* The `span` inside `div.read-only` is the value for the field name */
 div.read-only span {
   font-family: "Geneva";
-  font-size: 11px;
+  font-size: 14px;
 }
 
 div.read-only.add-margin {
