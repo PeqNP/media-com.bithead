@@ -1,12 +1,173 @@
-function initUI() {
-    styleOSMenus();
-    stylePopupMenus();
-    styleFolders();
+/// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
+
+/**
+ * Provides access to UI library.
+ */
+function UI(os) {
+
+    // List of "open" window controllers.
+    let controllers = {};
+
+    // Provides a way to access an instance of a controller and call a function
+    // on the instance.
+    //
+    // e.g. `os.ui.controller.ActiveTestRun_0000.fn()`
+    //
+    // The reason this was done, was to avoid creating a `controller()` function
+    // which required the ID to be passed in a string. The quotes would be escaped
+    // when interpolated by Vapor/Leaf backend renderer. Luckily, this provides a
+    // more succint, and clean, way to get access to controller instance.
+    //
+    // Furthermore, this still ensures the `controller`s variable is not being
+    // leaked.
+    const controller = {};
+    const handler = {
+        // `prop` is the `id` of the `window`
+        get: function(obj, prop) {
+            return controllers[prop];
+        },
+        set: function(obj, prop, value) {
+            console.warn(`It is not possible to assign ${value} to ${prop}`);
+            return false; // Not supported
+        }
+    };
+    this.controller = new Proxy(controller, handler);
+
+    function init() {
+        styleOSMenus();
+        stylePopupMenus();
+        styleFolders();
+
+        /**
+         * Close all menus when user clicks outside of `select`.
+         */
+        document.addEventListener("click", closeAllMenus);
+    }
+    this.init = init;
 
     /**
-     * Close all menus when user clicks outside of `select`.
+     * Creates an instance of a `UIWindow` given a `fragment.id`.
+     *
+     * - Parameter fragmentID: The `id` of the `fragment` in `document`.
+     * - Returns: Instance of the `fragment` as a `UIWindow`
      */
-    document.addEventListener("click", closeAllMenus);
+    function makeWindow(fragmentID) {
+        var fragment = document.getElementById(fragmentID);
+        var win = fragment.querySelector(`.window`).cloneNode(true);
+        // Register window
+        return win;
+    }
+    this.makeWindow = makeWindow;
+
+    function makeModal(fragmentID) {
+    }
+    this.makeModal = makeModal;
+
+    /**
+     * Register all windows with the OS.
+     *
+     * This allows for window menus to be displayed in the OS bar.
+     */
+    function registerWindows() {
+        let windows = document.getElementsByClassName("window");
+        for (let i = 0; i < windows.length; i++) {
+            registerWindow(windows[i]);
+        }
+    }
+    this.registerWindows = registerWindows;
+
+    /**
+     * Register a window with the OS.
+     *
+     * This allows the OS to display the window's menus in the OS bar.
+     */
+    function registerWindow(win) {
+        // Register window for life-cycle events
+        let id = win.getAttribute("id");
+        if (id !== null && id.length > 0) {
+            let code = "new window." + id + "(win);";
+            let ctrl = eval(code);
+            console.log(ctrl);
+            if (ctrl !== null && ctrl !== "undefined") {
+                // TODO: Eventually the controller will be registered and life-cycle events passed.
+                // TODO: Eventually an instance of the controller will be created, container
+                // content rendered, and then viewDidLoad called before it is visible in the #desktop.
+                if (ctrl.viewDidLoad !== undefined) {
+                    ctrl.viewDidLoad();
+                }
+                // For now, only the viewDidAppear life-cycle event is relevant
+                // as everything is rendered at once.
+                if (ctrl.viewDidAppear !== undefined) {
+                    ctrl.viewDidAppear();
+                }
+                controllers[id] = ctrl;
+            }
+        }
+
+        // TODO: Add `show`
+        // TODO: Add `close`
+
+        var osMenus = win.getElementsByClassName("os-menus");
+        if (osMenus.length < 1) {
+            return;
+        }
+        osMenus = osMenus[0];
+
+        var menus = osMenus.getElementsByClassName("os-menu");
+        for (;menus.length > 0;) {
+            var menu = menus[0];
+            menu.parentNode.removeChild(menu);
+            addOSBarMenu(menu);
+        }
+        osMenus.parentNode.removeChild(osMenus);
+    }
+
+    /**
+     * Add a menu to the OS bar.
+     */
+    function addOSBarMenu(menu) {
+        var p = document.getElementById("menus");
+        p.appendChild(menu);
+    }
+    this.addOSBarMenu = addOSBarMenu
+}
+
+/**
+ * Provides protocol definition for a Controller.
+ *
+ * A `UIController` allows a `div.window` to receive life-cycle events from the OS.
+ *
+ * All functions are optional. Therefore, implement only the functions needed.
+ *
+ * A `UIController` is defined on a `div.window` with the `id` attribute.
+ * e.g. <div class="window" id="my_controller">
+ *
+ * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.window`.
+ * The `script` tag must have a function with the same name as its `id`.
+ * This `script` is used to receive view life-cycle signals from the OS.
+ *
+ * e.g.
+ * ```
+ * // The respective `UIController`'s `view` is provided as the first parameter.
+ * function my_controller(view) {
+ *     this.viewDidAppear = function() {
+ *         // Do something when the view appears
+ *     }
+ * }
+ * ```
+ */
+function UIController() {
+    /**
+     * Called directly before the window is rendered.
+     *
+     * TODO: Not yet implemented.
+     */
+    function viewDidLoad() { }
+
+    /**
+     * Called after the window has been rendered.
+     */
+    function viewDidAppear() { }
 }
 
 function styleFolders() {

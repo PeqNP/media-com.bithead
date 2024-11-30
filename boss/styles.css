@@ -1,3 +1,5 @@
+/* Copyright ⓒ 2024 Bithead LLC. All rights reserved. */
+
 /** Reset **/
 
 /* padding: top right bottom left; */
@@ -824,6 +826,13 @@ ul.folder li.server::before {
   top: 11px;
   left: 12px;
   background: transparent url('/boss/server.svg') 0px 0px no-repeat;
+}
+
+ul.folder li.file::before {
+  width: 12px;
+  top: 4px;
+  left: 30px;
+  background: transparent url('/boss/file-icon.svg') 0px 0px no-repeat;
 }
 
 ul.folder li span {

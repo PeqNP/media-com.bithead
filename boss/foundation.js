@@ -1,3 +1,4 @@
+/// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
 /**
  * Returns `true` if the value is `null` or `undefined`.

@@ -1,12 +1,12 @@
+/// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
 /**
  * Bithead OS
  *
  * Provides system-level features
- * - OS bar menus
+ * - Access to UI API
+ * - Access to Network API
  * - Signing in and out
- * - App and window management
- * - Making network requests
  * - Clock
  */
 function OS() {
@@ -15,61 +15,21 @@ function OS() {
     this.username = "";
 
     this.network = new Network(this);
+    this.ui = new UI(this);
 
-    // List of "open" window controllers.
-    let controllers = {};
-
-    // Provides a way to access an instance of a controller and call a function
-    // on the instance.
-    //
-    // e.g. `os.controller.ActiveTestRun_0000.fn()`
-    //
-    // The reason this was done, was to avoid creating a `controller()` function
-    // which required the ID to be passed in a string. The quotes would be escaped
-    // when interpolated by Vapor/Leaf backend renderer. Luckily, this provides a
-    // more succint, and clean, way to get access to controller instance.
-    //
-    // Furthermore, this still ensures the `controller`s variable is not being
-    // leaked.
-    const controller = {};
-    const handler = {
-        // `prop` is the `id` of the `window`
-        get: function(obj, prop) {
-            return controllers[prop];
-        },
-        set: function(obj, prop, value) {
-            console.warn(`It is not possible to assign ${value} to ${prop}`);
-            return false; // Not supported
-        }
-    };
-
-    this.controller = new Proxy(controller, handler);
-
-    /**
-     * Execute an OS bar system action.
-     */
-    function executeSystemOption(option) {
-        if (option == "logOut") {
-            logOut();
-        }
-        else if (option == "showVersion") {
-            showVersion();
-        }
-        else {
-            console.log("Invalid system option (" + option + ")");
-        }
+    function init() {
+        this.ui.init();
+        startClock();
     }
-
-    this.executeSystemOption = executeSystemOption;
+    this.init = init;
 
     /**
      * Log user out of system.
      */
-    function logout() {
+    function logOut() {
         console.log("Log out user");
     }
-
-    this.logout = logout;
+    this.logOut = logOut;
 
     /**
      * Show Bithead OS version.
@@ -85,7 +45,6 @@ function OS() {
         }
         modal.style.display = "block";
     }
-
     this.showAbout = showAbout;
 
     function hideAbout() {
@@ -100,7 +59,6 @@ function OS() {
         modal.style.display = "none";
         return false;
     }
-
     this.hideAbout = hideAbout;
 
     function signIn(username) {
@@ -116,16 +74,6 @@ function OS() {
     }
 
     this.signIn = signIn;
-
-    /**
-     * Add a menu to the OS bar.
-     */
-    function addOSBarMenu(menu) {
-        var p = document.getElementById("menus");
-        p.appendChild(menu);
-    }
-
-    this.addOSBarMenu = addOSBarMenu
 
     /**
      * Get the current time formatted in DDD MMM dd HH:MM AA.
@@ -176,8 +124,6 @@ function OS() {
         setInterval(updateClock, 2000);
     }
 
-    this.startClock = startClock;
-
     /**
      * Close a (modal) window.
      *
@@ -212,63 +158,6 @@ function OS() {
     this.showErrorModal = showErrorModal;
 
     /**
-     * Register all windows with the OS.
-     *
-     * This allows for window menus to be displayed in the OS bar.
-     */
-    function registerWindows() {
-        var windows = document.getElementsByClassName("window");
-        for (var i = 0; i < windows.length; i++) {
-            registerWindow(windows[i]);
-        }
-    }
-
-    this.registerWindows = registerWindows;
-
-    /**
-     * Register a window with the OS.
-     *
-     * This allows the OS to display the window's menus in the OS bar.
-     */
-    function registerWindow(win) {
-        // Register window for life-cycle events
-        let id = win.getAttribute("id");
-        if (id !== null && id.length > 0) {
-            let code = "new window." + id + "(win);";
-            let ctrl = eval(code);
-            console.log(ctrl);
-            if (ctrl !== null && ctrl !== "undefined") {
-                // TODO: Eventually the controller will be registered and life-cycle events passed.
-                // TODO: Eventually an instance of the controller will be created, container
-                // content rendered, and then viewDidLoad called before it is visible in the #desktop.
-                if (ctrl.viewDidLoad !== undefined) {
-                    ctrl.viewDidLoad();
-                }
-                // For now, only the viewDidAppear life-cycle event is relevant
-                // as everything is rendered at once.
-                if (ctrl.viewDidAppear !== undefined) {
-                    ctrl.viewDidAppear();
-                }
-                controllers[id] = ctrl;
-            }
-        }
-
-        var osMenus = win.getElementsByClassName("os-menus");
-        if (osMenus.length < 1) {
-            return;
-        }
-        osMenus = osMenus[0];
-
-        var menus = osMenus.getElementsByClassName("os-menu");
-        for (;menus.length > 0;) {
-            var menu = menus[0];
-            menu.parentNode.removeChild(menu);
-            addOSBarMenu(menu);
-        }
-        osMenus.parentNode.removeChild(osMenus);
-    }
-
-    /**
      * Copy string `item` to clipboard.
      *
      * - Parameter button: The button invoking the copy action
@@ -282,63 +171,7 @@ function OS() {
             button.innerHTML = originalHTML;
         }, 2000);
     }
-
     this.copyToClipboard = copyToClipboard;
-
-    /**
-     * Return instance of resgistered controller, given its `controllerID`.
-    function controller(controllerID) {
-        let ctrl = controllers[controllerID];
-        if (ctrl === null || ctrl === undefined) {
-            console.error("No controller has been registerd with ID: " + controllerID);
-            return null;
-        }
-        return ctrl;
-    }
-
-    this.controller = controller;
-     */
-}
-
-/**
- * Provides protocol definition for a Controller.
- *
- * A Controller allows a `div.window` to receive life-cycle events from the OS.
- *
- * All functions are optional. Therefore, implement only the functions needed.
- *
- * A Controller is defined on a `div.window` with the `id` attribute.
- * e.g. <div class="window" id="my_controller">
- *
- * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.window`.
- * The `script` tag must have a function with the same name as its `id`.
- * This `script` is used to send view life-cycle signals to the respective controller.
- *
- * e.g.
- * ```
- * function my_controller(view) {
- *     this.viewDidAppear = function() {
- *         // Do something when the view appears
- *     }
- *
- *     // Return an instance to this object
- *     return this;
- * }
- * ```
- *
- * The respective `Controller`'s `view` is provided as the first parameter.
- */
-function Controller() {
-    /**
-     * Called directly before the window is rendered.
-     *
-     * TODO: Not yet implemented.
-     */
-    function viewDidLoad() { }
-    /**
-     * Called after the window has been rendered.
-     */
-    function viewDidAppear() { }
 }
 
 /**
