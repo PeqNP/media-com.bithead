@@ -54,7 +54,19 @@ function UI(os) {
     function makeWindow(fragmentID) {
         var fragment = document.getElementById(fragmentID);
         var win = fragment.querySelector(`.window`).cloneNode(true);
+        let id = win.getAttribute("id");
+        if (id === null) {
+            console.error("Window w/ ID (" + id + ") must have a controller");
+            return;
+        }
+        let code = "new window." + id + "(win)";
+        let ctrl = eval(code);
+        if (ctrl.viewDidLoad !== undefined) {
+            ctrl.viewDidLoad();
+        }
+        controllers[id] = ctrl;
         // Register window
+        win.ui = new UIWindow(this, win, ctrl);
         return win;
     }
     this.makeWindow = makeWindow;
@@ -67,6 +79,9 @@ function UI(os) {
      * Register all windows with the OS.
      *
      * This allows for window menus to be displayed in the OS bar.
+     *
+     * NOTE: This is temporary until all windows are creqated by the OS
+     * and not pre-rendered before the OS starts.
      */
     function registerWindows() {
         let windows = document.getElementsByClassName("window");
@@ -80,6 +95,9 @@ function UI(os) {
      * Register a window with the OS.
      *
      * This allows the OS to display the window's menus in the OS bar.
+     *
+     * NOTE: This is temporary solution until all windows are created by the OS
+     * and not pre-rendered before the OS starts.
      */
     function registerWindow(win) {
         // Register window for life-cycle events
@@ -87,7 +105,6 @@ function UI(os) {
         if (id !== null && id.length > 0) {
             let code = "new window." + id + "(win);";
             let ctrl = eval(code);
-            console.log(ctrl);
             if (ctrl !== null && ctrl !== "undefined") {
                 // TODO: Eventually the controller will be registered and life-cycle events passed.
                 // TODO: Eventually an instance of the controller will be created, container
@@ -103,9 +120,6 @@ function UI(os) {
                 controllers[id] = ctrl;
             }
         }
-
-        // TODO: Add `show`
-        // TODO: Add `close`
 
         var osMenus = win.getElementsByClassName("os-menus");
         if (osMenus.length < 1) {
@@ -167,6 +181,45 @@ function UI(os) {
     }
     this.hideAbout = hideAbout;
 
+    function showWindow(win) {
+    }
+}
+
+/**
+ * Provides window related functions.
+ */
+function UIWindow(ui, view, controller) {
+
+    view.controller = controller;
+
+    function show() {
+        // NOTE: Can I use `?` for undefined properties too?
+        if (controller.viewWillAppear !== undefined) {
+            controller.viewWillAppear();
+        }
+
+        let desktop = document.getElementById("desktop-container");
+        desktop.appendChild(view);
+
+        if (controller.viewDidAppear !== undefined) {
+            controller.viewDidAppear();
+        }
+    }
+    this.show = show;
+
+    function close() {
+        if (controller.viewWillDisappear !== undefined) {
+            controller.viewWillDisappear();
+        }
+
+        let desktop = document.getElementById("desktop-container");
+        desktop.removeChild(view);
+
+        if (controller.viewDidDisappear !== undefined) {
+            controller.viewDidDisappear();
+        }
+    }
+    this.close = close;
 }
 
 /**
@@ -733,7 +786,7 @@ function UIImageViewer() {
     function showImage(href) {
         let img = element.querySelector("img");
         img.src = href;
-        var desktop = document.getElementById("desktop-container");
+        let desktop = document.getElementById("desktop-container");
         desktop.appendChild(element);
     }
 

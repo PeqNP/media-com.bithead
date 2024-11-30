@@ -339,7 +339,7 @@ body {
   scrollbar-gutter: stable; */
   /* Prevents window from being resized down any further */
   min-width: 360xt;
-  min-height: 250px;
+  min-height: 40px;
   max-width: 600px;
   /* This must be relative to the size of the #desktop - 20px so that it never
    * exceeds the bottom. May require JS option. */
