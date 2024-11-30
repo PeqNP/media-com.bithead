@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "ChicagoFLF";
-  src: url("/chrome/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
+  src: url("/boss/ChicagoFLF.ttf") format('truetype'); /* Safari, Android, iOS */
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
@@ -181,7 +181,7 @@ body {
   border-bottom: 1px solid #000;
   background-position: center;
   /* TODO: The shade is too big */
-  background-image: url("/chrome/window-shade.svg");
+  background-image: url("/boss/window-shade.svg");
   background-size: auto 38px;
   background-repeat: repeat-x;
   flex-shrink: 0;
@@ -193,7 +193,7 @@ body {
   left: 10px;
   width: 17px;
   height: 17px;
-  background-image: url("/chrome/close-button.svg");
+  background-image: url("/boss/close-button.svg");
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -221,7 +221,7 @@ body {
   right: 10px;
   width: 17px;
   height: 17px;
-  background-image: url("/chrome/collapse-button.svg");
+  background-image: url("/boss/collapse-button.svg");
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
@@ -276,20 +276,20 @@ body {
   width: 20px;
 }
 ::-webkit-scrollbar-button:vertical:start {
-  background-image: url("/chrome/up-arrow.svg");
+  background-image: url("/boss/up-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
   border-left: 1px solid #000;
 }
 ::-webkit-scrollbar-button:vertical:end {
-  background-image: url("/chrome/down-arrow.svg");
+  background-image: url("/boss/down-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
   border-top: 1px solid #000;
   border-left: 1px solid #000;
 }
 ::-webkit-scrollbar-button:horizontal:start {
-  background-image: url("/chrome/left-arrow.svg");
+  background-image: url("/boss/left-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
   border-top: 1px solid #000;
@@ -297,7 +297,7 @@ body {
   border-bottom: 0px;
 }
 ::-webkit-scrollbar-button:horizontal:end {
-  background-image: url("/chrome/right-arrow.svg");
+  background-image: url("/boss/right-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
   border-top: 1px solid #000;
@@ -306,7 +306,7 @@ body {
   border-bottom: 0px;
 }
 ::-webkit-resizer {
-  background-image: url("/chrome/scrollbar-resize-button.svg");
+  background-image: url("/boss/scrollbar-resize-button.svg");
   background-position: center;
   background-repeat: no-repeat;
   /*
@@ -804,26 +804,26 @@ ul.folder summary::before {
 ul.folder summary::before {
   z-index: 1;
   top: 2px;
-  background: transparent url('/chrome/folder-closed.svg') 0px 0px no-repeat;
+  background: transparent url('/boss/folder-closed.svg') 0px 0px no-repeat;
 }
 
 ul.folder details[open] > summary::before {
   top: 6px;
-  background: transparent url('/chrome/folder-open.svg') 0px 0px no-repeat;
+  background: transparent url('/boss/folder-open.svg') 0px 0px no-repeat;
 }
 
 ul.folder li.group::before {
   width: 20px;
   top: 5px;
   left: 12px;
-  background: transparent url('/chrome/folder.svg') 0px 0px no-repeat;
+  background: transparent url('/boss/folder.svg') 0px 0px no-repeat;
 }
 
 ul.folder li.server::before {
   width: 20px;
   top: 11px;
   left: 12px;
-  background: transparent url('/chrome/server.svg') 0px 0px no-repeat;
+  background: transparent url('/boss/server.svg') 0px 0px no-repeat;
 }
 
 ul.folder li span {
@@ -859,18 +859,6 @@ ul.folder .metadata, ul.folder .metadata-title {
   padding: 10px 20px 10px 20px;
 }
 
-#desktop #search .contents {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 10px;
-  flex-wrap: nowrap;
-}
-
-#desktop #search .contents input {
-  flex-grow: 1;
-}
-
 #desktop fieldset legend {
   font-family: "ChicagoFLF";
   font-size: 14px;
@@ -901,12 +889,12 @@ ul.folder .metadata, ul.folder .metadata-title {
 }
 #desktop div.little-controls .up {
   display: block;
-  background-image: url("/chrome/filled-up-arrow.svg");
+  background-image: url("/boss/filled-up-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
 }
 #desktop div.little-controls .down {
-  background-image: url("/chrome/filled-down-arrow.svg");
+  background-image: url("/boss/filled-down-arrow.svg");
   background-position: center;
   background-repeat: no-repeat;
 }

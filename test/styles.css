@@ -1,3 +1,21 @@
+#search {
+  border-bottom: 1px solid #000;
+  padding: 10px;
+  margin: -20px -20px 10px -20px;
+}
+
+#search .contents {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+#search .contents input {
+  flex-grow: 1;
+}
+
 /* When test-steps are displayed, show a border underneath.
  * Also, when the test-steps are _not_ shown, and the row
  * is "inactive", show a border. */
