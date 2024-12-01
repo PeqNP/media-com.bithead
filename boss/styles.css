@@ -1070,6 +1070,7 @@ label {
   font-size: 14px;
 }
 
+.file-field.add-margin,
 .text-field.add-margin {
   margin-bottom: 10px;
 }
