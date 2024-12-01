@@ -172,13 +172,40 @@ function Network(os) {
                 fn(data);
             })
             .catch(error => {
-                os.showErrorModal(error.message);
+                os.ui.showErrorModal(error.message);
             });
     }
 
     // @deprecated - Use `post` instead
     this.json = json;
     this.post = json;
+
+    function upload(url, file, fn) {
+        let formData = new FormData();
+        formData.append("file", file);
+
+        fetch(url, {
+            method: "POST",
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request unexpectedly failed");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If there is an `error` struct, the response is considered to be in error
+                if (data.error !== undefined) {
+                    throw new Error(data.error.message);
+                }
+                fn(data);
+            })
+            .catch(error => {
+                os.ui.showErrorModal(error.message);
+            });
+    }
+    this.upload = upload;
 
     /**
      * Make a DELETE request.
@@ -206,7 +233,7 @@ function Network(os) {
                 fn(data);
             })
             .catch(error => {
-                os.showErrorModal(error.message);
+                os.ui.showErrorModal(error.message);
             });
     }
 
