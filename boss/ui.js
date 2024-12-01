@@ -182,6 +182,19 @@ function UI(os) {
     this.hideAbout = hideAbout;
 
     /**
+     * Close a (modal) window.
+     *
+     * Removes the window from the view hierarchy.
+     *
+     * FIXME: Needs to be updated to use latest UI patterns.
+     *
+     * - Parameter win: The window to close.
+     */
+    function closeWindow(win) {
+        const parent = win.parentNode;
+        parent.removeChild(win);
+    }
+    /**
      * Show an error modal above all other content.
      *
      * FIXME: Needs to be updated to use the latest patterns.

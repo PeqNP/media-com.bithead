@@ -95,18 +95,6 @@ function OS() {
     }
 
     /**
-     * Close a (modal) window.
-     *
-     * Removes the window from the view hierarchy.
-     *
-     * - Parameter win: The window to close.
-     */
-    function closeWindow(win) {
-        const parent = win.parentNode;
-        parent.removeChild(win);
-    }
-
-    /**
      * Copy string `item` to clipboard.
      *
      * - Parameter button: The button invoking the copy action
