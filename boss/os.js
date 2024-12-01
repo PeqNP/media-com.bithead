@@ -107,27 +107,6 @@ function OS() {
     }
 
     /**
-     * Show an error modal above all other content.
-     */
-    function showErrorModal(error) {
-        var fragment = document.getElementById("error-modal");
-        var modal = fragment.querySelector("div.modal").cloneNode(true);
-        var message = modal.querySelector("p.message");
-        message.innerHTML = error;
-        var button = modal.querySelector("button.default");
-        button.addEventListener("click", function() {
-            closeWindow(modal);
-        });
-        // Center modal in the middle of the screen.
-        modal.classList.add("center-control");
-        // Display modal in desktop container
-        var desktop = document.getElementById("desktop-container");
-        desktop.appendChild(modal);
-    }
-
-    this.showErrorModal = showErrorModal;
-
-    /**
      * Copy string `item` to clipboard.
      *
      * - Parameter button: The button invoking the copy action
