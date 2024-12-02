@@ -70,6 +70,7 @@ table th {
   padding: 4px;
   border-bottom: 1px solid #000;
 }
+/* I'm not sure how useful this is anymore */
 table th.add-eighty-width,
 table th.first {
   width: 80%;
@@ -1050,6 +1051,9 @@ div.read-only label {
   /* Should match the .popup-menu label width */
   width: 90px;
 }
+div.read-only label.wider {
+  width: 120px;
+}
 
 /* The `span` inside `div.read-only` is the value for the field name */
 div.read-only span {
@@ -1070,6 +1074,11 @@ label {
   font-size: 14px;
 }
 
+.checkbox-field.add-2x-margin {
+  margin-bottom: 20px;
+}
+
+.checkbox-field.add-margin,
 .file-field.add-margin,
 .text-field.add-margin {
   margin-bottom: 10px;
@@ -1084,8 +1093,5 @@ label {
   display: block;
 }
 
-.checkbox-field label {
-  position: relative;
-  top: -2px;
-}
+.checkbox-field label { }
 .radio-field { }
