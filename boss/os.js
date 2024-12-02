@@ -27,7 +27,9 @@ function OS() {
      * Log user out of system.
      */
     function logOut() {
-        console.log("Log out user");
+        os.ui.showDeleteModal("Are you sure you want to log out?", null, function() {
+            os.network.redirect('/account/signout');
+        });
     }
     this.logOut = logOut;
 
@@ -117,7 +119,7 @@ function OS() {
 function Network(os) {
 
     /**
-     * Redirect via a GET request.
+     * Redirect to a page using a GET request.
      */
     function redirect(url, redirectTo) {
         // TODO: If `redirectTo` provided, URL encode the value and add it as a GET parameter to the URL
@@ -127,6 +129,7 @@ function Network(os) {
     // @deprecated - Use `this.redirect`
     this.request = redirect;
     this.redirect = redirect;
+    this.request = redirect;
 
     /**
      * Make a POST request with an object that can be converted into JSON.
