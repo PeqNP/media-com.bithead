@@ -151,35 +151,21 @@ function UI(os) {
      * FIXME: This needs to use the latest patterns to instantiate, show,
      * and hide windows/modals.
      */
-    function showAbout() {
-        var modal = document.getElementById("os-about");
+    function showAboutModal() {
+        var fragment = document.getElementById("about-modal");
+        var modal = fragment.querySelector("div.modal").cloneNode(true);
         if (modal === null) {
             console.warn("OS About modal not found");
             return;
         }
-        if (modal.style.display == "block") {
-            return;
-        }
-        modal.style.display = "block";
+        var button = modal.querySelector("button.default");
+        button.addEventListener("click", function() {
+            closeWindow(modal);
+        });
+        var desktop = document.getElementById("desktop-container");
+        desktop.appendChild(modal);
     }
-    this.showAbout = showAbout;
-
-    /**
-     * Hide Bithead OS About.
-     */
-    function hideAbout() {
-        var modal = document.getElementById("os-about");
-        if (modal === null) {
-            console.warn("OS About modal not found");
-            return;
-        }
-        if (modal.style.display == "none") {
-            return;
-        }
-        modal.style.display = "none";
-        return false;
-    }
-    this.hideAbout = hideAbout;
+    this.showAboutModal = showAboutModal;
 
     /**
      * Close a (modal) window.
