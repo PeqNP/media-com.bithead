@@ -153,7 +153,7 @@ body {
 #desktop .modal .container {
   /* Bottom is 10px because all `modal`s have `controls` on the bottom,
     `controls` have 10px padding on bottom. */
-  padding: 10px;
+  padding: 10px 10px 0px 10px;
   font-family: "ChicagoFLF";
   font-size: 16px;
 }
@@ -180,6 +180,7 @@ body {
   font-family: "Geneva";
   font-size: 8px;
   color: #000;
+  margin-bottom: 2px;
 }
 
 /** Window **/
@@ -686,6 +687,7 @@ input[type=checkbox] {
 .popup-choices { }
 
 disabled .popup-choice,
+.popup-choice.disabled,
 .disabled .popup-choices-label {
   color: #ddd;
 }
