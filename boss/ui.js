@@ -215,6 +215,40 @@ function UI(os) {
         desktop.appendChild(modal);
     }
     this.showErrorModal = showErrorModal;
+
+    /**
+     * Show a delete modal.
+     *
+     * Ask user if they want to delete a model. This can be used in all contexts
+     * where a destructive action can take place.
+     *
+     * @param {string} msg - The (question) message to display.
+     * @param {function} cancel - A function that is called when user presses `Cancel`
+     * @param {function} ok - A function that is called when user presses `OK`
+     */
+    function showDeleteModal(msg, cancel, ok) {
+        var fragment = document.getElementById("delete-modal");
+        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var message = modal.querySelector("p.message");
+        message.innerHTML = msg;
+
+        var cancelButton = modal.querySelector("button.default");
+        cancelButton.addEventListener("click", function() {
+            if (cancel !== null) { cancel(); }
+            closeWindow(modal);
+        });
+
+        var okButton = modal.querySelector("button.primary");
+        okButton.addEventListener("click", function() {
+            if (ok !== null) { ok(); }
+            closeWindow(modal);
+        });
+
+        // Display modal in desktop container
+        var desktop = document.getElementById("desktop-container");
+        desktop.appendChild(modal);
+    }
+    this.showDeleteModal = showDeleteModal;
 }
 
 /**
