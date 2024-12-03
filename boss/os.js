@@ -129,7 +129,6 @@ function Network(os) {
     // @deprecated - Use `this.redirect`
     this.request = redirect;
     this.redirect = redirect;
-    this.request = redirect;
 
     /**
      * Make a POST request with an object that can be converted into JSON.
