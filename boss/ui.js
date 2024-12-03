@@ -733,23 +733,23 @@ function stylePopupMenus() {
  */
 function styleOSMenus() {
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
-    var menus = document.getElementsByClassName("os-menu");
-    for (var i = 0; i < menus.length; i++) {
-        var selectElement = menus[i].getElementsByTagName("select")[0];
+    let menus = document.getElementsByClassName("os-menu");
+    for (let i = 0; i < menus.length; i++) {
+        let selectElement = menus[i].getElementsByTagName("select")[0];
 
         // The container is positioned absolute so that when a selection is made it overlays
         // the content instead of pushing it down.
-        var container = document.createElement("div");
+        let container = document.createElement("div");
         container.setAttribute("class", "os-menu-container popup-inactive");
         menus[i].appendChild(container);
 
         // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
-        var choicesLabel = document.createElement("div");
+        let choicesLabel = document.createElement("div");
         choicesLabel.setAttribute("class", "os-menu-choices-label");
         // FIXME: This _should_ always be the `0`th element
-        var label = selectElement.options[selectElement.selectedIndex].innerHTML;
+        let label = selectElement.options[selectElement.selectedIndex].innerHTML;
         if (label.startsWith("img:")) {
-            var img = document.createElement("img");
+            let img = document.createElement("img");
             img.src = label.split(":")[1];
             choicesLabel.appendChild(img);
         }
@@ -759,31 +759,40 @@ function styleOSMenus() {
         container.appendChild(choicesLabel);
 
         // Container for all choices
-        var choices = document.createElement("div");
+        let choices = document.createElement("div");
         choices.setAttribute("class", "popup-choices");
 
         // Create choices
         // NOTE: This skips the first choice, which is used as the label for the menu.
-        for (var j = 1; j < selectElement.length; j++) {
-            var option = selectElement.options[j];
+        for (let j = 1; j < selectElement.length; j++) {
+            let option = selectElement.options[j];
             if (option.classList.contains("group")) {
-                var group = document.createElement("div");
+                let group = document.createElement("div");
                 group.setAttribute("class", "popup-choice-group");
                 choices.appendChild(group);
                 continue;
             }
-            var choice = document.createElement("div");
+            let choice = document.createElement("div");
             choice.setAttribute("class", "popup-choice");
+            if (option.disabled) {
+                choice.classList.add("disabled");
+            }
             // Adopt ID
             choice.setAttribute("id", option.getAttribute("id"));
             option.setAttribute("id", "");
             choice.innerHTML = option.innerHTML;
-            // Inherit click event
-            choice.setAttribute("onclick", option.getAttribute("onclick"));
+            choice.addEventListener("click", function() {
+                if (option.disabled) {
+                    return;
+                }
+                if (option.onclick !== null) {
+                    option.onclick();
+                }
+            });
             choices.appendChild(choice);
         }
         // Required to display border around options
-        var subContainer = document.createElement("div");
+        let subContainer = document.createElement("div");
         subContainer.setAttribute("class", "sub-container");
         // Inherit the parent's width (style)
         subContainer.setAttribute("style", menus[i].getAttribute("style"));
