@@ -412,6 +412,7 @@ body {
 /* System clock */
 #clock {
   flex: 0 1 auto;
+  margin-top: 2px;
 }
 
 /** Buttons **/
