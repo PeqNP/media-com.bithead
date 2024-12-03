@@ -476,7 +476,6 @@ function UIPopupMenu(select) {
         select.selectedIndex = index;
         updateSelectedOptionLabel();
     }
-
     this.selectOption = selectOption;
 
     /**
@@ -512,7 +511,6 @@ function UIPopupMenu(select) {
         let idx = select.selectedIndex;
         return select.options[idx]
     }
-
     this.selectedOption = selectedOption;
 
     /**
@@ -531,12 +529,11 @@ function UIPopupMenu(select) {
         let value = select.options[idx].value;
         return value;
     }
-
     this.selectedValue = selectedValue;
 
     function _removeAllOptions() {
         let container = select.parentNode.querySelector(".popup-choices");
-        // Remove all options from the select and facade except first option
+        // Remove all options from the select, and facade, except first option
         for (;select.options.length > 1;) {
             select.removeChild(select.lastElementChild);
             container.removeChild(container.lastElementChild);
@@ -570,7 +567,9 @@ function UIPopupMenu(select) {
           option.text = opt["name"];
           select.appendChild(option);
         }
+        select.selectedIndex = 0;
         styleOptions();
+        updateSelectedOptionLabel();
     }
 
     this.addNewOptions = addNewOptions;
