@@ -172,6 +172,7 @@ function Network(os) {
     this.json = json;
     this.post = json;
 
+
     function upload(url, file, fn) {
         let formData = new FormData();
         formData.append("file", file);
@@ -220,6 +221,46 @@ function Network(os) {
                 os.ui.showErrorModal(error.message);
             });
     }
+
+    /**
+     * Make PATCH request.
+     */
+    function patch(url, body, fn) {
+        if (body === null || body.length < 1) {
+            body = '{}';
+        }
+        else {
+            body = JSON.stringify(body);
+        }
+        fetch(url, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: body
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request unexpectedly failed");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If there is an `error` struct, the response is considered to be in error
+                if (data.error !== undefined) {
+                    throw new Error(data.error.message);
+                }
+                fn(data);
+            })
+            .catch(error => {
+                os.ui.showErrorModal(error.message);
+            });
+    }
+    this.patch = patch;
+
+    // @deprecated - Use `post` instead
+    this.json = json;
+    this.post = json;
 
     /**
      * Make a DELETE request.
