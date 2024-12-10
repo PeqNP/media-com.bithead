@@ -22,7 +22,7 @@
 table.test-run tr.notes td,
 table.test-run tr.test-suite td,
 table.test-run tr.test-suite-group td {
-  border-bottom: 1pt solid #000;
+  border-bottom: 1px solid #000;
 }
 table.test-run tr.notes:last-child td {
   border-bottom: none;
@@ -30,11 +30,11 @@ table.test-run tr.notes:last-child td {
 
 table.test-run tr.notes textarea {
   width: 100%;
-  height: 30pt;
+  height: 30px;
 }
 textarea.notes {
   width: 100%;
-  height: 50pt;
+  height: 50px;
 }
 table.test-run tr.test-suite {
   background-color: #ddd;
@@ -43,21 +43,21 @@ table.test-run tr.test-suite-group {
   background-color: #eee;
 }
 table.test-run tr.test-suite-group td {
-  padding-left: 10pt;
+  padding-left: 10px;
 }
 table.test-run tr.test-suite,
 table.test-run tr.test-suite-group {
   font-family: "ChicagoFLF";
-  font-size: 10pt;
+  font-size: 10px;
 }
 table.test-run tr.test-case {
   font-family: "Geneva";
-  font-size: 10pt;
+  font-size: 10px;
   font-weight: bold;
 }
 
 table.test-run tr.test-steps textarea {
-  margin: 5pt 5pt 5pt 15pt;
+  margin: 5px 5px 5px 15px;
   border: none;
   height: auto;
   width: 90%;
@@ -79,7 +79,7 @@ table.test-run tr.notes.inactive {
 }
 /* When a test case becomes inactive, show the border */
 table.test-run tr.test-case.inactive {
-  border-bottom: 1pt solid #000;
+  border-bottom: 1px solid #000;
 }
 /* When active, display options and hide status name. Do the inverse when inactive. */
 table.test-run tr.test-case.active .options {
@@ -100,18 +100,18 @@ table.test-run td.resources {
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
-  gap: 10pt;
+  gap: 10px;
 }
 table.test-run td.resources .images {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 10pt;
+  gap: 10px;
 }
 table.test-run td.resources .images img {
-  flex: 1 1 calc(50% - 10pt);
-  width: 70pt;
+  flex: 1 1 calc(50% - 10px);
+  width: 70px;
   max-width: 100%;
   height: auto;
   display: block;
@@ -121,7 +121,7 @@ table.test-run td.resources .images img {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 10pt;
+  gap: 10px;
 }
 
 .resources .images {

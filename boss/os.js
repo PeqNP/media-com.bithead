@@ -275,7 +275,9 @@ function Network(os) {
             __delete(url, fn);
             return;
         }
-        os.ui.showDeleteModal(msg, null, fn);
+        os.ui.showDeleteModal(msg, null, function () {
+            __delete(url, fn);
+        });
     }
     this.delete = _delete;
 
