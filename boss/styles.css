@@ -230,7 +230,6 @@ body {
 }
 
 #desktop .window .title {
-  height: 22px;
   -webkit-flex: 1;
   flex: 1;
   position: relative;
@@ -1003,6 +1002,18 @@ ul.bullet-list li::before {
   transform: translate(-50%, -50%);
 }
 
+.center-window {
+  position: absolute;
+  /* The reason the `top` is 25% is because the height is not defined. And its
+   * height can not be determined intrinsically. Therefore, the best guess is to
+   * make the modal about 25% of the way down in the screen. */
+  top: 25%;
+  left: 50%;
+  /* The window's containing div must set `width` in order for this to work. It
+   * can not determine the intrinsic width. */
+  transform: translateX(-50%);
+}
+
 /* Used to center images in the middle of a container
  * The image must be contained within a `div.center-image` */
 .center-image {
@@ -1051,19 +1062,6 @@ ul.simple-list li:last-child {
 ul.flat-list,
 ul.simple-list li::before {
   content: '';
-}
-
-/** Common Utility **/
-
-.center-control {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.center-text {
-  text-align: center;
 }
 
 /** Form Fields **/

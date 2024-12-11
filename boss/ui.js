@@ -45,6 +45,10 @@ function UI(os) {
     }
     this.init = init;
 
+    function unregisterController(id) {
+        delete controllers[id];
+    }
+
     /**
      * Creates an instance of a `UIWindow` given a `fragment.id`.
      *
@@ -53,7 +57,11 @@ function UI(os) {
      */
     function makeWindow(fragmentID) {
         var fragment = document.getElementById(fragmentID);
-        var win = fragment.querySelector(`.window`).cloneNode(true);
+        // The first div tells the position of the window. The positioning information
+        // may _not_ be in the window. Otherwise, it corrupts the background image
+        // styles of the title bar, as it needs a relative position.
+        var container = fragment.firstElementChild.cloneNode(true);
+        var win = container.querySelector(`.window`);
         let id = win.getAttribute("id");
         if (isEmpty(id)) {
             console.error("Window w/ ID (" + id + ") must have a controller");
@@ -61,17 +69,41 @@ function UI(os) {
         }
         let code = "new window." + id + "(win)";
         let ctrl = eval(code);
+        controllers[id] = ctrl;
+        // Register window
+        win.controller = ctrl;
+        win.ui = new UIWindow(this, container, ctrl, function() {
+            unregisterController(id);
+        });
         if (ctrl.viewDidLoad !== undefined) {
             ctrl.viewDidLoad();
         }
-        controllers[id] = ctrl;
-        // Register window
-        win.ui = new UIWindow(this, win, ctrl);
         return win;
     }
     this.makeWindow = makeWindow;
 
     function makeModal(fragmentID) {
+        var fragment = document.getElementById(fragmentID);
+        // Like the window, the first div tells the position of the modal.
+        var container = fragment.firstElementChild.cloneNode(true);
+        var modal = container.querySelector(`.modal`);
+        let id = modal.getAttribute("id");
+        if (isEmpty(id)) {
+            console.error("Modal w/ ID (" + id + ") must have a controller");
+            return;
+        }
+        let code = "new window." + id + "(modal)";
+        let ctrl = eval(code);
+        controllers[id] = ctrl;
+        // Register window
+        modal.controller = ctrl;
+        modal.ui = new UIWindow(this, container, ctrl, function() {
+            unregisterController(id);
+        });
+        if (ctrl.viewDidLoad !== undefined) {
+            ctrl.viewDidLoad();
+        }
+        return modal;
     }
     this.makeModal = makeModal;
 
@@ -153,17 +185,18 @@ function UI(os) {
      */
     function showAboutModal() {
         var fragment = document.getElementById("about-modal");
-        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var container = fragment.firstElementChild.cloneNode(true);
+        var modal = container.querySelector("div.modal");
         if (modal === null) {
             console.warn("OS About modal not found");
             return;
         }
         var button = modal.querySelector("button.default");
         button.addEventListener("click", function() {
-            closeWindow(modal);
+            closeWindow(container);
         });
         var desktop = document.getElementById("desktop-container");
-        desktop.appendChild(modal);
+        desktop.appendChild(container);
     }
     this.showAboutModal = showAboutModal;
 
@@ -187,18 +220,17 @@ function UI(os) {
      */
     function showErrorModal(error) {
         var fragment = document.getElementById("error-modal");
-        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var container = fragment.firstElementChild.cloneNode(true);
+        var modal = container.querySelector("div.modal");
         var message = modal.querySelector("p.message");
         message.innerHTML = error;
         var button = modal.querySelector("button.default");
         button.addEventListener("click", function() {
-            closeWindow(modal);
+            closeWindow(container);
         });
-        // Center modal in the middle of the screen.
-        modal.classList.add("center-control");
         // Display modal in desktop container
         var desktop = document.getElementById("desktop-container");
-        desktop.appendChild(modal);
+        desktop.appendChild(container);
     }
     this.showErrorModal = showErrorModal;
 
@@ -214,25 +246,26 @@ function UI(os) {
      */
     function showDeleteModal(msg, cancel, ok) {
         var fragment = document.getElementById("delete-modal");
-        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var container = fragment.firstElementChild.cloneNode(true);
+        var modal = container.querySelector("div.modal");
         var message = modal.querySelector("p.message");
         message.innerHTML = msg;
 
         var cancelButton = modal.querySelector("button.default");
         cancelButton.addEventListener("click", function() {
             if (cancel !== null) { cancel(); }
-            closeWindow(modal);
+            closeWindow(container);
         });
 
         var okButton = modal.querySelector("button.primary");
         okButton.addEventListener("click", function() {
             if (ok !== null) { ok(); }
-            closeWindow(modal);
+            closeWindow(container);
         });
 
         // Display modal in desktop container
         var desktop = document.getElementById("desktop-container");
-        desktop.appendChild(modal);
+        desktop.appendChild(container);
     }
     this.showDeleteModal = showDeleteModal;
 }
@@ -240,7 +273,7 @@ function UI(os) {
 /**
  * Provides window related functions.
  */
-function UIWindow(ui, view, controller) {
+function UIWindow(ui, view, controller, unregister_fn) {
 
     view.controller = controller;
 
@@ -270,6 +303,8 @@ function UIWindow(ui, view, controller) {
         if (controller.viewDidDisappear !== undefined) {
             controller.viewDidDisappear();
         }
+
+        unregister_fn();
     }
     this.close = close;
 }
