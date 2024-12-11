@@ -22,7 +22,7 @@ function UI(os) {
     // leaked.
     const controller = {};
     const handler = {
-        // `prop` is the `id` of the `window`
+        // `prop` is the `id` of the `ui-window`
         get: function(obj, prop) {
             return controllers[prop];
         },
@@ -61,7 +61,7 @@ function UI(os) {
         // may _not_ be in the window. Otherwise, it corrupts the background image
         // styles of the title bar, as it needs a relative position.
         var container = fragment.firstElementChild.cloneNode(true);
-        var win = container.querySelector(`.window`);
+        var win = container.querySelector(`.ui-window`);
         let id = win.getAttribute("id");
         if (isEmpty(id)) {
             console.error("Window w/ ID (" + id + ") must have a controller");
@@ -116,7 +116,7 @@ function UI(os) {
      * and not pre-rendered before the OS starts.
      */
     function registerWindows() {
-        let windows = document.getElementsByClassName("window");
+        let windows = document.getElementsByClassName("ui-window");
         for (let i = 0; i < windows.length; i++) {
             registerWindow(windows[i]);
         }
@@ -312,14 +312,14 @@ function UIWindow(ui, view, controller, unregister_fn) {
 /**
  * Provides protocol definition for a Controller.
  *
- * A `UIController` allows a `div.window` to receive life-cycle events from the OS.
+ * A `UIController` allows a `div.ui-window` to receive life-cycle events from the OS.
  *
  * All functions are optional. Therefore, implement only the functions needed.
  *
- * A `UIController` is defined on a `div.window` with the `id` attribute.
- * e.g. <div class="window" id="my_controller">
+ * A `UIController` is defined on a `div.ui-window` with the `id` attribute.
+ * e.g. <div class="ui-window" id="my_controller">
  *
- * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.window`.
+ * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.ui-window`.
  * The `script` tag must have a function with the same name as its `id`.
  * This `script` is used to receive view life-cycle signals from the OS.
  *
