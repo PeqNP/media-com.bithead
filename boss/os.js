@@ -172,7 +172,6 @@ function Network(os) {
     this.json = json;
     this.post = json;
 
-
     function upload(url, file, fn) {
         let formData = new FormData();
         formData.append("file", file);
