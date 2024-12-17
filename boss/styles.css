@@ -1145,35 +1145,33 @@ label {
 /** List Box **/
 
 .list-box select {
+  display: none;
+}
+.list-box {
   border: 1px solid #000;
   width: 100%;
   font-family: "ChicagoFLF";
   font-size: 14px;
+  padding: 2px;
+}
+.list-box > .container {
   /** Hides scrollbar
   overflow: hidden; */
 }
 
-.list-box select:active,
-.list-box select:hover,
-.list-box select:focus-within,
-.list-box select:focus {
-  outline: none;
-}
-
-.list-box select:focus option {
+.list-box > .container > .option {
+  padding-left: 2px;
   color: #000;
   background-color: #fff;
+  height: 18px;
 }
 
-/** doesn't work
-.list-box select option:checked:nth-of-type(1) {
-  color: white;
-} */
-
-.list-box option:checked {
-  color: #fff !important;
-  background: black linear-gradient(0deg, black 0%, black 100%);
-  outline: none !important;
+.list-box > .container > .option.selected {
+  color: #fff;
+  background-color: #000;
+}
+.list-box > .container > .option.disabled {
+  color: #ddd;
 }
 
 /** Stack Views **/

@@ -1035,39 +1035,52 @@ function UIImageViewer() {
 /** List Boxes **/
 
 function UIListBox(select, multiple) {
-    select.addEventListener("mouseup", function(element) {
-        if (multiple) {
-            return;
-        }
-        // Allow only one option to be selected
-        for (let i = 0; i < select.options.length; i++) {
-            let option = select.options[i];
-            if (option !== element.target && option.selected) {
-                element.target.selected = false;
-                return;
-            }
-        }
-    });
 }
 
 function styleListBox(list) {
     let select = list.querySelector("select");
-    if (!select.multiple) {
-        select.multiple = true;
+    let box = new UIListBox(select, select.multiple);
+    select.ui = box;
 
-        // When converting to `multiple`, the first option is always selected.
-        // De-select it.
-        for (let i = 0; i < select.options.length; i++) {
-            select.options[i].selected = false;
+    let container = document.createElement("div");
+    container.classList.add("container");
+
+    for (let i = 0; i < select.options.length; i++) {
+        let option = select.options[i];
+        let elem = document.createElement("div");
+        elem.innerHTML = option.innerHTML;
+        elem.classList.add("option");
+        if (option.disabled) {
+            elem.classList.add("disabled");
         }
-
-        let box = new UIListBox(select, false);
-        select.ui = box;
+        // When `select` is not `multiple`, selected index is always 0. This causes
+        // the first option to always be selected. There's no way around this.
+        if (option.selected) {
+            elem.classList.add("selected");
+        }
+        option.ui = elem;
+        container.appendChild(elem);
+        elem.addEventListener("mouseup", function(obj) {
+            if (select.multiple) {
+                option.selected = !option.selected;
+                elem.classList.remove("selected");
+                if (option.selected) {
+                    elem.classList.add("selected");
+                }
+            }
+            else {
+                select.selectedIndex = i;
+                for (let j = 0; j < select.options.length; j++) {
+                    let opt = select.options[j];
+                    opt.ui.classList.remove("selected");
+                    if (opt.selected) {
+                        elem.classList.add("selected");
+                    }
+                }
+            }
+        });
     }
-    else {
-        let box = new UIListBox(select, true);
-        select.ui = box;
-    }
+    list.appendChild(container);
 }
 
 function styleListBoxes() {
