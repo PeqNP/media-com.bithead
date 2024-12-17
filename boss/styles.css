@@ -1149,4 +1149,50 @@ label {
   width: 100%;
   font-family: "ChicagoFLF";
   font-size: 14px;
+  /** Hides scrollbar
+  overflow: hidden; */
+}
+
+.list-box select:active,
+.list-box select:hover,
+.list-box select:focus-within,
+.list-box select:focus {
+  outline: none;
+}
+
+.list-box select:focus option {
+  color: #000;
+  background-color: #fff;
+}
+
+/** doesn't work
+.list-box select option:checked:nth-of-type(1) {
+  color: white;
+} */
+
+.list-box option:checked {
+  color: #fff !important;
+  background: black linear-gradient(0deg, black 0%, black 100%);
+  outline: none !important;
+}
+
+/** Stack Views **/
+
+.hbox {
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: row;
+}
+
+.vbox {
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+}
+
+.hbox.gap-10 {
+  gap: 10px;
+}
+.vbox.gap-10 {
+  gap: 10px;
 }
