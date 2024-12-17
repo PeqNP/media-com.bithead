@@ -37,6 +37,7 @@ function UI(os) {
         styleOSMenus();
         stylePopupMenus();
         styleFolders();
+        styleListBoxes();
 
         /**
          * Close all menus when user clicks outside of `select`.
@@ -458,9 +459,9 @@ function UIController() {
 }
 
 function styleFolders() {
-    var folders = document.getElementsByClassName("folder");
-    for (var i = 0; i < folders.length; i++) {
-        var folder = new UIFolder(folders[i]);
+    let folders = document.getElementsByClassName("folder");
+    for (let i = 0; i < folders.length; i++) {
+        let folder = new UIFolder(folders[i]);
     }
 }
 
@@ -478,7 +479,7 @@ function closeMenuType(className) {
     let parentClassName = className + "-container";
     var containers = document.getElementsByClassName(parentClassName);
     for (var j = 0; j < containers.length; j++) {
-        var container = containers[j];
+        let container = containers[j];
         if (container.classList.contains("popup-inactive")) {
             continue;
         }
@@ -486,7 +487,7 @@ function closeMenuType(className) {
         container.classList.remove("popup-active");
         container.classList.add("popup-inactive");
         // Reset arrow
-        var choicesLabel = container.querySelector("." + className + "-choices-label");
+        let choicesLabel = container.querySelector("." + className + "-choices-label");
         choicesLabel.classList.remove("popup-arrow-active");
     }
 }
@@ -506,11 +507,11 @@ function closeAllMenus() {
  * @returns UIFolderMetadata
  */
 function getFolderMetadata(lis) {
-    var metadata = Array();
-    for (var i = 0; i < lis.length; i++) {
-        var name = lis[i].innerHTML;
-        var style = lis[i].style;
-        var m = new UIFolderMetadata(name, style);
+    let metadata = Array();
+    for (let i = 0; i < lis.length; i++) {
+        let name = lis[i].innerHTML;
+        let style = lis[i].style;
+        let m = new UIFolderMetadata(name, style);
         metadata.push(m);
     }
     return metadata;
@@ -1029,4 +1030,50 @@ function UIImageViewer() {
     }
 
     element = make();
+}
+
+/** List Boxes **/
+
+function UIListBox(select, multiple) {
+    select.addEventListener("mouseup", function(element) {
+        if (multiple) {
+            return;
+        }
+        // Allow only one option to be selected
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option !== element.target && option.selected) {
+                element.target.selected = false;
+                return;
+            }
+        }
+    });
+}
+
+function styleListBox(list) {
+    let select = list.querySelector("select");
+    if (!select.multiple) {
+        select.multiple = true;
+
+        // When converting to `multiple`, the first option is always selected.
+        // De-select it.
+        for (let i = 0; i < select.options.length; i++) {
+            select.options[i].selected = false;
+        }
+
+        let box = new UIListBox(select, false);
+        select.ui = box;
+    }
+    else {
+        let box = new UIListBox(select, true);
+        select.ui = box;
+    }
+}
+
+function styleListBoxes() {
+    let lists = document.getElementsByClassName("list-box");
+    for (let i = 0; i < lists.length; i++) {
+        let list = lists[i];
+        styleListBox(list);
+    }
 }

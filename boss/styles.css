@@ -279,11 +279,11 @@ body {
 /** Scroll Bar **/
 
 ::-webkit-scrollbar {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 ::-webkit-scrollbar-thumb {
-  height: 20px;
+  height: 18px;
   background-color: #fff;
   border: 1px solid #000;
 }
@@ -307,8 +307,8 @@ body {
   background-color: #fff;
   display: block;
   border-bottom: 1px solid #000;
-  height: 20px;
-  width: 20px;
+  height: 18px;
+  width: 18px;
 }
 ::-webkit-scrollbar-button:vertical:start {
   background-image: url("/boss/img/up-arrow.svg");
@@ -1141,3 +1141,12 @@ label {
 
 .checkbox-field label { }
 .radio-field { }
+
+/** List Box **/
+
+.list-box select {
+  border: 1px solid #000;
+  width: 100%;
+  font-family: "ChicagoFLF";
+  font-size: 14px;
+}
