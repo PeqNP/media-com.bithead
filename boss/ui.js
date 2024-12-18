@@ -259,13 +259,13 @@ function UI(os) {
 
         var cancelButton = modal.querySelector("button.default");
         cancelButton.addEventListener("click", function() {
-            if (cancel !== null) { cancel(); }
+            if (!isEmpty(cancel)) { cancel(); }
             closeWindow(container);
         });
 
         var okButton = modal.querySelector("button.primary");
         okButton.addEventListener("click", function() {
-            if (ok !== null) { ok(); }
+            if (!isEmpty(ok)) { ok(); }
             closeWindow(container);
         });
 
