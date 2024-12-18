@@ -526,7 +526,6 @@ body {
   display: flex;
   justify-content: flex-end;
   padding-top: 10px;
-  padding-bottom: 10px;
   gap: 10px;
   align-items: center;
 }
@@ -1147,11 +1146,29 @@ label {
   display: flex;
   flex-direction: row;
 }
+.hbox.align-top {
+  align-items: flex-start;
+}
+.hbox.align-center {
+  align-items: center;
+}
+.hbox.align-bottom {
+  align-items: flex-end;
+}
 
 .vbox {
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
+}
+.vbox.align-left {
+  justify-content: flex-start;
+}
+.vbox.align-center {
+  justify-content: center;
+}
+.vbox.align-right {
+  justify-content: flex-end;
 }
 
 .hbox.gap-10 {

@@ -16,6 +16,12 @@
   flex-grow: 1;
 }
 
+.CodeMirror {
+  border: 1px solid #000;
+  font-size: 14px; /* or any other size you prefer */
+  height: 100%;
+}
+
 /* When test-steps are displayed, show a border underneath.
  * Also, when the test-steps are _not_ shown, and the row
  * is "inactive", show a border. */
@@ -117,26 +123,6 @@ table.test-run td.resources .images img {
   display: block;
 }
 
-.resources {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 10px;
-}
-
-.resources .images {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 10px;
-}
-.resources .image {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 10px;
-}
 .resources .image figure {
   display: flex;
   flex-direction: column;
