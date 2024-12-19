@@ -152,3 +152,12 @@ table.test-run td.resources .images img {
   padding: 5px;
   background-color: #f9f9f9;
 }
+
+.test-case-widget {
+  padding: 4px;
+  background-color: #D2EF97;
+  font-size: 8px;
+}
+.test-case-id {
+  background-color: #d2ef97;
+}

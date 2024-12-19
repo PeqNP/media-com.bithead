@@ -1142,6 +1142,10 @@ label {
   color: #ddd;
 }
 
+.list-box > .container > .option.child {
+  padding-left: 20px;
+}
+
 /** Stack Views **/
 
 .hbox {
@@ -1172,6 +1176,9 @@ label {
 }
 .vbox.align-right {
   justify-content: flex-end;
+}
+.vbox.separated {
+  justify-content: space-between;
 }
 
 .hbox.gap-10 {
