@@ -770,7 +770,7 @@ select {
 
 ul.folder {
   /* This ensures the folder is directly lined up within its parent */
-  margin-left: -20px;
+  border: 1px solid #000;
 }
 
 ul.folder {
@@ -1138,14 +1138,13 @@ label {
 }
 .list-box {
   border: 1px solid #000;
-  width: 100%;
   font-family: "ChicagoFLF";
   font-size: 14px;
   padding: 2px;
 }
 .list-box > .container {
-  /** Hides scrollbar
-  overflow: hidden; */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .list-box > .container > .option {
@@ -1153,6 +1152,8 @@ label {
   color: #000;
   background-color: #fff;
   height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .list-box > .container > .option.selected {
@@ -1200,6 +1201,9 @@ label {
 }
 .vbox.separated {
   justify-content: space-between;
+}
+.vbox.align-bottom {
+  justify-content: flex-end;
 }
 
 .hbox.gap-10 {
