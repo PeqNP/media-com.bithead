@@ -439,6 +439,16 @@ body {
   color: #fff;
 }
 
+#desktop button.default:disabled {
+  border: 1px solid #c0c0c0;
+  outline: 2px solid #c0c0c0;
+  color: #c0c0c0;
+}
+
+#desktop button.default:disabled:hover {
+  background-color: #fff;
+}
+
 /* Primary: Same size as default w/o double border */
 
 #desktop button.default,
@@ -465,23 +475,16 @@ body {
 }
 
 #desktop button.primary:disabled {
-  border: 1px solid #000;
-  border-radius: 4px;
-  height: 24px;
-  color: #C0C0C0;
-  font-family: "ChicagoFLF";
-  font-size: 14px;
-  padding: 0px 20px 0px 20px;
+  border: 1px solid #c0c0c0;
+  color: #c0c0c0;
 }
 
 #desktop button.primary:disabled:hover {
   background-color: #fff;
-  color: #C0C0C0;
 }
 
 /* Secondary: Thinner and smaller then primary button. */
 
-::file-selector-button,
 #desktop button.secondary {
   border: 1px solid #000;
   border-radius: 4px;
@@ -493,27 +496,45 @@ body {
   padding: 0px 16px 0px 16px;
 }
 
-::file-selector-button:hover,
+/* NOTE: Even though the file select is the same type of button as secondary, I
+ * had to style it separately as it was interfering with secondary disabled
+ * states */
+::file-selector-button {
+  border: 1px solid #000;
+  border-radius: 4px;
+  height: 14px;
+  color: #000;
+  background-color: #fff;
+  font-family: "ChicagoFLF";
+  font-size: 9px;
+  padding: 0px 16px 0px 16px;
+}
+
 #desktop button.secondary:hover {
   background-color: #000;
   color: #fff;
 }
-
-::file-selector-button:disabled,
-#desktop button.secondary:disabled {
-  border: 1px solid #000;
-  border-radius: 4px;
-  height: 18px;
-  color: #C0C0C0;
-  font-family: "ChicagoFLF";
-  font-size: 9px;
-  padding: 0px 18px 0px 18px;
+::file-selector-button:hover {
+  background-color: #000;
+  color: #fff;
 }
 
-::file-selector-button:disabled:hover,
+#desktop button.secondary:disabled {
+  border: 1px solid #c0c0c0;
+  color: #c0c0c0;
+}
+::file-selector-button:disabled {
+  border: 1px solid #c0c0c0;
+  color: #c0c0c0;
+}
+
 #desktop button.secondary:disabled:hover {
   background-color: #fff;
-  color: #C0C0C0;
+  color: #c0c0c0;
+}
+::file-selector-button:disabled:hover {
+  background-color: #fff;
+  color: #c0c0c0;
 }
 
 #desktop button.secondary.add-left-margin {
