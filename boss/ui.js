@@ -201,7 +201,7 @@ function UI(os) {
         button.addEventListener("click", function() {
             closeWindow(container);
         });
-        var desktop = document.getElementById("desktop-container");
+        var desktop = document.getElementById("desktop");
         desktop.appendChild(container);
     }
     this.showAboutModal = showAboutModal;
@@ -235,7 +235,7 @@ function UI(os) {
             closeWindow(container);
         });
         // Display modal in desktop container
-        var desktop = document.getElementById("desktop-container");
+        var desktop = document.getElementById("desktop");
         desktop.appendChild(container);
     }
     this.showErrorModal = showErrorModal;
@@ -270,7 +270,7 @@ function UI(os) {
         });
 
         // Display modal in desktop container
-        var desktop = document.getElementById("desktop-container");
+        var desktop = document.getElementById("desktop");
         desktop.appendChild(container);
     }
     this.showDeleteModal = showDeleteModal;
@@ -376,7 +376,7 @@ function UIWindow(ui, view, controller, unregister_fn) {
             controller.viewWillAppear();
         }
 
-        let desktop = document.getElementById("desktop-container");
+        let desktop = document.getElementById("desktop");
         desktop.appendChild(view);
 
         if (controller.viewDidAppear !== undefined) {
@@ -393,7 +393,7 @@ function UIWindow(ui, view, controller, unregister_fn) {
             controller.viewWillDisappear();
         }
 
-        let desktop = document.getElementById("desktop-container");
+        let desktop = document.getElementById("desktop");
         desktop.removeChild(view);
 
         if (controller.viewDidDisappear !== undefined) {
@@ -1013,7 +1013,7 @@ function UIImageViewer() {
     function showImage(href) {
         let img = element.querySelector("img");
         img.src = href;
-        let desktop = document.getElementById("desktop-container");
+        let desktop = document.getElementById("desktop");
         desktop.appendChild(element);
     }
 

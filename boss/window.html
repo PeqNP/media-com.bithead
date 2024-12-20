@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Network</title>
+    <title>Window</title>
     <script type="text/javascript" src="/boss/foundation.js"></script>
     <script type="text/javascript" src="/boss/os.js"></script>
     <script type="text/javascript" src="/boss/ui.js"></script>
@@ -34,34 +34,8 @@
       <div id="desktop-container">
         <!-- The window's width must be defined by outside container to prevent styles from
           corrupting styles assigned directly to `ui-window`. -->
-        <div style="width: 400px;">
-          <div class="ui-window" id="TestWindow">
-            <script language="javascript">
-              function TestWindow(view) { }
-            </script>
-            <div class="top">
-              <div class="close-button" onclick="didTapCloseButton();"></div>
-              <div class="title" onclick="didTapWindowShade();"><span>Title</span></div>
-              <div class="collapse-button" onclick="didTapCollapseButton();"></div>
-            </div>
-            <div class="metadata">
-              <div class="item">32 items</div>
-            </div>
-            <div class="metadata-bottom"></div>
-            <div class="container">
-              <div class="read-only"><label>ID</label> <span>TC-1234</span></div>
-
-              <div class="controls">
-                <button class="primary">Delete</button>
-                <button class="primary">Cancel</button>
-                <button class="default">Save</button>
-              </div>
-            </div>
-          </div> <!-- ui-window -->
-        </div> <!-- window parent defines size, position, etc. -->
-
-        <!-- Using horizontal and vertical boxes -->
         <div> <!-- position and style -->
+          <!-- Using horizontal and vertical boxes -->
           <div class="ui-window" id="HVBox">
             <script language="javascript">
               function HVBox() {
