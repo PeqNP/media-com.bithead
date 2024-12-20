@@ -1137,10 +1137,18 @@ label {
   display: none;
 }
 .list-box {
+  /* The list-box must conform to the size of its children's content. When
+   * this component is managed by the OS, the parent's inline style is
+   * associated to the facade in order to control `overflow-x`. However,
+   * this then means the `list-box` will be the same width of its container.
+   * This ensures that its intrinsic size is determined by its child container.
+   */
+  display: inline-block;
   border: 1px solid #000;
   font-family: "ChicagoFLF";
   font-size: 14px;
   padding: 2px;
+  background-color: #fff;
 }
 .list-box > .container {
   overflow-x: hidden;

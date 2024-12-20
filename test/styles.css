@@ -19,7 +19,6 @@
 .CodeMirror {
   border: 1px solid #000;
   font-size: 14px; /* or any other size you prefer */
-  height: 100%;
 }
 
 /* When test-steps are displayed, show a border underneath.
