@@ -97,7 +97,7 @@ function UI(os) {
         let modal = fragment.firstElementChild.cloneNode(true);
         styleListBoxes(modal);
         let id = modal.getAttribute("id");
-        let ctrl;
+        let ctrl = null;
         if (!isEmpty(id)) {
             // Register modal. The overlay has ref to `ui`, which is required
             // to close modal.
@@ -120,7 +120,7 @@ function UI(os) {
         adjuster.appendChild(modal);
         overlay.appendChild(adjuster);
 
-        if (!isEmpty(ctrl.viewDidLoad)) {
+        if (!isEmpty(ctrl?.viewDidLoad)) {
             ctrl.viewDidLoad();
         }
 
@@ -294,18 +294,13 @@ function UI(os) {
      * FIXME: Needs to be updated to use the latest patterns.
      */
     function showErrorModal(error) {
-        var fragment = document.getElementById("error-modal-fragment");
-        var container = fragment.firstElementChild.cloneNode(true);
-        var modal = container.querySelector("div.modal");
+        let modal = _makeModal("error-modal-fragment", true);
         var message = modal.querySelector("p.message");
         message.innerHTML = error;
-        var button = modal.querySelector("button.default");
-        button.addEventListener("click", function() {
-            closeWindow(container);
+        modal.querySelector("button.default").addEventListener("click", function() {
+            modal.ui.close();
         });
-        // Display modal in desktop container
-        var desktop = document.getElementById("desktop");
-        desktop.appendChild(container);
+        modal.ui.show();
     }
     this.showErrorModal = showErrorModal;
 
@@ -320,27 +315,22 @@ function UI(os) {
      * @param {function} ok - A function that is called when user presses `OK`
      */
     function showDeleteModal(msg, cancel, ok) {
-        var fragment = document.getElementById("delete-modal-fragment");
-        var container = fragment.firstElementChild.cloneNode(true);
-        var modal = container.querySelector("div.modal");
+        let modal = _makeModal("delete-modal-fragment", true);
         var message = modal.querySelector("p.message");
         message.innerHTML = msg;
 
-        var cancelButton = modal.querySelector("button.default");
-        cancelButton.addEventListener("click", function() {
+        modal.querySelector("button.default").addEventListener("click", function() {
             if (!isEmpty(cancel)) { cancel(); }
-            closeWindow(container);
+            modal.ui.close();
         });
 
         var okButton = modal.querySelector("button.primary");
         okButton.addEventListener("click", function() {
             if (!isEmpty(ok)) { ok(); }
-            closeWindow(container);
+            modal.ui.close();
         });
 
-        // Display modal in desktop container
-        var desktop = document.getElementById("desktop");
-        desktop.appendChild(container);
+        modal.ui.show();
     }
     this.showDeleteModal = showDeleteModal;
 
@@ -384,8 +374,7 @@ function UI(os) {
         let progressBar = modal.querySelector("div.progress");
         progressBar.style.width = "0%";
 
-        var okButton = modal.querySelector("button.stop");
-        okButton.addEventListener("click", function() {
+        modal.querySelector("button.stop").addEventListener("click", function() {
             if (isEmpty(fn)) {
                 return;
             }
@@ -407,11 +396,6 @@ function UI(os) {
             progressBar.style.width = `${amount}%`;
         }
         modal.setProgress = setProgress;
-
-        function close() {
-            modal.ui.close();
-        }
-        modal.close = close;
 
         modal.ui.show();
 
