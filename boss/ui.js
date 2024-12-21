@@ -83,7 +83,7 @@ function UI(os) {
     }
     this.makeWindow = makeWindow;
 
-    function makeModal(fragmentID) {
+    function _makeModal(fragmentID, isSystemModal) {
         let fragment = document.getElementById(fragmentID);
         // Like the window, the first div tells the position of the modal.
         if (isEmpty(fragment)) {
@@ -97,15 +97,18 @@ function UI(os) {
         let modal = fragment.firstElementChild.cloneNode(true);
         styleListBoxes(modal);
         let id = modal.getAttribute("id");
-        if (isEmpty(id)) {
-            console.error("Modal w/ ID (" + id + ") must have a controller");
+        let ctrl;
+        if (!isEmpty(id)) {
+            // Register modal. The overlay has ref to `ui`, which is required
+            // to close modal.
+            let code = "new window." + id + "(overlay)";
+            ctrl = eval(code);
+            controllers[id] = ctrl;
+        }
+        else if (!isSystemModal) {
+            console.error(`Modal (${fragmentID}) must have an id attribute and a controller`);
             return;
         }
-        // Register modal. The overlay has ref to `ui`, which is required
-        // to close modal.
-        let code = "new window." + id + "(overlay)";
-        let ctrl = eval(code);
-        controllers[id] = ctrl;
 
         overlay.controller = ctrl;
         overlay.ui = new UIWindow(this, overlay, ctrl, true, function() {
@@ -122,6 +125,23 @@ function UI(os) {
         }
 
         return overlay;
+    }
+
+    /**
+     * Makes a modal that will be shown above all content.
+     *
+     * To show the modal:
+     * ```javascript
+     * let modal = os.ui.modal("my-modal-fragment");
+     * modal.ui.show();
+     * ```
+     *
+     * All modals must have a controller.
+     *
+     * @param {string} fragmentID - The ID of the fragment to clone
+     */
+    function makeModal(fragmentID) {
+        return _makeModal(fragmentID, false);
     }
     this.makeModal = makeModal;
 
@@ -247,7 +267,7 @@ function UI(os) {
      * and hide windows/modals.
      */
     function showAboutModal() {
-        let modal = makeModal("about-modal-fragment");
+        let modal = _makeModal("about-modal-fragment", true);
         modal.querySelector("button").addEventListener("click", function(e) {
             modal.ui.close();
         });
@@ -330,7 +350,7 @@ function UI(os) {
      * @param {string} msg - Message to display to user.
      */
     function showAlert(msg) {
-        let modal = makeModal("alert-modal-fragment");
+        let modal = _makeModal("alert-modal-fragment", true);
 
         let message = modal.querySelector("p.message");
         message.innerHTML = msg;
@@ -353,7 +373,7 @@ function UI(os) {
      * @param {function} fn - The async function to call when the `Stop` button is pressed.
      */
     function showProgressBar(msg, fn) {
-        let modal = makeModal("progress-bar-fragment");
+        let modal = _makeModal("progress-bar-fragment", true);
 
         let message = modal.querySelector("div.title");
         message.innerHTML = msg;
@@ -410,7 +430,8 @@ function UI(os) {
  * @param {view} view - An HTMLElement that contains all of the window's
  *   contents. It provides position and styling information.
  * @param {controller} controller - An instance of the window's controller. This
- *   is defined in respective window's `script` tag.
+ *   is defined in respective window's `script` tag. This may be `nil` for system
+ *   windows and modals.
  * @param {function} unregister_fn - Function to unregister window once it has
  *   been closed with OS.
  */
@@ -421,7 +442,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
      */
     function show() {
         // FIXME: Can I use `?` for undefined properties too?
-        if (controller.viewWillAppear !== undefined) {
+        if (!isEmpty(controller?.viewWillAppear)) {
             controller.viewWillAppear();
         }
 
@@ -434,7 +455,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
             desktop.appendChild(view);
         }
 
-        if (controller.viewDidAppear !== undefined) {
+        if (!isEmpty(controller?.viewDidAppear)) {
             controller.viewDidAppear();
         }
     }
@@ -444,7 +465,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
      * Close the window.
      */
     function close() {
-        if (controller.viewWillDisappear !== undefined) {
+        if (!isEmpty(controller?.viewWillDisappear)) {
             controller.viewWillDisappear();
         }
 
@@ -457,7 +478,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
             desktop.removeChild(view);
         }
 
-        if (controller.viewDidDisappear !== undefined) {
+        if (!isEmpty(controller?.viewDidDisappear)) {
             controller.viewDidDisappear();
         }
 
