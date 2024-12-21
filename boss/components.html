@@ -180,16 +180,17 @@
   </body>
 
 <!-- The BOSS About modal -->
-<fragment id="about-modal">
-<div class="center-window">
-  <div class="modal" style="width: 300px;">
-    <div class="container">
-      <p class="message center-text">Bithead OS aka BOSS v0.9a</p>
-      <div class="controls">
-        <button class="default">OK</button>
-      </div>
-      <p class="footer">Have questions? Please call <a href="tel:#(os.phone)">#(os.phone)</a>.</p>
+<fragment id="about-modal-fragment">
+<div class="modal" id="AboutModal">
+  <script language="javascript">
+    function AboutModal(view) { }
+  </script>
+  <div class="container">
+    <p class="message center-text">Bithead OS aka BOSS v0.9a</p>
+    <div class="controls">
+      <button class="default">OK</button>
     </div>
+    <p class="footer">Have questions? Please call <a href="tel:#(os.phone)">#(os.phone)</a>.</p>
   </div>
 </div>
 </fragment>

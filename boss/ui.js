@@ -73,7 +73,7 @@ function UI(os) {
         let ctrl = eval(code);
         controllers[id] = ctrl;
         win.controller = ctrl;
-        win.ui = new UIWindow(this, container, ctrl, function() {
+        win.ui = new UIWindow(this, container, ctrl, false, function() {
             unregisterController(id);
         });
         if (ctrl.viewDidLoad !== undefined) {
@@ -84,32 +84,44 @@ function UI(os) {
     this.makeWindow = makeWindow;
 
     function makeModal(fragmentID) {
-        var fragment = document.getElementById(fragmentID);
+        let fragment = document.getElementById(fragmentID);
         // Like the window, the first div tells the position of the modal.
         if (isEmpty(fragment)) {
             console.error(`Fragment with ID (${fragmentID}) not found in DOM`);
             return;
         }
-        var container = fragment.firstElementChild.cloneNode(true);
-        styleListBoxes(container);
-        var modal = container.querySelector(`.modal`);
+        // Wrap modal in an overlay to prevent taps from outside the modal
+        let overlay = document.createElement("div");
+        overlay.classList.add("modal-overlay");
+
+        let modal = fragment.firstElementChild.cloneNode(true);
+        styleListBoxes(modal);
         let id = modal.getAttribute("id");
         if (isEmpty(id)) {
             console.error("Modal w/ ID (" + id + ") must have a controller");
             return;
         }
-        // Register window
-        let code = "new window." + id + "(modal)";
+        // Register modal. The overlay has ref to `ui`, which is required
+        // to close modal.
+        let code = "new window." + id + "(overlay)";
         let ctrl = eval(code);
         controllers[id] = ctrl;
-        modal.controller = ctrl;
-        modal.ui = new UIWindow(this, container, ctrl, function() {
+
+        overlay.controller = ctrl;
+        overlay.ui = new UIWindow(this, overlay, ctrl, true, function() {
             unregisterController(id);
         });
+        // This is responsible for adjusting the position of the modal
+        let adjuster = document.createElement("div");
+        adjuster.classList.add("center-window");
+        adjuster.appendChild(modal);
+        overlay.appendChild(adjuster);
+
         if (!isEmpty(ctrl.viewDidLoad)) {
             ctrl.viewDidLoad();
         }
-        return modal;
+
+        return overlay;
     }
     this.makeModal = makeModal;
 
@@ -147,12 +159,12 @@ function UI(os) {
                 // TODO: Eventually the controller will be registered and life-cycle events passed.
                 // TODO: Eventually an instance of the controller will be created, container
                 // content rendered, and then viewDidLoad called before it is visible in the #desktop.
-                if (ctrl.viewDidLoad !== undefined) {
+                if (!isEmpty(ctrl.viewDidLoad)) {
                     ctrl.viewDidLoad();
                 }
                 // For now, only the viewDidAppear life-cycle event is relevant
                 // as everything is rendered at once.
-                if (ctrl.viewDidAppear !== undefined) {
+                if (!isEmpty(ctrl.viewDidAppear)) {
                     ctrl.viewDidAppear();
                 }
                 controllers[id] = ctrl;
@@ -175,6 +187,51 @@ function UI(os) {
     }
 
     /**
+     * Register all controllers on the page.
+     *
+     * Controllers are embedded elements inside a UIWindow. A good example of
+     * this is a "Search" component which may be used in several `UIWindow`s.
+     *
+     * Controllers may reference their respective Javascript model the same
+     * way as `UIWindow`s. e.g. `os.ui.controller.ControllerName`.
+     */
+    function registerControllers() {
+        let controllers = document.getElementsByClassName("ui-controller");
+        for (let i = 0; i < controllers.length; i++) {
+            registerController(controllers[i]);
+        }
+    }
+    this.registerControllers = registerControllers;
+
+    /**
+     * Register a controller with the OS.
+     *
+     * NOTE: Similar to `UIWindow`s, this logic may be temporary until the OS
+     * creates the windows, rather than the controller being pre-rendered.
+     *
+     * TODO: Once the OS renders `UIWindow`s, this may need to be updated.
+     */
+    function registerController(component) {
+        let id = component.getAttribute("id");
+        if (isEmpty(id)) {
+            console.error("Controller has no ID");
+            return;
+        }
+
+        let code = "new window." + id + "(component);";
+        let ctrl = eval(code);
+        if (!isEmpty(ctrl)) {
+            if (!isEmpty(ctrl.viewDidLoad)) {
+                ctrl.viewDidLoad();
+            }
+            if (!isEmpty(ctrl.viewDidAppear)) {
+                ctrl.viewDidAppear();
+            }
+            controllers[id] = ctrl;
+        }
+    }
+
+    /**
      * Add a menu to the OS bar.
      */
     function addOSBarMenu(menu) {
@@ -190,19 +247,11 @@ function UI(os) {
      * and hide windows/modals.
      */
     function showAboutModal() {
-        var fragment = document.getElementById("about-modal");
-        var container = fragment.firstElementChild.cloneNode(true);
-        var modal = container.querySelector("div.modal");
-        if (modal === null) {
-            console.warn("OS About modal not found");
-            return;
-        }
-        var button = modal.querySelector("button.default");
-        button.addEventListener("click", function() {
-            closeWindow(container);
+        let modal = makeModal("about-modal-fragment");
+        modal.querySelector("button").addEventListener("click", function(e) {
+            modal.ui.close();
         });
-        var desktop = document.getElementById("desktop");
-        desktop.appendChild(container);
+        modal.ui.show();
     }
     this.showAboutModal = showAboutModal;
 
@@ -225,7 +274,7 @@ function UI(os) {
      * FIXME: Needs to be updated to use the latest patterns.
      */
     function showErrorModal(error) {
-        var fragment = document.getElementById("error-modal");
+        var fragment = document.getElementById("error-modal-fragment");
         var container = fragment.firstElementChild.cloneNode(true);
         var modal = container.querySelector("div.modal");
         var message = modal.querySelector("p.message");
@@ -251,7 +300,7 @@ function UI(os) {
      * @param {function} ok - A function that is called when user presses `OK`
      */
     function showDeleteModal(msg, cancel, ok) {
-        var fragment = document.getElementById("delete-modal");
+        var fragment = document.getElementById("delete-modal-fragment");
         var container = fragment.firstElementChild.cloneNode(true);
         var modal = container.querySelector("div.modal");
         var message = modal.querySelector("p.message");
@@ -365,7 +414,7 @@ function UI(os) {
  * @param {function} unregister_fn - Function to unregister window once it has
  *   been closed with OS.
  */
-function UIWindow(ui, view, controller, unregister_fn) {
+function UIWindow(ui, view, controller, isModal, unregister_fn) {
 
     /**
      * Show the window.
@@ -376,8 +425,14 @@ function UIWindow(ui, view, controller, unregister_fn) {
             controller.viewWillAppear();
         }
 
-        let desktop = document.getElementById("desktop");
-        desktop.appendChild(view);
+        if (isModal) {
+            let body = document.querySelector("body");
+            body.appendChild(view);
+        }
+        else {
+            let desktop = document.getElementById("desktop");
+            desktop.appendChild(view);
+        }
 
         if (controller.viewDidAppear !== undefined) {
             controller.viewDidAppear();
@@ -393,8 +448,14 @@ function UIWindow(ui, view, controller, unregister_fn) {
             controller.viewWillDisappear();
         }
 
-        let desktop = document.getElementById("desktop");
-        desktop.removeChild(view);
+        if (isModal) {
+            let body = document.querySelector("body");
+            body.removeChild(view);
+        }
+        else {
+            let desktop = document.getElementById("desktop");
+            desktop.removeChild(view);
+        }
 
         if (controller.viewDidDisappear !== undefined) {
             controller.viewDidDisappear();
