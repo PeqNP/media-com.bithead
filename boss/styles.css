@@ -1238,6 +1238,9 @@ label {
 .vbox.separated {
   justify-content: space-between;
 }
+.vbox.align-top {
+  justify-content: flex-start;
+}
 .vbox.align-bottom {
   justify-content: flex-end;
 }
