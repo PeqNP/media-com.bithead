@@ -1086,8 +1086,8 @@ function UIImageViewer() {
     this.showImage = showImage;
 
     function make() {
-        var fragment = document.getElementById("image-viewer");
-        var modal = fragment.querySelector("div.modal").cloneNode(true);
+        var fragment = document.getElementById("image-viewer-fragment");
+        var modal = fragment.querySelector(".ui-modal").cloneNode(true);
         var button = modal.querySelector("button.default");
         button.addEventListener("click", function() {
             closeWindow(modal);
