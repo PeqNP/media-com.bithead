@@ -677,7 +677,7 @@ function UIPopupMenu(select) {
 
     function selectValue(value) {
         for (let idx = 0; idx < select.options.length; idx++) {
-            if (select.options[idx].value == `${value}`) {
+            if (select.options[idx].value == value) {
                 selectOption(idx);
                 return;
             }
@@ -1110,6 +1110,39 @@ function UIListBox(select) {
     }
     this.setDelegate = setDelegate;
 
+    /**
+     * Select an option by its value.
+     *
+     * @param {string} value - Value of option to select
+     */
+    function selectValue(value) {
+        for (let idx = 0; idx < select.options.length; idx++) {
+            if (select.options[idx].value == value) {
+                selectOption(idx);
+                return;
+            }
+        }
+    }
+    this.selectValue = selectValue;
+
+    /**
+     * Select an option by its index.
+     *
+     * @param {int} index - Index of option to select
+     */
+    function selectOption(index) {
+        select.selectedIndex = index;
+        for (let i = 0; i < select.options.length; i++) {
+            let opt = select.options[i];
+            opt.ui.classList.remove("selected");
+            if (opt.selected) {
+                opt.ui.classList.add("selected");
+                didSelectListBoxOption(opt);
+            }
+        }
+    }
+    this.selectOption = selectOption;
+
     function removeAllOptions() {
         // Remove all options from the select and facade
         for (;select.options.length > 0;) {
@@ -1215,18 +1248,6 @@ function UIListBox(select) {
     }
     this.selectedOptions = selectedOptions;
 
-    /**
-     * @returns {int} Respective index for option, using option's value
-     */
-    function indexForOption(option) {
-        for (let i = 0; i < select.options.length; i++) {
-            if (select.options[i].value == option.value) {
-                return i;
-            }
-        }
-        return null;
-    }
-
     function styleOption(option) {
         let elem = document.createElement("div");
         elem.innerHTML = option.innerHTML;
@@ -1260,15 +1281,7 @@ function UIListBox(select) {
                 }
             }
             else {
-                select.selectedIndex = indexForOption(option);
-                for (let j = 0; j < select.options.length; j++) {
-                    let opt = select.options[j];
-                    opt.ui.classList.remove("selected");
-                    if (opt.selected) {
-                        elem.classList.add("selected");
-                    }
-                }
-                didSelectListBoxOption(option);
+                selectValue(option.value);
             }
         });
     }
