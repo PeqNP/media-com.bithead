@@ -362,9 +362,14 @@ function UI(os) {
      *
      * @param {string} msg - Message to show in progress bar
      * @param {function} fn - The async function to call when the `Stop` button is pressed.
+     * @param {bool} indeterminate - If `true`, this will show an indeterminate progress bar. Default is `false`.
      */
-    function showProgressBar(msg, fn) {
+    function showProgressBar(msg, fn, indeterminate) {
         let modal = _makeModal("progress-bar-fragment", true);
+
+        if (isEmpty(indeterminate)) {
+            indeteriminate = false;
+        }
 
         let message = modal.querySelector("div.title");
         message.innerHTML = msg;
@@ -372,14 +377,23 @@ function UI(os) {
         let title = modal.querySelector("div.title");
         title.innerHTML = msg;
 
-        let progressBar = modal.querySelector("div.progress");
-        progressBar.style.width = "0%";
+
+        if (indeterminate) {
+            let bar = modal.querySelector(".progress-bar");
+            if (!bar.classList.contains("indeterminate")) {
+                bar.classList.add("indeterminate");
+            }
+        }
+        else {
+            let progressBar = modal.querySelector("div.progress");
+            progressBar.style.width = "0%";
+        }
 
         modal.querySelector("button.stop").addEventListener("click", function() {
+            this.disabled = true;
             if (isEmpty(fn)) {
                 return;
             }
-            this.disabled = true;
             message.innerHTML = "Stopping"
             fn().then((result) => {
                 console.log("Stopped")
@@ -390,12 +404,16 @@ function UI(os) {
         /**
          * Set the progress of the bar.
          *
+         * `amount` is ignored if progress bar is "Indeterminate"
+         *
          * @param {string} title - Title displayed directly above the progress bar.
          * @param {integer} amount - A value from 0-100, where the number represents the percent complete = `75` = 75% complete.
          */
         function setProgress(msg, amount) {
             title.innerHTML = msg;
-            progressBar.style.width = `${amount}%`;
+            if (!indeterminate) {
+                progressBar.style.width = `${amount}%`;
+            }
         }
         modal.setProgress = setProgress;
 
