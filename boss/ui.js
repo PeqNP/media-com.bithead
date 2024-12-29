@@ -360,7 +360,7 @@ function UI(os) {
      * Use this when performing long running actions that may be cancellable. If
      * `fn` is not provided, the `Stop` button does nothing.
      *
-     * @param {string} msg - Message to show in progess bar
+     * @param {string} msg - Message to show in progress bar
      * @param {function} fn - The async function to call when the `Stop` button is pressed.
      */
     function showProgressBar(msg, fn) {
@@ -379,6 +379,7 @@ function UI(os) {
             if (isEmpty(fn)) {
                 return;
             }
+            this.disabled = true;
             message.innerHTML = "Stopping"
             fn().then((result) => {
                 console.log("Stopped")
