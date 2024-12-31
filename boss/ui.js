@@ -585,6 +585,16 @@ function UIController() {
      * unregistered with the OS.
      */
     function viewDidDisappear() { }
+
+    /**
+     * TODO: Called when controller becomes focused.
+     */
+    function viewDidFocus() { }
+
+    /**
+     * TODO: Called when controller goes out of focus.
+     */
+    function viewDidBlur() { }
 }
 
 function styleFolders() {
