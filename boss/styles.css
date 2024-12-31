@@ -428,7 +428,7 @@ body {
   height: 14px;
 }
 /* Displays all menus for OS or the active application */
-#menus {
+#os-bar-menus {
   flex-grow: 1;
   display: flex;
 }
@@ -926,6 +926,9 @@ fieldset {
   /* top and bottom are 10 as 10 is too much between first component. 10 is added on bottom as the controls
      already have 10px bottom padding. */
   padding: 10px 20px 10px 20px;
+
+  font-family: "Geneva";
+  font-size: 14px;
 }
 
 fieldset legend {

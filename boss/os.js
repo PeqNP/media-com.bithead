@@ -180,10 +180,12 @@ function Network(os) {
                     throw new Error(data.error.message);
                 }
                 fn(data);
-                progressBar?.ui.close();
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
+            })
+            .then(() => {
+                progressBar?.ui.close();
             });
     }
 
@@ -226,10 +228,12 @@ function Network(os) {
                     throw new Error(data.error.message);
                 }
                 fn(data);
-                progressBar?.ui.close();
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
+            })
+            .then(() => {
+                progressBar?.ui.close();
             });
     }
     this.upload = upload;
@@ -255,10 +259,12 @@ function Network(os) {
                     throw new Error(data.error.message);
                 }
                 fn(data);
-                progressBar?.ui.close();
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
+            })
+            .then(() => {
+                progressBar?.ui.close();
             });
     }
 
@@ -325,10 +331,12 @@ function Network(os) {
                     throw new Error(data.error.message);
                 }
                 fn(data);
-                progressBar?.ui.close();
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
+            })
+            .then(() => {
+                progressBar?.ui.close();
             });
     }
     this.patch = patch;
