@@ -65,16 +65,12 @@ function UI(os) {
     /**
      * Creates an instance of a `UIWindow` given a `fragment.id`.
      *
-     * - Parameter fragmentID: The `id` of the `fragment` in `document`.
-     * - Returns: Instance of the `fragment` as a `UIWindow`
+     * @param {string} fragmentId: The `id` of the `fragment` in `document`.
+     * @returns Instance of `fragment` as a `UIWindow`
      */
-    function makeWindow(fragmentID) {
-        var fragment = document.getElementById(fragmentID);
-        // The first div tells the position of the window. The positioning information
-        // may _not_ be in the window. Otherwise, it corrupts the background image
-        // styles of the title bar, as it needs a relative position.
-        var container = fragment.firstElementChild.cloneNode(true);
-        var win = container.querySelector(`.ui-window`);
+    function makeWindow(fragmentId) {
+        let fragment = document.getElementById(fragmentId).cloneNode(true);
+        let win = fragment.querySelector(`.ui-window`);
         let id = win.getAttribute("id");
         if (isEmpty(id)) {
             console.error("Window w/ ID (" + id + ") must have a controller");
@@ -85,10 +81,34 @@ function UI(os) {
         let ctrl = eval(code);
         controllers[id] = ctrl;
         win.controller = ctrl;
+
+        // Container is responsible for positioning the window element.
+        let container = document.createElement("div");
+        container.appendChild(win);
+        container.style.position = "absolute";
+        // The positioning doesn't work
+        container.style.top = "20px;"
+        container.style.left = "20px;"
+
+        // Register buttons, if they exist
+        let closeButton = win.querySelector(".close-button");
+        if (!isEmpty(closeButton)) {
+            closeButton.addEventListener("click", function (e) {
+                // Any additional cleanup here?
+                win.ui.close();
+            });
+        }
+        let zoomButton = win.querySelector(".zoom-button");
+        if (!isEmpty(zoomButton)) {
+            zoomButton.addEventListener("click", function (e) {
+                console.log("Not yet implemented");
+            });
+        }
+
         win.ui = new UIWindow(this, container, ctrl, false, function() {
             unregisterController(id);
         });
-        if (ctrl.viewDidLoad !== undefined) {
+        if (!isEmpty(ctrl.viewDidLoad)) {
             ctrl.viewDidLoad();
         }
         return win;
@@ -292,6 +312,18 @@ function UI(os) {
         modal.ui.show();
     }
     this.showAboutModal = showAboutModal;
+
+    /**
+     * Show installed applications.
+     *
+     * FIXME: This needs to use the latest patterns to instantiate, show,
+     * and hide windows/modals.
+     */
+    function showInstalledApplications() {
+        let win = makeWindow("applications-fragment");
+        win.ui.show();
+    }
+    this.showInstalledApplications = showInstalledApplications;
 
     /**
      * Close a (modal) window.
