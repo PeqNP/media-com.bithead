@@ -443,6 +443,66 @@ function UI(os) {
 }
 
 /**
+ * Represents a BOSS application.
+ *
+ * This is provided to a user's application instance.
+ *
+ * @param {UI} ui - Instance of UI
+ * @param {object} cfg - Contains all of the applications configuration
+ */
+function UIApplication(config) {
+
+    readOnly(this, "bundleId", config.bundleId);
+    readOnly(this, "name", config.name);
+    readOnly(this, "version", config.version);
+    readOnly(this, "icon", config.icon);
+
+    /** Delegate Callbacks **/
+
+    /**
+     * Called after the application's configuration has been loaded.
+     *
+     * This is responsible for showing the first window of the application.
+     *
+     * This is where you would show your splash screen when loading assets,
+     * making network requests for app data, etc.
+     */
+    function applicationDidStart() { }
+
+    /**
+     * Called before the application is removed from the OS's cache.
+     *
+     * Perform any necessary cleanup steps. In most cases, this is not
+     * necessary as any memory used by your application will be cleaned
+     * automatically.
+     */
+    function applicationDidStop() { }
+
+    /**
+     * Application became the focused application.
+     *
+     * This is not called when the application starts. Only when switching
+     * contexts.
+     */
+    function applicationDidFocus() { }
+
+    /**
+     * Application went out of focus.
+     *
+     * This happens when a user changes the app they want to work with. Your
+     * app is not removed from memory and may work in the background.
+     * However, none of your UI interfaces will be shown to the user.
+     *
+     * Please be cognizant of what operations you perform in the background
+     * as the user expects your app to be mostly dormant while they are
+     * working in the other app.
+     *
+     * Perform any necessary save actions.
+     */
+    function applicationDidBlur() { }
+}
+
+/**
  * Provides abstraction for a "window."
  *
  * FIXME: You may not close and re-open a window. The window is not
@@ -543,7 +603,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
         }
         let value = _input.value.trim()
         if (!isEmpty(msg) && isEmpty(value)) {
-          os.ui.showAlert(msg);
+          ui.showAlert(msg);
           throw new Error(msg);
         }
         return value;
@@ -626,7 +686,7 @@ function UIController() {
 }
 
 function styleFolders() {
-    let folders = document.getElementsByClassName("folder");
+    let folders = document.getElementsByClassName("ui-folder");
     for (let i = 0; i < folders.length; i++) {
         let folder = new UIFolder(folders[i]);
     }

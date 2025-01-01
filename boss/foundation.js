@@ -41,3 +41,19 @@ function generateUUID() {
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   );
 }
+
+/**
+ * Define a read-only function on an object.
+ *
+ * @param {object} obj - Object that will contain the property to be read-only
+ * @param {name} name - Name of property that will be read-only
+ * @param {any} value - The value of the read-only property
+ */
+function readOnly(obj, name, value) {
+    Object.defineProperty(obj, name, {
+        value: value,
+        writable: false, // Do not allow property to be changed
+        enumerable: true, // Allow it to be enumerated
+        configurable: false // Do not allow property to be redefined
+    });
+}

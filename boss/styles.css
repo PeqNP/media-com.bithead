@@ -796,17 +796,17 @@ select {
 
 /* Folders */
 
-ul.folder {
+ul.ui-folder {
   /* This ensures the folder is directly lined up within its parent */
   border: 1px solid #000;
 }
 
-ul.folder {
+ul.ui-folder {
   --spacing: 2rem;
   --radius: 7px;
 }
 
-ul.folder li {
+ul.ui-folder li {
   display: block;
   position: relative;
   padding-top: 2px;
@@ -817,15 +817,15 @@ ul.folder li {
   cursor: pointer;
 }
 
-ul.folder ul {
+ul.ui-folder ul {
   padding-left: 0px;
 }
 
-ul.folder ul li:last-child {
+ul.ui-folder ul li:last-child {
   border-color: transparent;
 }
 
-ul.folder ul li::before {
+ul.ui-folder ul li::before {
   content: '';
   display: block;
   position: absolute;
@@ -836,24 +836,24 @@ ul.folder ul li::before {
   height: calc(var(--spacing) + 1px);
 }
 
-ul.folder summary {
+ul.ui-folder summary {
   display: block;
   cursor: pointer;
 }
 
-ul.folder summary::marker,
-ul.folder summary::-webkit-details-marker {
+ul.ui-folder summary::marker,
+ul.ui-folder summary::-webkit-details-marker {
   display: none;
 }
 
-ul.folder summary:focus {
+ul.ui-folder summary:focus {
   outline: none;
 }
 
-ul.folder summary:focus-visible { }
+ul.ui-folder summary:focus-visible { }
 
-ul.folder li::after,
-ul.folder summary::before {
+ul.ui-folder li::after,
+ul.ui-folder summary::before {
   content: '';
   display: block;
   position: absolute;
@@ -863,49 +863,49 @@ ul.folder summary::before {
   height: calc(2 * var(--radius));
 }
 
-ul.folder summary::before {
+ul.ui-folder summary::before {
   z-index: 1;
   top: 2px;
   background: transparent url('/boss/img/folder-closed.svg') 0px 0px no-repeat;
 }
 
-ul.folder details[open] > summary::before {
+ul.ui-folder details[open] > summary::before {
   top: 6px;
   background: transparent url('/boss/img/folder-open.svg') 0px 0px no-repeat;
 }
 
-ul.folder li.group::before {
+ul.ui-folder li.group::before {
   width: 20px;
   top: 5px;
   left: 12px;
   background: transparent url('/boss/img/folder.svg') 0px 0px no-repeat;
 }
 
-ul.folder li.server::before {
+ul.ui-folder li.server::before {
   width: 20px;
   top: 11px;
   left: 12px;
   background: transparent url('/boss/img/server.svg') 0px 0px no-repeat;
 }
 
-ul.folder li.file::before {
+ul.ui-folder li.file::before {
   width: 12px;
   top: 4px;
   left: 30px;
   background: transparent url('/boss/img/file-icon.svg') 0px 0px no-repeat;
 }
 
-ul.folder li span {
+ul.ui-folder li span {
   padding: 0px 1px 0px 2px;
 }
 
-ul.folder li span.active {
+ul.ui-folder li span.active {
   background-color: #000;
   color: #fff;
 }
 
 /* Folder metadata */
-ul.folder .metadata, ul.folder .metadata-title {
+ul.ui-folder .metadata, ul.ui-folder .metadata-title {
   display: none;
 }
 
