@@ -77,7 +77,12 @@ function UI(os) {
             pos3 = e.clientX;
             pos4 = e.clientY;
 
-            container.style.top = (container.offsetTop - pos2) + "px";
+            // Prevent window from going past the OS bar
+            let topPos = container.offsetTop - pos2;
+            if (topPos < 28) {
+                topPos = 28;
+            }
+            container.style.top = topPos + "px";
             container.style.left = (container.offsetLeft - pos1) + "px";
         }
 
@@ -126,14 +131,11 @@ function UI(os) {
         let container = document.createElement("div");
         container.appendChild(win);
         container.style.position = "absolute";
-        // The positioning doesn't work
-        // TODO: Stagger position where windows appear by 10-20px for each new
-        // window until we get 1/3 through page. Then reset back to 20/20. Use
-        // the size of the viewport to determine where a window should be. There
-        // is probably a minimum viewport size which makes all windows start
-        // at 20/20.
-        container.style.top = "20px;"
-        container.style.left = "20px;"
+        // TODO: Stagger position where windows appear. Each new window should
+        // be 10-20 px from top and left. When intial position is > 1/3 of page
+        // viewport size, reset back to 40/20.
+        container.style.top = "40px";
+        container.style.left = "20px";
 
         // Register buttons, if they exist
         let closeButton = win.querySelector(".close-button");
@@ -160,6 +162,9 @@ function UI(os) {
         win.ui = new UIWindow(this, container, ctrl, false, function() {
             unregisterController(id);
         });
+        // TODO: viewDidLoad should happen only when `view` is known and appended to
+        // window container. This is the correct thing to do in this context
+        // because the fragment has a hard-coded view.
         if (!isEmpty(ctrl.viewDidLoad)) {
             ctrl.viewDidLoad();
         }
