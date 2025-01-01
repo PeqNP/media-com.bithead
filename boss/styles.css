@@ -389,19 +389,14 @@ body {
   font-size: 22px;
   overflow: scroll;
   resize: both;
-  /* Re-enable, if needed
-  scrollbar-gutter: stable; */
   /* Prevents window from being resized down any further */
   min-width: 360px;
   min-height: 40px;
-  /* max-width: 600px; */
-  /* This must be relative to the size of the #desktop - 20px so that it never
-   * exceeds the bottom. May require JS option. */
-  /* max-height: 550px; */
-  /* For testing - Setting the initial width and height prevents the window from being the size of the parent's viewport
-  width: 360px;
-  height: 250px;
-   */
+}
+
+/* Some windows, like folder windows, should have no padding. */
+#desktop .ui-window > .container.no-padding {
+  padding: 0px;
 }
 
 /**
@@ -796,10 +791,7 @@ select {
 
 /* Folders */
 
-ul.ui-folder {
-  /* This ensures the folder is directly lined up within its parent */
-  border: 1px solid #000;
-}
+ul.ui-folder { }
 
 ul.ui-folder {
   --spacing: 2rem;
@@ -1187,14 +1179,14 @@ label {
 
 /** List Box **/
 
-.list-box select {
+.ui-list-box select {
   display: none;
 }
-.list-box {
-  /* The list-box must conform to the size of its children's content. When
+.ui-list-box {
+  /* The ui-list-box must conform to the size of its children's content. When
    * this component is managed by the OS, the parent's inline style is
    * associated to the facade in order to control `overflow-x`. However,
-   * this then means the `list-box` will be the same width of its container.
+   * this then means the `ui-list-box` will be the same width of its container.
    * This ensures that its intrinsic size is determined by its child container.
    */
   display: inline-block;
@@ -1204,12 +1196,12 @@ label {
   padding: 2px;
   background-color: #fff;
 }
-.list-box > .container {
+.ui-list-box > .container {
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.list-box > .container > .option {
+.ui-list-box > .container > .option {
   padding-left: 2px;
   color: #000;
   background-color: #fff;
@@ -1218,15 +1210,15 @@ label {
   text-overflow: ellipsis;
 }
 
-.list-box > .container > .option.selected {
+.ui-list-box > .container > .option.selected {
   color: #fff;
   background-color: #000;
 }
-.list-box > .container > .option.disabled {
+.ui-list-box > .container > .option.disabled {
   color: #ddd;
 }
 
-.list-box > .container > .option.child {
+.ui-list-box > .container > .option.child {
   padding-left: 20px;
 }
 

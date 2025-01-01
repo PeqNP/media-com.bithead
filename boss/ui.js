@@ -63,6 +63,46 @@ function UI(os) {
     }
 
     /**
+     * Drag window.
+     */
+    function dragWindow(container) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        function dragElement(e) {
+            e = e || window.event;
+            e.preventDefault();
+
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+
+            container.style.top = (container.offsetTop - pos2) + "px";
+            container.style.left = (container.offsetLeft - pos1) + "px";
+        }
+
+        function stopDraggingElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            container.onmousedown = null;
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+
+            // Register global drag events on document
+            document.onmousemove = dragElement;
+            // Unregister global drag events
+            document.onmouseup = stopDraggingElement;
+        }
+
+        container.onmousedown = dragMouseDown;
+    }
+
+    /**
      * Creates an instance of a `UIWindow` given a `fragment.id`.
      *
      * @param {string} fragmentId: The `id` of the `fragment` in `document`.
@@ -87,6 +127,11 @@ function UI(os) {
         container.appendChild(win);
         container.style.position = "absolute";
         // The positioning doesn't work
+        // TODO: Stagger position where windows appear by 10-20px for each new
+        // window until we get 1/3 through page. Then reset back to 20/20. Use
+        // the size of the viewport to determine where a window should be. There
+        // is probably a minimum viewport size which makes all windows start
+        // at 20/20.
         container.style.top = "20px;"
         container.style.left = "20px;"
 
@@ -104,6 +149,13 @@ function UI(os) {
                 console.log("Not yet implemented");
             });
         }
+
+        // TODO: Register click to change focus of window
+        // TODO: When dragging, change focus on window
+        // Register window drag event
+        win.querySelector(".top").onmousedown = function() {
+          dragWindow(container);
+        };
 
         win.ui = new UIWindow(this, container, ctrl, false, function() {
             unregisterController(id);
@@ -1516,7 +1568,7 @@ function styleListBox(list) {
 }
 
 function styleListBoxes(elem) {
-    let lists = elem.getElementsByClassName("list-box");
+    let lists = elem.getElementsByClassName("ui-list-box");
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
         styleListBox(list);
