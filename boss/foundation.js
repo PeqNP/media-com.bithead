@@ -78,13 +78,10 @@ function readOnly(obj, name, value) {
  * @returns {int} Returns a unique object ID
  */
 function makeObjectId() {
-    const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const alphanumeric = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-    // First character is alphabetic
-    let id = alphabet[Math.floor(Math.random() * alphabet.length)];
-
-    for (let i = 0; i < 7; i++) {
+    let id = "";
+    for (let i = 0; i < 8; i++) {
         id += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
     }
 

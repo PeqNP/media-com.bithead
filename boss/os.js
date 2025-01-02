@@ -179,9 +179,9 @@ function OS() {
             }
 
             progressBar.setProgress(50, "Loading controller...");
-            let ctrl = resp.controllers[resp.main];
+            let ctrl = resp.controllers[resp.application.main];
             if (isEmpty(ctrl)) {
-                showError(`Could not find main application controller (${resp.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
+                showError(`Could not find main application controller (${resp.application.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
                 return;
             }
 
@@ -189,14 +189,17 @@ function OS() {
                 showError(`Unsupported renderer (${ctrl.renderer}) defined in controller (${ctrl.name}).`);
                 return;
             }
-            os.network.get(`/boss/app/${bundleId}/controller/${resp.main}.${ctrl.renderer}`, "text", function(result) {
+            else if (isEmpty(ctrl.renderer)) {
+                ctrl.renderer = "html";
+            }
+            os.network.get(`/boss/app/${bundleId}/controller/${resp.application.main}.${ctrl.renderer}`, "text", function(result) {
                 if (!result.ok) {
                     showError(`Failed to load application bundle (${bundleId}) controller (${resp.main}).`, result.error);
                     return;
                 }
 
                 progressBar.ui.close();
-                let win = os.ui.makeWindow(html);
+                let win = os.ui.makeWindow(result.value);
                 win.show();
 
                 // TODO: The application is officially "launched". Set it as the

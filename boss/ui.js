@@ -43,10 +43,10 @@ function UI(os) {
     this.controller = new Proxy(controller, handler);
 
     function init() {
+        // TODO: Some of these should go away and be performed only in `makeWindow`.
         styleOSMenus();
         stylePopupMenus();
         styleFolders();
-        styleListBoxes(document);
 
         /**
          * Close all menus when user clicks outside of `select`.
@@ -67,9 +67,15 @@ function UI(os) {
         // TODO: Make controller from current application bundle
     }
 
-    function unregisterController(id) {
+    function addController(id, ctrl) {
+        controllers[id] = ctrl;
+    }
+    this.addController = addController;
+
+    function removeController(id) {
         delete controllers[id];
     }
+    this.removeController = removeController;
 
     /**
      * Drag window.
@@ -128,6 +134,7 @@ function UI(os) {
         let zIndex = windowIndices.length + WINDOW_START_ZINDEX;
         container.style.zIndex = `${zIndex}`;
     }
+    this.addWindow = addWindow;
 
     /**
      * Unregister a window container.
@@ -157,6 +164,7 @@ function UI(os) {
             ctr.style.zIndex = `${zIndex}`;
         }
     }
+    this.removeWindow = removeWindow;
 
     /**
      * Focus on the window container.
@@ -177,6 +185,7 @@ function UI(os) {
         removeWindow(container);
         addWindow(container);
     }
+    this.focusWindow = focusWindow;
 
     /**
      * Creates an instance of a `UIWindow` from an HTML string.
@@ -207,97 +216,38 @@ function UI(os) {
         container.style.top = "40px";
         container.style.left = "20px";
 
-        addWindow(container);
-
-        let win = container.querySelector(`.ui-window`);
-        // Register window
-        let code = "new window." + id + "(win)";
-        let ctrl = eval(code);
-        controllers[id] = ctrl;
-        win.controller = ctrl;
-
-        // Register buttons, if they exist
-        let closeButton = win.querySelector(".close-button");
-        if (!isEmpty(closeButton)) {
-            closeButton.addEventListener("click", function (e) {
-                // Any additional cleanup here?
-                win.ui.close();
-            });
-        }
-        let zoomButton = win.querySelector(".zoom-button");
-        if (!isEmpty(zoomButton)) {
-            zoomButton.addEventListener("click", function (e) {
-                console.log("Not yet implemented");
-            });
-        }
-
-        styleListBoxes(win);
-
-        // TODO: Register click to change focus of window
-        // TODO: When dragging, change focus on window
-        // Register window drag event
-        win.querySelector(".top").onmousedown = function() {
-            focusWindow(container);
-            dragWindow(container);
-        };
-
-        win.ui = new UIWindow(this, container, ctrl, false, function() {
-            unregisterController(id);
-            removeWindow(container);
-        });
-
-        // I'm not sure if this is the right place for this yet. The user
-        // hasn't had a chance to configure the controller before the view
-        // is loaded.
-        if (!isEmpty(ctrl.viewDidLoad)) {
-            ctrl.viewDidLoad();
-        }
-
+        win.ui = new UIWindow(id, container, false);
         return win;
     }
     this.makeWindow = makeWindow;
 
-    function _makeModal(fragmentID, isSystemModal) {
-        let fragment = document.getElementById(fragmentID);
+    function _makeModal(fragmentId, isSystemModal) {
+        let fragment = document.getElementById(fragmentId).cloneNode(true);
         // Like the window, the first div tells the position of the modal.
         if (isEmpty(fragment)) {
-            console.error(`Fragment with ID (${fragmentID}) not found in DOM`);
+            console.error(`Fragment with ID (${fragmentId}) not found in DOM`);
             return;
         }
+
+        let objectId = makeObjectId();
+        let id = `Window_${objectId}`;
+
+        const attr = {
+            "window": {id: id, controller: `os.ui.controller.${id}`},
+        };
+
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
         overlay.classList.add("modal-overlay");
 
-        let modal = fragment.firstElementChild.cloneNode(true);
-        styleListBoxes(modal);
-        let id = modal.getAttribute("id");
-        let ctrl = null;
-        if (!isEmpty(id)) {
-            // Register modal. The overlay has ref to `ui`, which is required
-            // to close modal.
-            let code = "new window." + id + "(overlay)";
-            ctrl = eval(code);
-            controllers[id] = ctrl;
-        }
-        else if (!isSystemModal) {
-            console.error(`Modal (${fragmentID}) must have an id attribute and a controller`);
-            return;
-        }
-
-        overlay.controller = ctrl;
-        overlay.ui = new UIWindow(this, overlay, ctrl, true, function() {
-            unregisterController(id);
-        });
-        // This is responsible for adjusting the position of the modal
+        // Wrap modal in adjusting layer that defines position. This is similar
+        // to a `UIWindow`'s `HTMLElement` container, except it is always centered.
         let adjuster = document.createElement("div");
         adjuster.classList.add("center-window");
-        adjuster.appendChild(modal);
+        adjuster.innerHTML = interpolate(fragment.innerHTML, attr);
         overlay.appendChild(adjuster);
 
-        if (!isEmpty(ctrl?.viewDidLoad)) {
-            ctrl.viewDidLoad();
-        }
-
+        overlay.ui = new UIWindow(id, overlay, true);
         return overlay;
     }
 
@@ -312,10 +262,10 @@ function UI(os) {
      *
      * All modals must have a controller.
      *
-     * @param {string} fragmentID - The ID of the fragment to clone
+     * @param {string} fragmentId - The ID of the fragment to clone
      */
-    function makeModal(fragmentID) {
-        return _makeModal(fragmentID, false);
+    function makeModal(fragmentId) {
+        return _makeModal(fragmentId, false);
     }
     this.makeModal = makeModal;
 
@@ -364,40 +314,14 @@ function UI(os) {
     function registerWindow(win) {
         // Register window for life-cycle events if it has a controller
         let id = win.getAttribute("id");
-        if (!isEmpty(id)) {
-            let code = "new window." + id + "(win);";
-            let ctrl = eval(code);
-            win.controller = ctrl;
-            // NOTE: These windows are rendered server-side. They can never be unregistered.
-            // This is why the unregister function does nothing.
-            win.ui = new UIWindow(this, win, ctrl, false, function() { });
-            if (!isEmpty(ctrl)) {
-                // TODO: Eventually this will be rendered client-side. Until
-                // this is complete the view life cycle events need to be triggered
-                // here.
-                if (!isEmpty(ctrl.viewDidLoad)) {
-                    ctrl.viewDidLoad();
-                }
-                if (!isEmpty(ctrl.viewDidAppear)) {
-                    ctrl.viewDidAppear();
-                }
-                controllers[id] = ctrl;
-            }
-        }
 
-        var osMenus = win.getElementsByClassName("os-menus");
-        if (osMenus.length < 1) {
-            return;
+        // When windows are pre-rendered, `show` is not called. Therefore, parts
+        // of the view life-cycle methods must be managed here.
+        win.ui = new UIWindow(id, win, false);
+        let ctrl = win.ui.initialize(true);
+        if (!isEmpty(ctrl?.viewDidAppear)) {
+            ctrl.viewDidAppear();
         }
-        osMenus = osMenus[0];
-
-        var menus = osMenus.getElementsByClassName("os-menu");
-        for (;menus.length > 0;) {
-            var menu = menus[0];
-            menu.parentNode.removeChild(menu);
-            addOSBarMenu(menu);
-        }
-        osMenus.parentNode.removeChild(osMenus);
     }
 
     /**
@@ -441,7 +365,7 @@ function UI(os) {
             if (!isEmpty(ctrl.viewDidAppear)) {
                 ctrl.viewDidAppear();
             }
-            controllers[id] = ctrl;
+            addController(id, ctrl);
         }
     }
 
@@ -702,38 +626,124 @@ function UIApplication(config) {
  * re-registered when shown subsequent times.
  *
  * @param {UI} ui - Instance of UI
- * @param {view} view - An HTMLElement that contains all of the window's
- *   contents. It provides position and styling information.
- * @param {controller} controller - An instance of the window's controller. This
- *   is defined in respective window's `script` tag. This may be `nil` for system
- *   windows and modals.
- * @param {function} unregister_fn - Function to unregister window once it has
- *   been closed with OS.
+ * @param {HTMLElement} container - `.ui-window` container
  */
-function UIWindow(ui, view, controller, isModal, unregister_fn) {
+function UIWindow(id, container, isModal) {
+
+    let controller = null;
+
+    /**
+     * Prepare the window for display, load controller source, etc.
+     *
+     * This returns a `UIController` to support pre-rendered windows. Even though
+     * this function is "public" it should be visible only to UI. Do not call this
+     * method directly.
+     *
+     * @param {bool} isPreRendered - Window is already rendered to desktop and
+     *      not managed by OS.
+     * @returns {UIController} that was loaded from window
+     */
+    function initialize(isPreRendered) {
+        styleListBoxes(container);
+
+        let src = `new window.${id}(container)`;
+        // A window does not need a controller.
+        try {
+            controller = eval(src);
+        }
+        catch (error) {
+            controller = null;
+            // Log just in case user wasn't expecting this to happen.
+            console.log(error);
+        }
+
+        if (!isEmpty(controller)) {
+            os.ui.addController(id, controller);
+        }
+
+        // TODO: Register embedded controllers
+
+        if (!isPreRendered) {
+            // Register buttons, if they exist
+            let closeButton = container.querySelector(".close-button");
+            if (!isEmpty(closeButton)) {
+                closeButton.addEventListener("click", function (e) {
+                    close();
+                });
+            }
+            let zoomButton = container.querySelector(".zoom-button");
+            if (!isEmpty(zoomButton)) {
+                zoomButton.addEventListener("click", function (e) {
+                    zoom();
+                });
+            }
+
+            // Register window drag event
+            container.querySelector(".top").onmousedown = function() {
+                os.ui.focusWindow(container);
+                os.ui.dragWindow(container);
+            };
+        }
+
+        let osMenus = container.getElementsByClassName("os-menus");
+        if (osMenus.length > 0) {
+            // Only one `UIMenu` parent may be registered
+            let winMenu = osMenus[0];
+
+            let menus = winMenu.getElementsByClassName("os-menu");
+            for (let i = 0; i < menus.length; i++) {
+                let menu = menus[i];
+                os.ui.addOSBarMenu(menu);
+            }
+
+            // TODO: Make sure all menus in the container are removed
+            // Remove from container as they are now in the OS bar
+            for (let i = 0; i < osMenus.length; i++) {
+                let menu = osMenus[i];
+                menu.parentNode.removeChild(menu);
+            }
+        }
+
+        if (!isEmpty(controller?.viewDidLoad)) {
+            controller.viewDidLoad();
+        }
+
+        // Prepare window to be displayed -- assigns z-index.
+        // NOTE: Modals are displayed in a different than windows and, therefore,
+        // are not registered as a window.
+        if (!isModal && !isPreRendered) {
+            os.ui.addWindow(container);
+        }
+
+        return controller;
+    }
+    this.initialize = initialize;
 
     /**
      * Show the window.
      */
     function show() {
+        initialize(false);
+
         // Allow the controller to load its view.
         if (!isEmpty(controller?.initialize)) {
             // TODO: This is an async function. The functions below shall not
             // be called until the view is loaded from the server.
         }
+        else {
+        }
 
-        // FIXME: Can I use `?` for undefined properties too?
         if (!isEmpty(controller?.viewWillAppear)) {
             controller.viewWillAppear();
         }
 
         if (isModal) {
             let body = document.querySelector("body");
-            body.appendChild(view);
+            body.appendChild(container);
         }
         else {
             let desktop = document.getElementById("desktop");
-            desktop.appendChild(view);
+            desktop.appendChild(container);
         }
 
         if (!isEmpty(controller?.viewDidAppear)) {
@@ -743,6 +753,13 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
     this.show = show;
 
     /**
+     * Toggle fullscreen window.
+     */
+    function zoom() {
+        console.log("zoom() not yet implemented");
+    }
+
+    /**
      * Close the window.
      */
     function close() {
@@ -750,20 +767,21 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
             controller.viewWillDisappear();
         }
 
+        os.ui.removeController(id);
+
         if (isModal) {
             let body = document.querySelector("body");
-            body.removeChild(view);
+            body.removeChild(container);
         }
         else {
             let desktop = document.getElementById("desktop");
-            desktop.removeChild(view);
+            desktop.removeChild(container);
+            os.ui.removeWindow(container);
         }
 
         if (!isEmpty(controller?.viewDidDisappear)) {
             controller.viewDidDisappear();
         }
-
-        unregister_fn();
     }
     this.close = close;
 
@@ -776,12 +794,12 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
      * @returns HTMLElement?
      */
     function input(name) {
-        return view.querySelector(`input[name='${name}']`)
+        return container.querySelector(`input[name='${name}']`)
     }
     this.input = input;
 
     function select(name) {
-        return view.querySelector(`select[name='${name}']`)
+        return container.querySelector(`select[name='${name}']`)
     }
     this.select = select;
 
@@ -801,7 +819,7 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
         }
         let value = _input.value.trim()
         if (!isEmpty(msg) && isEmpty(value)) {
-          ui.showAlert(msg);
+          os.ui.showAlert(msg);
           throw new Error(msg);
         }
         return value;
@@ -1720,23 +1738,6 @@ function styleListBoxes(elem) {
     let lists = elem.getElementsByClassName("ui-list-box");
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
-        // Do not style list boxes in fragments
-        // TODO: This is temporary. This exists only because windows may
-        // be rendered in the document w/o intervention from OS.
-        let p = list.parentNode;
-        let inFragment = false;
-        while (true) {
-            if (isEmpty(p)) {
-                break;
-            }
-            else if (p.tagName == "FRAGMENT") {
-                inFragment = true;
-                break;
-            }
-            p = p.parentNode;
-        }
-        if (!inFragment) {
-            styleListBox(list);
-        }
+        styleListBox(list);
     }
 }
