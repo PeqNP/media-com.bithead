@@ -18,6 +18,7 @@ function OS() {
     this.ui = new UI(this);
 
     // List of installed (registered) apps the OS is aware of.
+    // object{bundleId:{name:icon:system:}}
     let apps = {};
 
     function init() {
@@ -125,7 +126,6 @@ function OS() {
     }
     this.copyToClipboard = copyToClipboard;
 
-
     /**
      * Register applications available to BOSS.
      *
@@ -156,6 +156,33 @@ function OS() {
         console.log(`Opening application bundle (${bundleId})`);
     }
     this.openApplication = openApplication;
+
+    /**
+     * Returns all user-space installed applications.
+     *
+     * This is assumed to be used in a `UIListBox`. Therefore, `name` also
+     * contains the application's icon.
+     *
+     * @returns [object{id:value:}]
+     */
+    function installedApplications() {
+        let _apps = [];
+        for (key in apps) {
+            let app = apps[key];
+            if (app.system !== true) {
+                let name = null;
+                if (isEmpty(app.icon)) {
+                    name = app.name;
+                }
+                else {
+                    name = `img:${app.icon},app.name`;
+                }
+                _apps.push({id: key, name: name});
+            }
+        }
+        return _apps;
+    }
+    this.installedApplications = installedApplications;
 }
 
 /**

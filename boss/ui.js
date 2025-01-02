@@ -1455,7 +1455,9 @@ function UIListBox(select) {
             select.appendChild(option);
         }
 
-        select.selectedIndex = 0;
+        if (!select.multiple) {
+            select.selectedIndex = 0;
+        }
         styleOptions();
     }
     this.addNewOptions = addNewOptions;
