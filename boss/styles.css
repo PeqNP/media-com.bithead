@@ -1208,6 +1208,7 @@ label {
   height: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 /* When icons are displayed, there needs to be enough space on the left to support
  * them. */

@@ -318,10 +318,7 @@ function UI(os) {
         // When windows are pre-rendered, `show` is not called. Therefore, parts
         // of the view life-cycle methods must be managed here.
         win.ui = new UIWindow(id, win, false);
-        let ctrl = win.ui.initialize(true);
-        if (!isEmpty(ctrl?.viewDidAppear)) {
-            ctrl.viewDidAppear();
-        }
+        win.ui.initialize(true);
     }
 
     /**
@@ -356,14 +353,11 @@ function UI(os) {
             return;
         }
 
-        let code = "new window." + id + "(component);";
+        let code = `new window.${id}(component);`;
         let ctrl = eval(code);
         if (!isEmpty(ctrl)) {
             if (!isEmpty(ctrl.viewDidLoad)) {
                 ctrl.viewDidLoad();
-            }
-            if (!isEmpty(ctrl.viewDidAppear)) {
-                ctrl.viewDidAppear();
             }
             addController(id, ctrl);
         }
@@ -641,7 +635,6 @@ function UIWindow(id, container, isModal) {
      *
      * @param {bool} isPreRendered - Window is already rendered to desktop and
      *      not managed by OS.
-     * @returns {UIController} that was loaded from window
      */
     function initialize(isPreRendered) {
         styleListBoxes(container);
@@ -704,10 +697,6 @@ function UIWindow(id, container, isModal) {
             }
         }
 
-        if (!isEmpty(controller?.viewDidLoad)) {
-            controller.viewDidLoad();
-        }
-
         // Prepare window to be displayed -- assigns z-index.
         // NOTE: Modals are displayed in a different than windows and, therefore,
         // are not registered as a window.
@@ -715,7 +704,9 @@ function UIWindow(id, container, isModal) {
             os.ui.addWindow(container);
         }
 
-        return controller;
+        if (!isEmpty(controller?.viewDidLoad)) {
+            controller.viewDidLoad();
+        }
     }
     this.initialize = initialize;
 
@@ -723,20 +714,8 @@ function UIWindow(id, container, isModal) {
      * Show the window.
      */
     function show() {
-        initialize(false);
-
-        // Allow the controller to load its view.
-        if (!isEmpty(controller?.initialize)) {
-            // TODO: This is an async function. The functions below shall not
-            // be called until the view is loaded from the server.
-        }
-        else {
-        }
-
-        if (!isEmpty(controller?.viewWillAppear)) {
-            controller.viewWillAppear();
-        }
-
+        // NOTE: `container` must be added to DOM before controller can be
+        // instantiated.
         if (isModal) {
             let body = document.querySelector("body");
             body.appendChild(container);
@@ -746,8 +725,15 @@ function UIWindow(id, container, isModal) {
             desktop.appendChild(container);
         }
 
-        if (!isEmpty(controller?.viewDidAppear)) {
-            controller.viewDidAppear();
+        initialize(false);
+
+        // TODO: Allow the controller to load its view.
+        // Typically used when providing server-side rendered window container.
+        if (!isEmpty(controller?.initialize)) {
+            // TODO: This is an async function. The functions below shall not
+            // be called until the view is loaded from the server.
+        }
+        else {
         }
     }
     this.show = show;
@@ -763,8 +749,8 @@ function UIWindow(id, container, isModal) {
      * Close the window.
      */
     function close() {
-        if (!isEmpty(controller?.viewWillDisappear)) {
-            controller.viewWillDisappear();
+        if (!isEmpty(controller?.viewWillUnload)) {
+            controller.viewWillUnload();
         }
 
         os.ui.removeController(id);
@@ -777,10 +763,6 @@ function UIWindow(id, container, isModal) {
             let desktop = document.getElementById("desktop");
             desktop.removeChild(container);
             os.ui.removeWindow(container);
-        }
-
-        if (!isEmpty(controller?.viewDidDisappear)) {
-            controller.viewDidDisappear();
         }
     }
     this.close = close;
@@ -828,27 +810,32 @@ function UIWindow(id, container, isModal) {
 }
 
 /**
- * Provides protocol definition for a Controller.
+ * Provides protocol definition for a `UIWindow` controller.
  *
  * A `UIController` allows a `div.ui-window` to receive life-cycle events from the OS.
  *
  * All functions are optional. Therefore, implement only the functions needed.
  *
- * A `UIController` is defined on a `div.ui-window` with the `id` attribute.
- * e.g. <div class="ui-window" id="my_controller">
+ * A pre-rendered `UIController` is defined on a `div.ui-window` with the `id` attribute.
  *
  * When the `id` attribute exists, it is assumed there is a `script` tag inside the `div.ui-window`.
  * The `script` tag must have a function with the same name as its `id`.
- * This `script` is used to receive view life-cycle signals from the OS.
- *
- * e.g.
  * ```
- * // The respective `UIController`'s `view` is provided as the first parameter.
- * function my_controller(view) {
- *     this.viewDidAppear = function() {
- *         // Do something when the view appears
- *     }
- * }
+ * <div class="ui-window" id="my_controller">
+ *   <script language="javascript">
+ *     function my_controller(view) { ... }
+ *   </script>
+ * </div>
+ * ```
+ *
+ * An OS rendered `UIController` requires the window fragment to interpolate an OS provided
+ * window instance ID. e.g.
+ * ```
+ * <div class="ui-window">
+ *   <script language="javascript">
+ *     function ${window.id}(view) { ... }
+ *   </script>
+ * </div>
  * ```
  */
 function UIController() {
@@ -863,32 +850,14 @@ function UIController() {
     async function initialize() { }
 
     /**
-     * Called directly before the window is rendered.
-     *
-     * TODO: Not yet implemented.
+     * Called directly after the window is added to DOM.
      */
     function viewDidLoad() { }
 
     /**
-     * Called before the view is about to appear.
+     * Called directly before window is removed from DOM.
      */
-    function viewWillAppear() { }
-
-    /**
-     * Called after the window has been rendered.
-     */
-    function viewDidAppear() { }
-
-    /**
-     * Called directly before view will disappear.
-     */
-    function viewWillDisappear() { }
-
-    /**
-     * Called after view disappears, but just before window becomes
-     * unregistered with the OS.
-     */
-    function viewDidDisappear() { }
+    function viewWillUnload() { }
 
     /**
      * TODO: Called when controller becomes focused.
