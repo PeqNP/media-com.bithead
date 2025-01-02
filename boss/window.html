@@ -67,11 +67,11 @@
                   }
 
                   updates = [
-                    function() { return ["Requesting...", 10] },
-                    function() { return ["Downloading...", 20] },
-                    function() { return ["Parsing...", 70] },
-                    function() { return ["Cleaning up...", 90] },
-                    function() { return ["Finished", 100] },
+                    function() { return [10, "Requesting..."] },
+                    function() { return [20, "Downloading..."] },
+                    function() { return [70, "Parsing..."] },
+                    function() { return [90, "Cleaning up..."] },
+                    function() { return [100, "Finished"] },
                     function() { bar.ui.close(); return null; },
                   ];
 

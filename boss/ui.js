@@ -8,6 +8,15 @@ function UI(os) {
     // List of "open" window controllers.
     let controllers = {};
 
+    // Modal z-index is defined to be above all other windows. Therefore, the max
+    // number of windows that can be displayed is ~1998.
+    const MODAL_ZINDEX = 1999;
+
+    const WINDOW_START_ZINDEX = 10;
+    // Contains a list of displayed windows. The index of the array is the window's
+    // respective z-index + WINDOW_START_ZINDEX.
+    let windowIndices = [];
+
     // Provides a way to access an instance of a controller and call a function
     // on the instance.
     //
@@ -108,6 +117,68 @@ function UI(os) {
     }
 
     /**
+     * Adds and registers a window container z-index.
+     *
+     * @param {HTMLElement} container - The window's container `div`
+     */
+    function addWindow(container) {
+        windowIndices.push(container);
+
+        // The z-index is the same as the position in the indices array
+        let zIndex = windowIndices.length + WINDOW_START_ZINDEX;
+        container.style.zIndex = `${zIndex}`;
+    }
+
+    /**
+     * Unregister a window container.
+     *
+     * @param {HTMLElement} container - The window's container
+     */
+    function removeWindow(container) {
+        let index = null;
+        for (let i = 0; i < windowIndices.length; i++) {
+            if (container.id == windowIndices[container].id) {
+                console.log(`Unregistering window z-index for container (${container.id})`);
+                windowIndices.splice(i, 1);
+                index = i;
+                break;
+            }
+        }
+
+        // Window was not found
+        if (isEmpty(index)) {
+            return;
+        }
+
+        // Repair window indices
+        for (let i = index; i < windowIndices.length; i++) {
+            let ctr = windowIndices[i];
+            let zIndex = i + WINDOW_START_ZINDEX;
+            ctr.style.zIndex = `${zIndex}`;
+        }
+    }
+
+    /**
+     * Focus on the window container.
+     *
+     * This moves the window to the front of all other windows and updates the
+     * state of the window's title.
+     *
+     * @param {HTMLElement} container - The window's container
+     */
+    function focusWindow(container) {
+        let topZIndex = windowIndices.length - 1 + WINDOW_START_ZINDEX;
+
+        // Already the top window
+        if (parseInt(container.style.zIndex) === topZIndex) {
+            return;
+        }
+
+        removeWindow(container);
+        addWindow(container);
+    }
+
+    /**
      * Creates an instance of a `UIWindow` from an HTML string.
      *
      * This is designed to work with:
@@ -118,8 +189,17 @@ function UI(os) {
      * @returns Instance of `fragment` as a `UIWindow`
      */
     function makeWindow(html) {
+        // FIXME: This assumes the object ID always exists.
+        let objectId = makeObjectId();
+        let id = `Window_${objectId}`;
+
+        const attr = {
+            "window": {id: id, controller: `os.ui.controller.${id}`},
+        };
+
         let container = document.createElement("div");
-        container.innerHTML = html;
+        container.id = id;
+        container.innerHTML = interpolate(html, attr);
         container.style.position = "absolute";
         // TODO: Stagger position where windows appear. Each new window should
         // be 10-20 px from top and left. When intial position is > 1/3 of page
@@ -127,12 +207,9 @@ function UI(os) {
         container.style.top = "40px";
         container.style.left = "20px";
 
+        addWindow(container);
+
         let win = container.querySelector(`.ui-window`);
-        let id = win.getAttribute("id");
-        if (isEmpty(id)) {
-            console.error("Window w/ ID (" + id + ") must have a controller");
-            return;
-        }
         // Register window
         let code = "new window." + id + "(win)";
         let ctrl = eval(code);
@@ -160,18 +237,22 @@ function UI(os) {
         // TODO: When dragging, change focus on window
         // Register window drag event
         win.querySelector(".top").onmousedown = function() {
-          dragWindow(container);
+            focusWindow(container);
+            dragWindow(container);
         };
 
         win.ui = new UIWindow(this, container, ctrl, false, function() {
             unregisterController(id);
+            removeWindow(container);
         });
-        // TODO: viewDidLoad should happen only when `view` is known and appended to
-        // window container. This is the correct thing to do in this context
-        // because the fragment has a hard-coded view.
+
+        // I'm not sure if this is the right place for this yet. The user
+        // hasn't had a chance to configure the controller before the view
+        // is loaded.
         if (!isEmpty(ctrl.viewDidLoad)) {
             ctrl.viewDidLoad();
         }
+
         return win;
     }
     this.makeWindow = makeWindow;
@@ -399,8 +480,7 @@ function UI(os) {
      * and hide windows/modals.
      */
     function showInstalledApplications() {
-        let win = makeWindow("applications-fragment");
-        win.ui.show();
+        os.openApplication("io.bithead.applications");
     }
     this.showInstalledApplications = showInstalledApplications;
 
@@ -506,7 +586,7 @@ function UI(os) {
         let title = modal.querySelector("div.title");
         title.innerHTML = msg;
 
-
+        let progressBar = null;
         if (indeterminate) {
             let bar = modal.querySelector(".progress-bar");
             if (!bar.classList.contains("indeterminate")) {
@@ -514,7 +594,7 @@ function UI(os) {
             }
         }
         else {
-            let progressBar = modal.querySelector("div.progress");
+            progressBar = modal.querySelector("div.progress");
             progressBar.style.width = "0%";
         }
 
@@ -535,11 +615,13 @@ function UI(os) {
          *
          * `amount` is ignored if progress bar is "Indeterminate"
          *
-         * @param {string} title - Title displayed directly above the progress bar.
          * @param {integer} amount - A value from 0-100, where the number represents the percent complete = `75` = 75% complete.
+         * @param {string?} title - Title displayed directly above the progress bar.
          */
-        function setProgress(msg, amount) {
-            title.innerHTML = msg;
+        function setProgress(amount, msg) {
+            if (!isEmpty(msg)) {
+                title.innerHTML = msg;
+            }
             if (!indeterminate) {
                 progressBar.style.width = `${amount}%`;
             }

@@ -1,5 +1,17 @@
 /// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
+function Result(value) {
+    if (value instanceof Error) {
+        this.ok = false;
+        this.error = value;
+    }
+    else {
+        this.ok = true;
+        this.value = value;
+    }
+}
+
+
 /**
  * Returns `true` if the type of `value` is a string.
  *
@@ -56,4 +68,58 @@ function readOnly(obj, name, value) {
         enumerable: true, // Allow it to be enumerated
         configurable: false // Do not allow property to be redefined
     });
+}
+
+/**
+ * Generate an 8 character object ID that starts with a character.
+ *
+ * This is designed for generating IDs used for a window instance.
+ *
+ * @returns {int} Returns a unique object ID
+ */
+function makeObjectId() {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphanumeric = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    // First character is alphabetic
+    let id = alphabet[Math.floor(Math.random() * alphabet.length)];
+
+    for (let i = 0; i < 7; i++) {
+        id += alphanumeric[Math.floor(Math.random() * alphanumeric.length)];
+    }
+
+    return id;
+}
+
+/**
+ * Returns value for given key path in nested dictionary.
+ *
+ * Used in conjunction with `interpolate`.
+ *
+ * @param {object} obj - Dictionary
+ * @param {string} path - String path that identfies key in nested dictionary
+ */
+function getKey(obj, path) {
+    if (typeof(path) === 'string') {
+        path = path.split('.')
+    }
+    return path.reduce((x, y) => x[y], obj)
+}
+
+/**
+ * Interpolate tokens in string with values in object.
+ *
+ * ```
+ * let person = {person: {name: 'Joe'}};
+ * let name = 'My name is, ${person.name}.';
+ * console.log(interpolate(name, person));
+ * // prints 'My name is, Joe.'
+ * ```
+ *
+ * @param {string} str - String that contains tokens to interpolate
+ * @param {object} obj - Dictionary that contains token values
+ * @returns {string}
+ */
+function interpolate(str, obj) {
+    return str.replace(/\${(.*?)}/g, (x, g) => getKey(obj, g));
 }

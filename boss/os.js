@@ -155,28 +155,47 @@ function OS() {
 
         let app = apps[bundleId];
 
-        progressBar = os.ui.showProgressBar(`Loading application ${app.name}...`);
-        os.network.get(`/boss/app/${bundleId}/application.json`, "json", function(resp) {
+        let progressBar = os.ui.showProgressBar(`Loading application ${app.name}...`);
+
+        function showError(msg, error) {
+            if (!isEmpty(error)) {
+                console.error(error);
+            }
+            os.ui.showAlert(msg);
+            progressBar.ui.close();
+        }
+
+
+        os.network.get(`/boss/app/${bundleId}/application.json`, "json", function(result) {
+            if (!result.ok) {
+                showError(`Failed to load application bundle (${bundleId}).`, result.error);
+                return;
+            }
+
+            let resp = result.value;
             if (resp.main === "application.json") {
-                console.error("Loading an application's UIApplication not yet supported");
+                showError("Loading an application's UIApplication not yet supported");
                 return;
             }
 
             progressBar.setProgress(50, "Loading controller...");
             let ctrl = resp.controllers[resp.main];
             if (isEmpty(ctrl)) {
-                os.ui.showAlert(`Could not find main application controller (${resp.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
-                progressBar.ui.hide();
+                showError(`Could not find main application controller (${resp.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
                 return;
             }
 
             if (!isEmpty(ctrl.renderer) && ctrl.renderer !== "html") {
-                os.ui.showAlert(`Unsupported renderer (${ctrl.renderer}) defined in controller (${ctrl.name}).`);
-                progressBar.ui.hide();
+                showError(`Unsupported renderer (${ctrl.renderer}) defined in controller (${ctrl.name}).`);
                 return;
             }
-            os.network.get(`/boss/app/${bundleId}/controller/${resp.main}.${ctrl.renderer}`, "text", function(html) {
-                progressBar.ui.hide();
+            os.network.get(`/boss/app/${bundleId}/controller/${resp.main}.${ctrl.renderer}`, "text", function(result) {
+                if (!result.ok) {
+                    showError(`Failed to load application bundle (${bundleId}) controller (${resp.main}).`, result.error);
+                    return;
+                }
+
+                progressBar.ui.close();
                 let win = os.ui.makeWindow(html);
                 win.show();
 
@@ -240,10 +259,10 @@ function Network(os) {
      *
      * @param {string} url
      * @param {string} decoder - Response decoder. Supported: text | json
-     * @param {function} fn? - Response function. Returns response as text.
+     * @param {function} fn(Result)? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function get(url, decoder, fn, msg) {
+    function get(url, decoder, fn, error_fn, msg) {
         let progressBar = null;
         if (!isEmpty(msg)) {
             progressBar = os.ui.showProgressBar(msg);
@@ -253,7 +272,7 @@ function Network(os) {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Request unexpectedly failed");
+                    throw new Error(`GET request (${url}) unexpectedly failed`);
                 }
                 if (decoder === "json") {
                     return response.json();
@@ -263,14 +282,10 @@ function Network(os) {
                 }
             })
             .then(data => {
-                // If there is an `error` struct, the response is considered to be in error
-                if (!isEmpty(data.error)) {
-                    throw new Error(data.error.message);
-                }
-                fn(data);
+                fn(new Result(data));
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                fn(new Result(error));
             })
             .then(() => {
                 progressBar?.ui.close();
