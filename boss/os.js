@@ -153,7 +153,38 @@ function OS() {
             return;
         }
 
-        console.log(`Opening application bundle (${bundleId})`);
+        let app = apps[bundleId];
+
+        progressBar = os.ui.showProgressBar(`Loading application ${app.name}...`);
+        os.network.get(`/boss/app/${bundleId}/application.json`, "json", function(resp) {
+            if (resp.main === "application.json") {
+                console.error("Loading an application's UIApplication not yet supported");
+                return;
+            }
+
+            progressBar.setProgress(50, "Loading controller...");
+            let ctrl = resp.controllers[resp.main];
+            if (isEmpty(ctrl)) {
+                os.ui.showAlert(`Could not find main application controller (${resp.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
+                progressBar.ui.hide();
+                return;
+            }
+
+            if (!isEmpty(ctrl.renderer) && ctrl.renderer !== "html") {
+                os.ui.showAlert(`Unsupported renderer (${ctrl.renderer}) defined in controller (${ctrl.name}).`);
+                progressBar.ui.hide();
+                return;
+            }
+            os.network.get(`/boss/app/${bundleId}/controller/${resp.main}.${ctrl.renderer}`, "text", function(html) {
+                progressBar.ui.hide();
+                let win = os.ui.makeWindow(html);
+                win.show();
+
+                // TODO: The application is officially "launched". Set it as the
+                // current application if it is _not_ a system app.
+                // TODO: Start calling application life-cycle methods
+            });
+        });
     }
     this.openApplication = openApplication;
 
@@ -203,12 +234,57 @@ function Network(os) {
     this.redirect = redirect;
 
     /**
+     * Make a GET request.
+     *
+     * Note: Displays error message if request failed.
+     *
+     * @param {string} url
+     * @param {string} decoder - Response decoder. Supported: text | json
+     * @param {function} fn? - Response function. Returns response as text.
+     * @param {string} msg? - Show progress bar with message
+     */
+    function get(url, decoder, fn, msg) {
+        let progressBar = null;
+        if (!isEmpty(msg)) {
+            progressBar = os.ui.showProgressBar(msg);
+        }
+        let response = fetch(url, {
+            method: "GET"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request unexpectedly failed");
+                }
+                if (decoder === "json") {
+                    return response.json();
+                }
+                else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                // If there is an `error` struct, the response is considered to be in error
+                if (!isEmpty(data.error)) {
+                    throw new Error(data.error.message);
+                }
+                fn(data);
+            })
+            .catch(error => {
+                os.ui.showErrorModal(error.message);
+            })
+            .then(() => {
+                progressBar?.ui.close();
+            });
+    }
+    this.get = get;
+
+    /**
      * Make a POST request with an object that can be converted into JSON.
      *
      * Note: Displays error message if request failed.
      *
      * @param {string} url
-     * @param {File} file - File object to upload
+     * @param {File} body - Object to pass as JSON
      * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
      */
@@ -238,7 +314,7 @@ function Network(os) {
             })
             .then(data => {
                 // If there is an `error` struct, the response is considered to be in error
-                if (data.error !== undefined) {
+                if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
                 }
                 fn(data);

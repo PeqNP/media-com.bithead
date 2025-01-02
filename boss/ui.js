@@ -108,14 +108,26 @@ function UI(os) {
     }
 
     /**
-     * Creates an instance of a `UIWindow` given a `fragment.id`.
+     * Creates an instance of a `UIWindow` from an HTML string.
+     *
+     * This is designed to work with:
+     * - `OS` facilities to launch an application
+     * - Create new windows from `UI.makeController(name:)`
      *
      * @param {string} fragmentId: The `id` of the `fragment` in `document`.
      * @returns Instance of `fragment` as a `UIWindow`
      */
-    function makeWindow(fragmentId) {
-        let fragment = document.getElementById(fragmentId).cloneNode(true);
-        let win = fragment.querySelector(`.ui-window`);
+    function makeWindow(html) {
+        let container = document.createElement("div");
+        container.innerHTML = html;
+        container.style.position = "absolute";
+        // TODO: Stagger position where windows appear. Each new window should
+        // be 10-20 px from top and left. When intial position is > 1/3 of page
+        // viewport size, reset back to 40/20.
+        container.style.top = "40px";
+        container.style.left = "20px";
+
+        let win = container.querySelector(`.ui-window`);
         let id = win.getAttribute("id");
         if (isEmpty(id)) {
             console.error("Window w/ ID (" + id + ") must have a controller");
@@ -126,16 +138,6 @@ function UI(os) {
         let ctrl = eval(code);
         controllers[id] = ctrl;
         win.controller = ctrl;
-
-        // Container is responsible for positioning the window element.
-        let container = document.createElement("div");
-        container.appendChild(win);
-        container.style.position = "absolute";
-        // TODO: Stagger position where windows appear. Each new window should
-        // be 10-20 px from top and left. When intial position is > 1/3 of page
-        // viewport size, reset back to 40/20.
-        container.style.top = "40px";
-        container.style.left = "20px";
 
         // Register buttons, if they exist
         let closeButton = win.querySelector(".close-button");
