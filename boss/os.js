@@ -17,6 +17,9 @@ function OS() {
     this.network = new Network(this);
     this.ui = new UI(this);
 
+    // List of installed (registered) apps the OS is aware of.
+    let apps = {};
+
     function init() {
         this.ui.init();
         startClock();
@@ -121,6 +124,38 @@ function OS() {
         }, 2000);
     }
     this.copyToClipboard = copyToClipboard;
+
+
+    /**
+     * Register applications available to BOSS.
+     *
+     * This is primarily used by the `io.bithead.applications` app to inform
+     * user which applications are installed. This may change in the future.
+     *
+     * @param {object[bundleId:name:]} apps - List of installed apps
+     */
+    function registerApplications(_apps) {
+        apps = _apps;
+    }
+    this.registerApplications = registerApplications;
+
+    /**
+     * Open a BOSS application.
+     *
+     * TODO: In the future, this will check if the user has permission to
+     * open the app.
+     *
+     * @param {string} bundleId - The Bundle ID of the application to open e.g. 'io.bithead.test-management'
+     */
+    function openApplication(bundleId) {
+        if (!(bundleId in apps)) {
+            os.ui.showAlert(`Application with Bundle ID (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`);
+            return;
+        }
+
+        console.log(`Opening application bundle (${bundleId})`);
+    }
+    this.openApplication = openApplication;
 }
 
 /**
