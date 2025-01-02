@@ -152,6 +152,8 @@ function UI(os) {
             });
         }
 
+        styleListBoxes(win);
+
         // TODO: Register click to change focus of window
         // TODO: When dragging, change focus on window
         // Register window drag event
@@ -1497,7 +1499,29 @@ function UIListBox(select) {
 
     function styleOption(option) {
         let elem = document.createElement("div");
-        elem.innerHTML = option.innerHTML;
+        let label = option.innerHTML;
+        let labels = label.split(",");
+
+        // Label has an image
+        if (labels.length == 2) {
+            let imgLabel = labels[0].trim();
+            if (!imgLabel.startsWith("img:")) {
+                console.warn("The first label item must be an image");
+                elem.innerHTML = label;
+            }
+            else {
+                let img = document.createElement("img");
+                img.src = imgLabel.split(":")[1];
+                elem.appendChild(img);
+                let span = document.createElement("span");
+                span.innerHTML = labels[1];
+                elem.append(span);
+            }
+        }
+        else {
+            elem.innerHTML = label;
+        }
+
         elem.classList.add("option");
         if (option.disabled) {
             elem.classList.add("disabled");
@@ -1576,6 +1600,23 @@ function styleListBoxes(elem) {
     let lists = elem.getElementsByClassName("ui-list-box");
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
-        styleListBox(list);
+        // Do not style list boxes in fragments
+        // TODO: This is temporary. This exists only because windows may
+        // be rendered in the document w/o intervention from OS.
+        let p = list.parentNode;
+        let inFragment = false;
+        while (true) {
+            if (isEmpty(p)) {
+                break;
+            }
+            else if (p.tagName == "FRAGMENT") {
+                inFragment = true;
+                break;
+            }
+            p = p.parentNode;
+        }
+        if (!inFragment) {
+            styleListBox(list);
+        }
     }
 }
