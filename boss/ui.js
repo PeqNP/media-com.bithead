@@ -247,7 +247,25 @@ function UI(os) {
     function registerWindows() {
         let windows = document.getElementsByClassName("ui-window");
         for (let i = 0; i < windows.length; i++) {
-            registerWindow(windows[i]);
+            let win = windows[i];
+            // Do not style windows in fragments
+            // TODO: This is temporary. This exists only because windows may
+            // be rendered in the document w/o intervention from OS.
+            let p = win.parentNode;
+            let inFragment = false;
+            while (true) {
+                if (isEmpty(p)) {
+                    break;
+                }
+                else if (p.tagName == "FRAGMENT") {
+                    inFragment = true;
+                    break;
+                }
+                p = p.parentNode;
+            }
+            if (!inFragment) {
+                registerWindow(win);
+            }
         }
     }
     this.registerWindows = registerWindows;
@@ -677,6 +695,11 @@ function UIWindow(ui, view, controller, isModal, unregister_fn) {
         return view.querySelector(`input[name='${name}']`)
     }
     this.input = input;
+
+    function select(name) {
+        return view.querySelector(`select[name='${name}']`)
+    }
+    this.select = select;
 
     /**
      * Returns the value of the input and displays error message if the value
@@ -1481,6 +1504,17 @@ function UIListBox(select) {
         return select.options[idx]
     }
     this.selectedOption = selectedOption;
+
+    /**
+     * Returns the value of the selected option, if any.
+     *
+     * @returns {any?}
+     */
+    function selectedValue() {
+        let opt = selectedOption();
+        return opt?.value;
+    }
+    this.selectedValue = selectedValue;
 
     /**
      * Returns list of selected options.
