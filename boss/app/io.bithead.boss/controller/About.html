@@ -1,0 +1,17 @@
+<div class="ui-modal">
+  <script language="text/javascript">
+    function $(this.id)(view) {
+      function ok() {
+        view.ui.close();
+      }
+      this.ok = ok;
+    }
+  </script>
+  <div class="container">
+    <p class="message center-text">Bithead OS aka BOSS v0.9a</p>
+    <div class="controls">
+      <button class="default" onclick="$(this.controller).close();">OK</button>
+    </div>
+    <p class="footer">Have questions? Please call <a href="tel:$(os.phone)">$(os.phone)</a>.</p>
+  </div>
+</div>

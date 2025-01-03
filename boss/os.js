@@ -17,13 +17,40 @@ function OS() {
     this.network = new Network(this);
     this.ui = new UI(this);
 
+    // Indicates that the OS is loaded. Some facilities will not work until
+    // the OS if fully loaded. Such as showing system modals, progress bars,
+    // etc.
+    let loaded = false;
+
+    function isLoaded() {
+        return loaded;
+    }
+
     // List of installed (registered) apps the OS is aware of.
     // object{bundleId:{name:icon:system:}}
     let apps = {};
 
+    // Represents any app that was loaded. Loaded apps are considered
+    // to be running, even if their application context is not active.
+    let loadedApps = {};
+
+    // Defines the "active" application. When an application is "active", it
+    // means the application has focus on the desktop. Only one non-system
+    // application may be displayed at a time.
+    let activeApplication = null;
+
     function init() {
         this.ui.init();
         startClock();
+
+        os.openApplication("io.bithead.boss", function(result) {
+            if (!result.ok) {
+                console.error(result.error);
+                return;
+            }
+
+            loaded = true;
+        });
     }
     this.init = init;
 
@@ -147,9 +174,15 @@ function OS() {
      *
      * @param {string} bundleId - The Bundle ID of the application to open e.g. 'io.bithead.test-management'
      */
-    function openApplication(bundleId) {
+    async function openApplication(bundleId, loaded_fn) {
+        let loadedApp = loadedApps[bundleId];
+        if (!isEmpty(loadedApp)) {
+            // TODO: Switch to non-system application
+            return loaded_fn(new Result(loadedApp));
+        }
+
         if (!(bundleId in apps)) {
-            os.ui.showAlert(`Application with Bundle ID (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`);
+            loaded_fn(new Result(new Error(`Application with Bundle ID (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`)));
             return;
         }
 
@@ -161,10 +194,9 @@ function OS() {
             if (!isEmpty(error)) {
                 console.error(error);
             }
-            os.ui.showAlert(msg);
-            progressBar.ui.close();
+            loaded_fn(new Result(new Error(msg)));
+            progressBar?.ui.close();
         }
-
 
         os.network.get(`/boss/app/${bundleId}/application.json`, "json", function(result) {
             if (!result.ok) {
@@ -172,43 +204,132 @@ function OS() {
                 return;
             }
 
-            let resp = result.value;
-            if (resp.application.main === "application.json") {
+            let app = new UIApplication(config);
+            loadedApps[bundleId] = app;
+
+            let config = result.value;
+
+            if (config.application.main === "Application") {
+                os.network.get(`/boss/app/${bundleId}/controller/Application.html`, "text", function(result) {
+                    if (!result.ok) {
+                        showError(`Failed to load UIApplication for application bundle (${bundleId}).`, result.error);
+                        return;
+                    }
+
+                    let objectId = makeObjectId();
+                    id = `Application_${objectId}`;
+                    const attr = {
+                        "this": {id: id}
+                    }
+
+                    // Like, `UIController`s, the script must be re-attached
+                    // to the body as HTML5 does not parse or execute Javascript
+                    // in `innerHTML`
+                    let div = document.createElement("div");
+                    div.innerHTML = interpolate(result.value, attr);
+                    let script = div.querySelector("script");
+                    script.id = id; // Required to unload script later
+                    let parentNode = script.parentNode;
+                    parentNode.removeChild(script);
+
+                    let sc = document.createElement("script");
+                    sc.language = "text/javascript";
+                    let inline = document.createTextNode(script.innerHTML);
+                    sc.appendChild(inline);
+                    document.body.appendChild(sc);
+
+                    if (app.system) {
+                        app.applicationDidStart();
+                    }
+                    else {
+                        if (!isEmpty(activeApplication)) {
+                            activeApplication.applicationDidBlur();
+                        }
+
+                        activeApplication = app;
+
+                        app.applicationDidStart();
+                        app.applicationDidFocus();
+                    }
+
+                    progressBar?.ui.close();
+
+                    loaded_fn(new Result(app));
+                });
+
                 showError("Loading an application's UIApplication not yet supported");
                 return;
             }
 
-            progressBar.setProgress(50, "Loading controller...");
-            let ctrl = resp.controllers[resp.application.main];
-            if (isEmpty(ctrl)) {
-                showError(`Could not find main application controller (${resp.application.main}). Make sure 'application.main' references a controller name in 'controllers'.`);
-                return;
-            }
+            progressBar?.setProgress(50, "Loading controller...");
 
-            if (!isEmpty(ctrl.renderer) && ctrl.renderer !== "html") {
-                showError(`Unsupported renderer (${ctrl.renderer}) defined in controller (${ctrl.name}).`);
-                return;
-            }
-            else if (isEmpty(ctrl.renderer)) {
-                ctrl.renderer = "html";
-            }
-            os.network.get(`/boss/app/${bundleId}/controller/${resp.application.main}.${ctrl.renderer}`, "text", function(result) {
-                if (!result.ok) {
-                    showError(`Failed to load application bundle (${bundleId}) controller (${resp.application.main}).`, result.error);
-                    return;
+            app.loadController(
+                config.application.main,
+                function(container) {
+                    // TODO: Switch to application context
+
+                    if (app.system) {
+                        app.applicationDidStart();
+                    }
+                    else {
+                        if (!isEmpty(activeApplication)) {
+                            activeApplication.applicationDidBlur();
+                        }
+
+                        activeApplication = app;
+                        app.applicationDidStart();
+
+                        container.ui.show();
+
+                        app.applicationDidFocus();
+                    }
+
+                    loaded_fn(new Result(app));
+                    progressBar?.ui.close();
+                },
+                function(error) {
+                    showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
+                    progressBar?.ui.close();
                 }
-
-                progressBar.ui.close();
-                let win = os.ui.makeWindow(result.value);
-                win.ui.show();
-
-                // TODO: The application is officially "launched". Set it as the
-                // current application if it is _not_ a system app.
-                // TODO: Start calling application life-cycle methods
-            });
+            );
         });
     }
     this.openApplication = openApplication;
+
+    /**
+     * Close an application.
+     */
+    function closeApplication(bundleId) {
+        // TODO: Remove `script` from document.body
+    }
+
+    /**
+     * Switch to application context.
+     *
+     * The application must be loaded first.
+     *
+     * @param {string} bundleId
+     */
+    function switchApplication(bundleId) {
+        let app = loadedApps[bundleId];
+        if (isEmpty(app)) {
+            os.ui.showAlert(`Application bundle (${bundleId}) is not loaded.`);
+            return;
+        }
+
+        if (!isEmpty(activeApplication)) {
+            activeApplication.applicationDidBlur();
+        }
+
+        activeApplication = app;
+        app.applicationDidFocus();
+
+        // TODO: Switch controllers being viewed
+        // There's a lot that needs to be done here. For example, the controllers must be
+        // associated to an application. They need to be managed by UI and the window.
+        // Essentially, the window needs to store the state of an application before it is
+        // switched. This function may even need to exist in UI.
+    }
 
     /**
      * Returns all user-space installed applications.

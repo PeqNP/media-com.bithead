@@ -1,6 +1,6 @@
 <div class="ui-window">
   <script language="text/javascript">
-    function $(window.id)(view) {
+    function $(this.id)(view) {
       function open() {
         let select = view.ui.select("applications");
         let bundleId = select.ui.selectedValue();
@@ -31,7 +31,7 @@
         </select>
       </div>
       <div class="vbox align-bottom">
-        <button class="primary" onclick="$(window.controller).open();">Open</button>
+        <button class="primary" onclick="$(this.controller).open();">Open</button>
       </div>
     </div>
   </div>

@@ -182,6 +182,44 @@ function UI(os) {
     this.focusWindow = focusWindow;
 
     /**
+     * Create window attributes.
+     *
+     * Window attributes provide a way for a `.ui-window` to reference:
+     * - Their controller's instance
+     * - Respective app instance
+     * - OS information
+     *
+     * An ID may be provided if the window is pre-rendered.
+     *
+     * @param {string?} id - The ID of the window instance
+     */
+    function makeWindowAttributes(id) {
+        if (isEmpty(id)) {
+            // FIXME: This assumes the object ID always exists.
+            let objectId = makeObjectId();
+            id = `Window_${objectId}`;
+        }
+
+        const attr = {
+            app: {
+                // TODO: How do I get the app's information in this context?
+                // Attributes may need to be created in the `UIApplication` context.
+                resourcePath: "",
+                controller: null
+            },
+            os: {
+                phone: "253-329-1280"
+            },
+            "this": {
+                id: id,
+                controller: `os.ui.controller.${id}`
+            },
+        };
+
+        return attr;
+    }
+
+    /**
      * Creates an instance of a `UIWindow` from an HTML string.
      *
      * This is designed to work with:
@@ -192,13 +230,7 @@ function UI(os) {
      * @returns Instance of `fragment` as a `UIWindow`
      */
     function makeWindow(html) {
-        // FIXME: This assumes the object ID always exists.
-        let objectId = makeObjectId();
-        let id = `Window_${objectId}`;
-
-        const attr = {
-            "window": {id: id, controller: `os.ui.controller.${id}`},
-        };
+        const attr = makeWindowAttributes();
 
         // To get around the fact that you can't add javascript using innerHTML
         // you have to go about this long round about way of adding a new script tag.
@@ -226,25 +258,27 @@ function UI(os) {
         container.style.top = "40px";
         container.style.left = "20px";
 
-        container.ui = new UIWindow(id, container, false);
+        container.ui = new UIWindow(attr.this.id, container, false);
         return container;
     }
     this.makeWindow = makeWindow;
 
-    function _makeModal(fragmentId, isSystemModal) {
-        let fragment = document.getElementById(fragmentId).cloneNode(true);
-        // Like the window, the first div tells the position of the modal.
-        if (isEmpty(fragment)) {
-            console.error(`Fragment with ID (${fragmentId}) not found in DOM`);
-            return;
-        }
-
-        let objectId = makeObjectId();
-        let id = `Window_${objectId}`;
-
-        const attr = {
-            "window": {id: id, controller: `os.ui.controller.${id}`},
-        };
+    /**
+     * Create modal window.
+     *
+     * Modals are displayed above all other content. Elements behind the modal
+     * may not be interacted with until the modal is dismissed.
+     *
+     * To show a modal:
+     * ```javascript
+     * let modal = os.ui.makeModal("my-modal-fragment");
+     * modal.ui.show();
+     * ```
+     *
+     * @param {string} html - The HTML to display
+     */
+    function makeModal(html) {
+        const attr = makeWindowAttributes();
 
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
@@ -253,30 +287,25 @@ function UI(os) {
         // Container is used for positioning
         let container = document.createElement("div");
         container.classList.add("ui-modal-container");
-        container.innerHTML = interpolate(fragment.innerHTML, attr);
+        container.innerHTML = interpolate(html, attr);
         overlay.appendChild(container);
 
-        overlay.ui = new UIWindow(id, overlay, true);
+        overlay.ui = new UIWindow(attr.this.id, overlay, true);
         return overlay;
     }
 
     /**
-     * Makes a modal that will be shown above all content.
+     * Make a modal from an HTML fragment.
      *
-     * To show the modal:
-     * ```javascript
-     * let modal = os.ui.modal("my-modal-fragment");
-     * modal.ui.show();
-     * ```
+     * Designed only to be used for pre-rendered pages. Modals should be
+     * loaded from an application's respective controller registry.
      *
-     * All modals must have a controller.
-     *
-     * @param {string} fragmentId - The ID of the fragment to clone
+     * @param {string} fragmentId - The id of the HTML fragment
      */
-    function makeModal(fragmentId) {
-        return _makeModal(fragmentId, false);
+    function makeModalFromFragment(fragmentId) {
+        let fragment = document.getElementById(fragmentId);
+        return makeModal(fragment.innerHTML);
     }
-    this.makeModal = makeModal;
 
     /**
      * Register all windows with the OS.
@@ -319,6 +348,8 @@ function UI(os) {
      *
      * NOTE: This is temporary solution until all windows are created by the OS
      * and not pre-rendered before the OS starts.
+     *
+     * Window attributes are not interpolated on pre-rendered windows.
      */
     function registerWindow(win) {
         // Register window for life-cycle events if it has a controller
@@ -327,7 +358,7 @@ function UI(os) {
         // When windows are pre-rendered, `show` is not called. Therefore, parts
         // of the view life-cycle methods must be managed here.
         win.ui = new UIWindow(id, win, false);
-        win.ui.initialize(true);
+        win.ui.init(true);
     }
 
     /**
@@ -392,11 +423,15 @@ function UI(os) {
      * and hide windows/modals.
      */
     function showAboutModal() {
-        let modal = _makeModal("about-modal-fragment", true);
-        modal.querySelector("button").addEventListener("click", function(e) {
-            modal.ui.close();
+        os.openApplication("io.bithead.boss", function(result) {
+            if (!isEmpty(result.error)) {
+                return;
+            }
+
+            result.value.loadController("About", function(ctrl) {
+                ctrl.show();
+            });
         });
-        modal.ui.show();
     }
     this.showAboutModal = showAboutModal;
 
@@ -430,12 +465,9 @@ function UI(os) {
      * FIXME: Needs to be updated to use the latest patterns.
      */
     function showErrorModal(error) {
-        let modal = _makeModal("error-modal-fragment", true);
+        let modal = makeModal("error-modal-fragment", true);
         var message = modal.querySelector("p.message");
         message.innerHTML = error;
-        modal.querySelector("button.default").addEventListener("click", function() {
-            modal.ui.close();
-        });
         modal.ui.show();
     }
     this.showErrorModal = showErrorModal;
@@ -451,21 +483,10 @@ function UI(os) {
      * @param {function} ok - A function that is called when user presses `OK`
      */
     function showDeleteModal(msg, cancel, ok) {
-        let modal = _makeModal("delete-modal-fragment", true);
+        let modal = makeModal("delete-modal-fragment");
         var message = modal.querySelector("p.message");
         message.innerHTML = msg;
-
-        modal.querySelector("button.default").addEventListener("click", function() {
-            if (!isEmpty(cancel)) { cancel(); }
-            modal.ui.close();
-        });
-
-        var okButton = modal.querySelector("button.primary");
-        okButton.addEventListener("click", function() {
-            if (!isEmpty(ok)) { ok(); }
-            modal.ui.close();
-        });
-
+        // TODO: Configure controller
         modal.ui.show();
     }
     this.showDeleteModal = showDeleteModal;
@@ -473,19 +494,20 @@ function UI(os) {
     /**
      * Show a generic alert modal with `OK` button.
      *
+     * If the OS is not loaded, this logs the alert to console.
+     *
      * @param {string} msg - Message to display to user.
      */
     function showAlert(msg) {
-        let modal = _makeModal("alert-modal-fragment", true);
+        if (!os.isLoaded()) {
+            console.error(msg);
+            return;
+        }
+
+        let modal = makeModal("alert-modal-fragment");
 
         let message = modal.querySelector("p.message");
         message.innerHTML = msg;
-
-        var okButton = modal.querySelector("button.default");
-        okButton.addEventListener("click", function() {
-            modal.ui.close();
-        });
-
         modal.ui.show();
     }
     this.showAlert = showAlert;
@@ -499,9 +521,14 @@ function UI(os) {
      * @param {string} msg - Message to show in progress bar
      * @param {function} fn - The async function to call when the `Stop` button is pressed.
      * @param {bool} indeterminate - If `true`, this will show an indeterminate progress bar. Default is `false`.
+     * @returns UIProgressBar if OS is loaded. Otherwise, returns `null`.
      */
     function showProgressBar(msg, fn, indeterminate) {
-        let modal = _makeModal("progress-bar-fragment", true);
+        if (!os.isLoaded()) {
+            return null;
+        }
+
+        let modal = makeModal("progress-bar-fragment");
 
         if (isEmpty(indeterminate)) {
             indeteriminate = false;
@@ -573,21 +600,101 @@ function UI(os) {
 function UIApplication(config) {
 
     readOnly(this, "bundleId", config.bundleId);
-    readOnly(this, "name", config.name);
-    readOnly(this, "version", config.version);
     readOnly(this, "icon", config.icon);
+    readOnly(this, "name", config.name);
+    readOnly(this, "system", config.sytem);
+    readOnly(this, "version", config.version);
+
+    // Application function
+    let main = null;
+
+    // (Down)Loaded controllers
+    let controllers = {};
+
+    /**
+     * Load and return new instance of controller.
+     *
+     * If controller is a singleton, and is visible, the singleton is returned.
+     *
+     * If a controller is not found in the application's controller list, or could
+     * not be created, the callback function is _not_ called.
+     *
+     * If error_fn is defined, the Error is returned instead of showing an alert.
+     *
+     * @param {string} name - Name of controller
+     * @param {function} fn - Callback function with new instance of controller
+     * @param {function?} error_fn - Callback function when error occurs
+     */
+    function loadController(name, fn, error_fn) {
+        function showAlert(msg, error) {
+            if (!isEmpty(error)) {
+                console.error(error);
+            }
+
+            if (isEmpty(error_fn)) {
+                os.ui.showAlert(msg);
+            }
+            else {
+                error_fn(new Error(msg));
+            }
+        }
+
+        let def = config.controllers[def];
+        if (!isEmpty(def)) {
+            showAlert(`Controller (${name}) does not exist in application's (${config.bundleId}) controller list.`);
+            return;
+        }
+
+        // FIXME: When loading controller from cache, the renderer may need to
+        // be factord in.
+
+        // Return cached controller
+        let html = controllers[name];
+        if (!isEmpty(html)) {
+            fn(os.ui.makeWindow(html));
+            return;
+        }
+
+        if (!isEmpty(def.renderer) && def.renderer !== "html") {
+            showAlert(`Unsupported renderer (${def.renderer}) for controller (${def.name}).`);
+            return;
+        }
+        else if (isEmpty(def.renderer)) {
+            def.renderer = "html";
+        }
+
+        // Download and cache controller
+        os.network.get(`/boss/app/${config.bundleId}/controller/${name}.${def.renderer}`, "text", function(result) {
+            if (!result.ok) {
+                showAlert(`Failed to load application bundle (${bundleId}) controller (${name}).`, result.error);
+                return;
+            }
+
+            let html = result.value;
+            controllers[name] = html;
+            fn(os.ui.makeWindow(html));
+        });
+    }
+    this.loadController = loadController;
 
     /** Delegate Callbacks **/
 
     /**
      * Called after the application's configuration has been loaded.
      *
-     * This is responsible for showing the first window of the application.
+     * If `main` is a `UIController`, this is called directly before the
+     * controller is displayed.
      *
-     * This is where you would show your splash screen when loading assets,
-     * making network requests for app data, etc.
+     * If `main` is a `UIApplication`, then the app is responsible for showing
+     * the controller. e.g. This is where the app can show a splash screen,
+     * load assets, making network requests for app data, etc.
      */
-    function applicationDidStart() { }
+    function applicationDidStart(m) {
+        main = m;
+        if (!isEmpty(main?.applicationDidStart)) {
+            main.applicationDidStart();
+        }
+    }
 
     /**
      * Called before the application is removed from the OS's cache.
@@ -596,7 +703,11 @@ function UIApplication(config) {
      * necessary as any memory used by your application will be cleaned
      * automatically.
      */
-    function applicationDidStop() { }
+    function applicationDidStop() {
+        if (!isEmpty(main?.applicationDidStop)) {
+            main.applicationDidStop();
+        }
+    }
 
     /**
      * Application became the focused application.
@@ -604,7 +715,11 @@ function UIApplication(config) {
      * This is not called when the application starts. Only when switching
      * contexts.
      */
-    function applicationDidFocus() { }
+    function applicationDidFocus() {
+        if (!isEmpty(main?.applicationDidFocus)) {
+            main.applicationDidFocus();
+        }
+    }
 
     /**
      * Application went out of focus.
@@ -619,11 +734,15 @@ function UIApplication(config) {
      *
      * Perform any necessary save actions.
      */
-    function applicationDidBlur() { }
+    function applicationDidBlur() {
+        if (!isEmpty(main?.applicationDidBlur)) {
+            main.applicationDidBlur();
+        }
+    }
 }
 
 /**
- * Provides abstraction for a "window."
+ * Provides abstraction for a window.
  *
  * FIXME: You may not close and re-open a window. The window is not
  * re-registered when shown subsequent times.
@@ -645,7 +764,7 @@ function UIWindow(id, container, isModal) {
      * @param {bool} isPreRendered - Window is already rendered to desktop and
      *      not managed by OS.
      */
-    function initialize(isPreRendered) {
+    function init(isPreRendered) {
         styleListBoxes(container);
 
         // Add window controller if it exists.
@@ -702,7 +821,7 @@ function UIWindow(id, container, isModal) {
             controller.viewDidLoad();
         }
     }
-    this.initialize = initialize;
+    this.init = init;
 
     /**
      * Show the window.
@@ -714,11 +833,11 @@ function UIWindow(id, container, isModal) {
         desktop.appendChild(container);
 
         // Allow time for parsing. I'm honestly not sure this is required.
-        setTimeout(function() { initialize(false); } , 50);
+        setTimeout(function() { init(false); } , 50);
 
         // TODO: Allow the controller to load its view.
         // Typically used when providing server-side rendered window container.
-        if (!isEmpty(controller?.initialize)) {
+        if (!isEmpty(controller?.init)) {
             // TODO: This is an async function. The functions below shall not
             // be called until the view is loaded from the server.
         }
@@ -833,7 +952,7 @@ function UIController() {
      *
      * @returns {object[view:source?:]} HTML view and optionally the source
      */
-    async function initialize() { }
+    async function init() { }
 
     /**
      * Called directly after the window is added to DOM.

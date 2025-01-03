@@ -1,0 +1,39 @@
+<div class="ui-modal">
+  <script language="text/javascript">
+    function $(this.id)(view) {
+      let cancel_fn = null;
+      let ok_fn = null;
+
+      function configure(c_fn, o_fn) {
+        cancel_fn = c_fn;
+        ok_fn = o_fn;
+      }
+      this.configure = configure;
+
+      function cancel() {
+        if (!isEmpty(cancel)) {
+          cancel_fn();
+        }
+        view.ui.close();
+      }
+      this.cancel = cancel;
+
+      function ok() {
+        if (!isEmpty(ok_fn)) {
+          ok_fn();
+        }
+        view.ui.close();
+      }
+      this.ok = ok;
+    }
+  </script>
+  <div class="container">
+    <div class="exclamation add-margin">
+      <p class="message"></p>
+    </div>
+    <div class="controls">
+      <button class="default" onclick="$(this.controller).cancel();">Cancel</button>
+      <button class="primary" onclick="$(this.controller).ok();">OK</button>
+    </div>
+  </div>
+</div>
