@@ -127,6 +127,15 @@ body {
   z-index: 1999;
 }
 
+.ui-modal-container {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  width: 400px;
+  margin-left: -200px;
+  z-index: 2000; /* Above everything including overlay */
+}
+
 .ui-modal {
   outline: 1px solid #000;
   outline-offset: 2px;
@@ -135,15 +144,6 @@ body {
   /* Fills in the space between border and outline */
   box-shadow: 0px 0px 0px 2px #fff;
   background-color: #fff;
-  /** For testing. Use `center-window` or other class/style for modal position.
-  position: absolute;
-  left: 10px;
-  top: 200px;
-  width: 200px;
-  height: 200px;
-  */
-  /* Must be above all other windows. */
-  z-index: 2000;
 }
 
 .ui-modal .title {

@@ -4,15 +4,16 @@
  * Provides access to UI library.
  */
 function UI(os) {
-
-    // List of "open" window controllers.
-    let controllers = {};
-
     // Modal z-index is defined to be above all other windows. Therefore, the max
     // number of windows that can be displayed is ~1998.
     const MODAL_ZINDEX = 1999;
 
+    // Starting z-index for windows
     const WINDOW_START_ZINDEX = 10;
+
+    // List of "open" window controllers.
+    let controllers = {};
+
     // Contains a list of displayed windows. The index of the array is the window's
     // respective z-index + WINDOW_START_ZINDEX.
     let windowIndices = [];
@@ -247,14 +248,13 @@ function UI(os) {
 
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
-        overlay.classList.add("modal-overlay");
+        overlay.classList.add("ui-modal-overlay");
 
-        // Wrap modal in adjusting layer that defines position. This is similar
-        // to a `UIWindow`'s `HTMLElement` container, except it is always centered.
-        let adjuster = document.createElement("div");
-        adjuster.classList.add("center-window");
-        adjuster.innerHTML = interpolate(fragment.innerHTML, attr);
-        overlay.appendChild(adjuster);
+        // Container is used for positioning
+        let container = document.createElement("div");
+        container.classList.add("ui-modal-container");
+        container.innerHTML = interpolate(fragment.innerHTML, attr);
+        overlay.appendChild(container);
 
         overlay.ui = new UIWindow(id, overlay, true);
         return overlay;
@@ -699,10 +699,8 @@ function UIWindow(id, container, isModal) {
             }
         }
 
-        // Prepare window to be displayed -- assigns z-index.
-        // NOTE: Modals are displayed in a different than windows and, therefore,
-        // are not registered as a window.
         if (!isModal && !isPreRendered) {
+            // Prepare window to be displayed -- assigns z-index.
             os.ui.addWindow(container);
         }
 
@@ -718,14 +716,8 @@ function UIWindow(id, container, isModal) {
     function show() {
         // NOTE: `container` must be added to DOM before controller can be
         // instantiated.
-        if (isModal) {
-            let body = document.querySelector("body");
-            body.appendChild(container);
-        }
-        else {
-            let desktop = document.getElementById("desktop");
-            desktop.appendChild(container);
-        }
+        let desktop = document.getElementById("desktop");
+        desktop.appendChild(container);
 
         // Allow time for parsing. I'm honestly not sure this is required.
         setTimeout(function() { initialize(false); } , 50);
@@ -758,13 +750,10 @@ function UIWindow(id, container, isModal) {
 
         os.ui.removeController(id);
 
-        if (isModal) {
-            let body = document.querySelector("body");
-            body.removeChild(container);
-        }
-        else {
-            let desktop = document.getElementById("desktop");
-            desktop.removeChild(container);
+        let desktop = document.getElementById("desktop");
+        desktop.removeChild(container);
+
+        if (!isModal) {
             os.ui.removeWindow(container);
         }
     }
