@@ -121,6 +121,7 @@ function UI(os) {
 
         container.onmousedown = dragMouseDown;
     }
+    this.dragWindow = dragWindow;
 
     /**
      * Adds and registers a window container z-index.
@@ -128,11 +129,11 @@ function UI(os) {
      * @param {HTMLElement} container - The window's container `div`
      */
     function addWindow(container) {
-        windowIndices.push(container);
-
         // The z-index is the same as the position in the indices array
         let zIndex = windowIndices.length + WINDOW_START_ZINDEX;
         container.style.zIndex = `${zIndex}`;
+
+        windowIndices.push(container);
     }
     this.addWindow = addWindow;
 
@@ -142,26 +143,18 @@ function UI(os) {
      * @param {HTMLElement} container - The window's container
      */
     function removeWindow(container) {
-        let index = null;
-        for (let i = 0; i < windowIndices.length; i++) {
-            if (container.id == windowIndices[container].id) {
-                console.log(`Unregistering window z-index for container (${container.id})`);
-                windowIndices.splice(i, 1);
-                index = i;
-                break;
-            }
-        }
-
-        // Window was not found
-        if (isEmpty(index)) {
+        let index = parseInt(container.style.zIndex) - WINDOW_START_ZINDEX;
+        if (index < 0) {
+            console.error(`Window (${container.id}) does not appear to be a registered window`);
             return;
         }
+        windowIndices.splice(index, 1);
 
         // Repair window indices
         for (let i = index; i < windowIndices.length; i++) {
-            let ctr = windowIndices[i];
+            let ctrl = windowIndices[i];
             let zIndex = i + WINDOW_START_ZINDEX;
-            ctr.style.zIndex = `${zIndex}`;
+            ctrl.style.zIndex = `${zIndex}`;
         }
     }
     this.removeWindow = removeWindow;
@@ -216,8 +209,8 @@ function UI(os) {
         container.style.top = "40px";
         container.style.left = "20px";
 
-        win.ui = new UIWindow(id, container, false);
-        return win;
+        container.ui = new UIWindow(id, container, false);
+        return container;
     }
     this.makeWindow = makeWindow;
 
@@ -238,6 +231,7 @@ function UI(os) {
 
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
+        overlay.id = id;
         overlay.classList.add("modal-overlay");
 
         // Wrap modal in adjusting layer that defines position. This is similar
@@ -647,7 +641,7 @@ function UIWindow(id, container, isModal) {
         catch (error) {
             controller = null;
             // Log just in case user wasn't expecting this to happen.
-            console.log(error);
+            console.log(`Failed to instantiate controller for window ID (${id})`);
         }
 
         if (!isEmpty(controller)) {
@@ -656,7 +650,7 @@ function UIWindow(id, container, isModal) {
 
         // TODO: Register embedded controllers
 
-        if (!isPreRendered) {
+        if (!isModal && !isPreRendered) {
             // Register buttons, if they exist
             let closeButton = container.querySelector(".close-button");
             if (!isEmpty(closeButton)) {

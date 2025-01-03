@@ -200,7 +200,7 @@ function OS() {
 
                 progressBar.ui.close();
                 let win = os.ui.makeWindow(result.value);
-                win.show();
+                win.ui.show();
 
                 // TODO: The application is officially "launched". Set it as the
                 // current application if it is _not_ a system app.
