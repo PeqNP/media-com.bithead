@@ -680,23 +680,17 @@ function UIWindow(id, container, isModal) {
             };
         }
 
-        let osMenus = container.getElementsByClassName("os-menus");
-        if (osMenus.length > 0) {
-            // Only one `UIMenu` parent may be registered
-            let winMenu = osMenus[0];
-
-            let menus = winMenu.getElementsByClassName("os-menu");
+        // There should only be one ui-menus
+        let uiMenus = container.querySelector(".ui-menus");
+        if (!isEmpty(uiMenus)) {
+            let menus = uiMenus.getElementsByClassName("ui-menu");
             for (let i = 0; i < menus.length; i++) {
                 let menu = menus[i];
                 os.ui.addOSBarMenu(menu);
             }
 
-            // TODO: Make sure all menus in the container are removed
-            // Remove from container as they are now in the OS bar
-            for (let i = 0; i < osMenus.length; i++) {
-                let menu = osMenus[i];
-                menu.parentNode.removeChild(menu);
-            }
+            // Remove menu declaration from window
+            uiMenus.parentNode.removeChild(uiMenus);
         }
 
         if (!isModal && !isPreRendered) {
@@ -898,7 +892,7 @@ function closeMenuType(className) {
  * Close all popup menus.
  */
 function closeAllMenus() {
-    closeMenuType("os-menu");
+    closeMenuType("ui-menu");
     closeMenuType("popup");
 }
 
@@ -1280,19 +1274,19 @@ function stylePopupMenus() {
  */
 function styleOSMenus() {
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
-    let menus = document.getElementsByClassName("os-menu");
+    let menus = document.getElementsByClassName("ui-menu");
     for (let i = 0; i < menus.length; i++) {
         let selectElement = menus[i].getElementsByTagName("select")[0];
 
         // The container is positioned absolute so that when a selection is made it overlays
         // the content instead of pushing it down.
         let container = document.createElement("div");
-        container.setAttribute("class", "os-menu-container popup-inactive");
+        container.setAttribute("class", "ui-menu-container popup-inactive");
         menus[i].appendChild(container);
 
         // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
         let choicesLabel = document.createElement("div");
-        choicesLabel.setAttribute("class", "os-menu-choices-label");
+        choicesLabel.setAttribute("class", "ui-menu-choices-label");
         // FIXME: This _should_ always be the `0`th element
         let label = selectElement.options[selectElement.selectedIndex].innerHTML;
         if (label.startsWith("img:")) {
@@ -1360,7 +1354,7 @@ function styleOSMenus() {
          * event associated to the toggle state.
          */
         choicesLabel.addEventListener("click", function(e) {
-            var container = this.parentNode; // os-menu-container
+            var container = this.parentNode; // ui-menu-container
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
             closeAllMenus();

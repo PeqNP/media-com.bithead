@@ -628,7 +628,7 @@ input[type=checkbox] {
   justify-content: flex-start;
 }
 
-.os-menu {
+.ui-menu {
   position: relative;
   cursor: pointer;
 }
@@ -636,11 +636,11 @@ input[type=checkbox] {
   display: flex;
   cursor: pointer;
 }
-.os-menu {
+.ui-menu {
   flex: 0 1 auto;
 }
 
-.os-menu select,
+.ui-menu select,
 .popup-menu select {
   display: none; /* Hide original select element */
 }
@@ -660,12 +660,12 @@ input[type=checkbox] {
  * be positioned absolutely inside another container that it is positioned
  * relative to.
  */
-.os-menu-container,
+.ui-menu-container,
 .popup-container {
   font-family: "ChicagoFLF";
   font-size: 12px;
 }
-.os-menu-container {
+.ui-menu-container {
   position: relative;
 }
 .popup-container {
@@ -678,17 +678,17 @@ input[type=checkbox] {
 }
 
 /* This is the first option in select */
-.os-menu-choices-label {
+.ui-menu-choices-label {
   width: fit-content;
   padding: 2px 10px 2px 10px;
 }
 .popup-choices-label { }
 
-.os-menu-choices-label.popup-arrow-active {
+.ui-menu-choices-label.popup-arrow-active {
   background-color: #000;
   color: #fff;
 }
-.os-menu .sub-container {
+.ui-menu .sub-container {
   position: absolute;
   left: 0px;
   top: 17px;
