@@ -173,7 +173,7 @@ function OS() {
             }
 
             let resp = result.value;
-            if (resp.main === "application.json") {
+            if (resp.application.main === "application.json") {
                 showError("Loading an application's UIApplication not yet supported");
                 return;
             }
@@ -194,7 +194,7 @@ function OS() {
             }
             os.network.get(`/boss/app/${bundleId}/controller/${resp.application.main}.${ctrl.renderer}`, "text", function(result) {
                 if (!result.ok) {
-                    showError(`Failed to load application bundle (${bundleId}) controller (${resp.main}).`, result.error);
+                    showError(`Failed to load application bundle (${bundleId}) controller (${resp.application.main}).`, result.error);
                     return;
                 }
 
@@ -271,7 +271,13 @@ function Network(os) {
             progressBar = os.ui.showProgressBar(msg);
         }
         let response = fetch(url, {
-            method: "GET"
+            method: "GET",
+            // FIXME: Required when loading controller files. Failing to do this
+            // will prevent controller JSON files from being loaded when changes
+            // are made, as the older cached version will be served. How these
+            // files are served (using Etag) could be smarter as it has more to
+            // do with the backend (probably) then the front-end.
+            cache: "no-cache"
         })
             .then(response => {
                 if (!response.ok) {
@@ -285,6 +291,9 @@ function Network(os) {
                 }
             })
             .then(data => {
+                if (!isEmpty(data.error)) {
+                    throw new Error(data.error.message);
+                }
                 fn(new Result(data));
             })
             .catch(error => {

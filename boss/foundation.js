@@ -96,11 +96,16 @@ function makeObjectId() {
  * @param {object} obj - Dictionary
  * @param {string} path - String path that identfies key in nested dictionary
  */
-function getKey(obj, path) {
-    if (typeof(path) === 'string') {
-        path = path.split('.')
+function getValue(obj, keyPath) {
+    if (typeof(keyPath) !== 'string') {
+        console.warn(`Invalid key path (${keyPath}). Expected string.`);
+        return null;
     }
-    return path.reduce((x, y) => x[y], obj)
+
+    let path = keyPath.split('.')
+    return path.reduce(function(x, y) {
+        return x[y];
+    }, obj);
 }
 
 /**
@@ -118,5 +123,5 @@ function getKey(obj, path) {
  * @returns {string}
  */
 function interpolate(str, obj) {
-    return str.replace(/\${(.*?)}/g, (x, g) => getKey(obj, g));
+    return str.replace(/\$\((.*?)\)/g, (x, g) => getValue(obj, g));
 }

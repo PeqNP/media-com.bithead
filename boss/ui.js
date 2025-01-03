@@ -199,9 +199,25 @@ function UI(os) {
             "window": {id: id, controller: `os.ui.controller.${id}`},
         };
 
+        // To get around the fact that you can't add javascript using innerHTML
+        // you have to go about this long round about way of adding a new script tag.
+        // Wtaf. Yes. I understand you want to avoid XSS and vulnerabilities, but if
+        // you're downloading content from your own site, there is no reason for this.
+        // It is a trusted source.
+        let div = document.createElement("div");
+        div.innerHTML = interpolate(html, attr);
+        let script = div.querySelector("script");
+        let parentNode = script.parentNode;
+        parentNode.removeChild(script);
+
+        let sc = document.createElement("script");
+        sc.language = "text/javascript";
+        let inline = document.createTextNode(script.innerHTML);
+        sc.appendChild(inline);
+        parentNode.append(sc);
+
         let container = document.createElement("div");
-        container.id = id;
-        container.innerHTML = interpolate(html, attr);
+        container.appendChild(div.firstChild);
         container.style.position = "absolute";
         // TODO: Stagger position where windows appear. Each new window should
         // be 10-20 px from top and left. When intial position is > 1/3 of page
@@ -231,7 +247,6 @@ function UI(os) {
 
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
-        overlay.id = id;
         overlay.classList.add("modal-overlay");
 
         // Wrap modal in adjusting layer that defines position. This is similar
@@ -633,18 +648,9 @@ function UIWindow(id, container, isModal) {
     function initialize(isPreRendered) {
         styleListBoxes(container);
 
-        let src = `new window.${id}(container)`;
-        // A window does not need a controller.
-        try {
-            controller = eval(src);
-        }
-        catch (error) {
-            controller = null;
-            // Log just in case user wasn't expecting this to happen.
-            console.log(`Failed to instantiate controller for window ID (${id})`);
-        }
-
-        if (!isEmpty(controller)) {
+        // Add window controller if it exists.
+        if (typeof window[id] === 'function') {
+            controller = new window[id](container);
             os.ui.addController(id, controller);
         }
 
@@ -655,18 +661,20 @@ function UIWindow(id, container, isModal) {
             let closeButton = container.querySelector(".close-button");
             if (!isEmpty(closeButton)) {
                 closeButton.addEventListener("click", function (e) {
+                    e.stopPropagation();
                     close();
                 });
             }
             let zoomButton = container.querySelector(".zoom-button");
             if (!isEmpty(zoomButton)) {
                 zoomButton.addEventListener("click", function (e) {
+                    e.stopPropagation();
                     zoom();
                 });
             }
 
             // Register window drag event
-            container.querySelector(".top").onmousedown = function() {
+            container.querySelector(".top").onmousedown = function(e) {
                 os.ui.focusWindow(container);
                 os.ui.dragWindow(container);
             };
@@ -719,7 +727,8 @@ function UIWindow(id, container, isModal) {
             desktop.appendChild(container);
         }
 
-        initialize(false);
+        // Allow time for parsing. I'm honestly not sure this is required.
+        setTimeout(function() { initialize(false); } , 50);
 
         // TODO: Allow the controller to load its view.
         // Typically used when providing server-side rendered window container.
@@ -827,7 +836,7 @@ function UIWindow(id, container, isModal) {
  * ```
  * <div class="ui-window">
  *   <script language="javascript">
- *     function ${window.id}(view) { ... }
+ *     function $(window.id)(view) { ... }
  *   </script>
  * </div>
  * ```

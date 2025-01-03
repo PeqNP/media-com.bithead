@@ -1,6 +1,6 @@
 <div class="ui-window">
-  <script language="javascript">
-    function ${window.id}(view) {
+  <script language="text/javascript">
+    function $(window.id)(view) {
       function open() {
         let select = view.ui.select("applications");
         let bundleId = select.ui.selectedValue();
@@ -12,6 +12,7 @@
         let apps = os.installedApplications();
         let select = view.ui.select("applications");
         select.ui.addNewOptions(apps);
+        view.querySelector(".num-apps").innerHTML = `${apps.length}`;
       }
       this.viewDidLoad = viewDidLoad;
     }
@@ -21,7 +22,7 @@
     <div class="title"><span>Applications</span></div>
     <div class="zoom-button"></div>
   </div>
-  <div class="metadata">3 applications installed</div>
+  <div class="metadata"><span class="num-apps">0</span> applications installed</div>
   <div class="metadata-bottom"></div>
   <div class="container">
     <div class="hbox gap-10">
@@ -30,7 +31,7 @@
         </select>
       </div>
       <div class="vbox align-bottom">
-        <button class="primary" onclick="${window.controller}.open();">Open</button>
+        <button class="primary" onclick="$(window.controller).open();">Open</button>
       </div>
     </div>
   </div>
