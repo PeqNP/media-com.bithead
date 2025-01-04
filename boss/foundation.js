@@ -11,11 +11,20 @@ function Result(value) {
     }
 }
 
+/**
+ * Check if function is async.
+ *
+ * @returns {bool} `true` if async function
+ */
+function isAsyncFunction(fn) {
+    return fn.constructor.name === "AsyncFunction";
+}
 
 /**
- * Returns `true` if the type of `value` is a string.
+ * Check if value is string.
  *
  * @param {mixed} value - value to test if string
+ * @returns {bool} `true` if the type of `value` is a string.
  */
 function isString(value) {
     return typeof value === 'string';

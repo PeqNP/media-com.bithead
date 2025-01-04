@@ -193,7 +193,7 @@ function OS() {
             throw new Error(`Application (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`);
         }
 
-        let progressBar = os.ui.showProgressBar(`Loading application ${apps[bundleId].name}...`);
+        let progressBar = await os.ui.showProgressBar(`Loading application ${apps[bundleId].name}...`);
 
         function showError(msg, error) {
             if (!isEmpty(error)) {
@@ -269,8 +269,9 @@ function OS() {
 
         progressBar?.setProgress(50, "Loading controller...");
 
+        let container;
         try {
-            let container = await app.loadController(config.application.main);
+            container = await app.loadController(config.application.main);
         }
         catch (error) {
             showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
@@ -391,10 +392,10 @@ function Network(os) {
      * @param {function} fn(Result)? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    async function get(url, decoder, fn, msg) {
+    async function get(url, decoder, msg) {
         let progressBar = null;
         if (!isEmpty(msg)) {
-            progressBar = os.ui.showProgressBar(msg);
+            progressBar = await os.ui.showProgressBar(msg);
         }
         return fetch(url, {
             method: "GET",
@@ -427,6 +428,13 @@ function Network(os) {
                 else {
                     throw new Error(data.error.message);
                 }
+            })
+            .catch(error => {
+                os.ui.showErrorModal(error.message);
+            })
+            .then(data => {
+                progressBar?.ui.close();
+                return data;
             });
     }
     this.get = get;
@@ -438,10 +446,9 @@ function Network(os) {
      *
      * @param {string} url
      * @param {File} body - Object to pass as JSON
-     * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function json(url, body, fn, msg) {
+    async function json(url, body, msg) {
         if (body === null || body.length < 1) {
             body = '{}';
         }
@@ -450,9 +457,9 @@ function Network(os) {
         }
         let progressBar = null;
         if (!isEmpty(msg)) {
-            progressBar = os.ui.showProgressBar(msg);
+            progressBar = await os.ui.showProgressBar(msg);
         }
-        let response = fetch(url, {
+        return fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -470,13 +477,14 @@ function Network(os) {
                 if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
                 }
-                fn(data);
+                return data;
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
             })
-            .then(() => {
+            .then(data => {
                 progressBar?.ui.close();
+                return data;
             });
     }
 
@@ -491,19 +499,18 @@ function Network(os) {
      *
      * @param {string} url
      * @param {File} file - File object to upload
-     * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function upload(url, file, fn, msg) {
+    async function upload(url, file, msg) {
         let formData = new FormData();
         formData.append("file", file);
 
         let progressBar = null;
         if (!isEmpty(msg)) {
-            progressBar = os.ui.showProgressBar(msg);
+            progressBar = await os.ui.showProgressBar(msg);
         }
 
-        fetch(url, {
+        return fetch(url, {
             method: "POST",
             body: formData
         })
@@ -518,24 +525,25 @@ function Network(os) {
                 if (data.error !== undefined) {
                     throw new Error(data.error.message);
                 }
-                fn(data);
+                return data;
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
             })
-            .then(() => {
+            .then(data => {
                 progressBar?.ui.close();
+                return data;
             });
     }
     this.upload = upload;
 
-    function __delete(url, fn, msg) {
+    async function __delete(url, msg) {
         let progressBar = null;
         if (!isEmpty(msg)) {
-            progressBar = os.ui.showProgressBar(msg);
+            progressBar = await os.ui.showProgressBar(msg);
         }
 
-        fetch(url, {
+        return fetch(url, {
             method: "DELETE"
         })
             .then(response => {
@@ -549,13 +557,14 @@ function Network(os) {
                 if (data.error !== undefined) {
                     throw new Error(data.error.message);
                 }
-                fn(data);
+                return data;
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
             })
-            .then(() => {
+            .then(data => {
                 progressBar?.ui.close();
+                return data;
             });
     }
 
@@ -569,13 +578,14 @@ function Network(os) {
      * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function _delete(url, msg, fn, dmsg) {
+    async function _delete(url, msg, fn, dmsg) {
         if (msg === null) {
-            __delete(url, fn, dmsg);
-            return;
+            let data = await __delete(url, dmsg);
+            fn(data);
         }
-        os.ui.showDeleteModal(msg, null, function () {
-            __delete(url, fn, dmsg);
+        os.ui.showDeleteModal(msg, null, async function () {
+            let data = await __delete(url, dmsg);
+            fn(data);
         });
     }
     this.delete = _delete;
@@ -590,7 +600,7 @@ function Network(os) {
      * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function patch(url, body, fn, msg) {
+    async function patch(url, body, msg) {
         if (body === null || body.length < 1) {
             body = '{}';
         }
@@ -600,10 +610,10 @@ function Network(os) {
 
         let progressBar = null;
         if (!isEmpty(msg)) {
-            progressBar = os.ui.showProgressBar(msg);
+            progressBar = await os.ui.showProgressBar(msg);
         }
 
-        fetch(url, {
+        return fetch(url, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json"
@@ -621,21 +631,22 @@ function Network(os) {
                 if (data.error !== undefined) {
                     throw new Error(data.error.message);
                 }
-                fn(data);
+                return data;
             })
             .catch(error => {
                 os.ui.showErrorModal(error.message);
             })
-            .then(() => {
+            .then(data => {
                 progressBar?.ui.close();
+                return data;
             });
     }
     this.patch = patch;
 
     /**
-     * Load a stylesheet asynchronously.
+     * Dynamically load stylesheet.
      */
-    function stylesheet(href) {
+    async function stylesheet(href) {
         return new Promise((resolve, reject) => {
             let link = document.createElement('link');
             link.rel = 'stylesheet';
@@ -648,7 +659,10 @@ function Network(os) {
     }
     this.stylesheet = stylesheet;
 
-    function javascript(href) {
+    /**
+     * Dynamically load javascript.
+     */
+    async function javascript(href) {
         return new Promise((resolve, reject) => {
             let script = document.createElement('script');
             script.type = 'text/javascript';

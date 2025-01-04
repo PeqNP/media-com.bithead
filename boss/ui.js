@@ -495,10 +495,17 @@ function UI(os) {
      * where a destructive action can take place.
      *
      * @param {string} msg - The (question) message to display.
-     * @param {function} cancel - A function that is called when user presses `Cancel`
-     * @param {function} ok - A function that is called when user presses `OK`
+     * @param {async function} cancel - A function that is called when user presses `Cancel`
+     * @param {async function} ok - A function that is called when user presses `OK`
+     * @throws
      */
     function showDeleteModal(msg, cancel, ok) {
+        if (!isAsyncFunction(cancel)) {
+            throw new Error(`Cancel function for msg (${msg}) is not async function`);
+        }
+        if (!isAsyncFunction(ok)) {
+            throw new Error(`OK function for msg (${msg}) is not async function`);
+        }
         let modal = makeModal("delete-modal-fragment");
         var message = modal.querySelector("p.message");
         message.innerHTML = msg;
@@ -531,20 +538,28 @@ function UI(os) {
     /**
      * Show a cancellable progress bar modal.
      *
-     * Use this when performing long running actions that may be cancellable. If
-     * `fn` is not provided, the `Stop` button does nothing.
+     * Use this when performing long running actions that may be cancelled.
+     *
+     * When the `Stop` button is tapped, regardless if `fn` is set, the button
+     * will become disabled. This visual feedback informs user that the operation
+     * can only be performed once.
      *
      * @param {string} msg - Message to show in progress bar
-     * @param {function} fn - The async function to call when the `Stop` button is pressed.
+     * @param {async function} fn - The async function to call when the `Stop` button is pressed.
      * @param {bool} indeterminate - If `true`, this will show an indeterminate progress bar. Default is `false`.
      * @returns UIProgressBar if OS is loaded. Otherwise, returns `null`.
+     * @throws
      */
-    function showProgressBar(msg, fn, indeterminate) {
+    async function showProgressBar(msg, fn, indeterminate) {
         if (!os.isLoaded()) {
             return null;
         }
+        if (!isEmpty(fn) && !isAsyncFunction(fn)) {
+            throw new Error(`Callback function for progress bar (${msg}) is not async function`);
+        }
 
-        let modal = makeModal("progress-bar-fragment");
+        let app = await os.openApplication("io.bithead.boss");
+        let modal = await app.loadController("ProgressBar");
 
         if (isEmpty(indeterminate)) {
             indeteriminate = false;
@@ -568,13 +583,13 @@ function UI(os) {
             progressBar.style.width = "0%";
         }
 
-        modal.querySelector("button.stop").addEventListener("click", function() {
+        modal.querySelector("button.stop").addEventListener("click", async function() {
             this.disabled = true;
             if (isEmpty(fn)) {
                 return;
             }
             message.innerHTML = "Stopping"
-            fn().then((result) => {
+            await fn().then((result) => {
                 console.log("Stopped")
                 modal.ui.close();
             });
