@@ -22,6 +22,8 @@ function OS() {
     // etc.
     let loaded = false;
 
+    // TODO: Is there some sort of proxy I can create that will allow `loaded`
+    // to be written privately but read-only public?
     function isLoaded() {
         return loaded;
     }
@@ -163,13 +165,39 @@ function OS() {
     /**
      * Register applications available to BOSS.
      *
-     * This is primarily used by the `io.bithead.applications` app to inform
-     * user which applications are installed. This may change in the future.
+     * This is designed to display apps that a user has access to. This
+     * over-writes any registered applications, except system apps, that may
+     * have been initialized or registered at a previous time.
      *
-     * @param {object[bundleId:name:]} apps - List of installed apps
+     * @param {object{bundleId:{name:system:icon:}}} apps - List of installed apps
      */
     function registerApplications(_apps) {
-        apps = _apps;
+        let rapps = {};
+
+        // Re-create app list. Include only system apps.
+        for (bundleId in apps) {
+            let app = apps[bundleId];
+            if (app.system) {
+                rapps[bundleId] = app;
+            }
+        }
+
+        // Add apps to list
+        for (bundleId in _apps) {
+            if (bundleId in rapps) {
+                console.log("You may not overwrite a system app");
+                continue;
+            }
+
+            let app = _apps[bundleId];
+            if (app.system) {
+                console.log("System apps may not be registered");
+                continue;
+            }
+            rapps[bundleId] = app;
+        }
+
+        apps = rapps;
     }
     this.registerApplications = registerApplications;
 
@@ -208,7 +236,7 @@ function OS() {
             config = await os.network.get(`/boss/app/${bundleId}/application.json`, "json");
         }
         catch (error) {
-            showError(`Failed to load application bundle (${bundleId}).`, error);
+            showError(`Failed to load application bundle (${bundleId}) configuration.`, error);
         }
 
         let app = new UIApplication(config);
@@ -391,6 +419,7 @@ function Network(os) {
      * @param {string} decoder - Response decoder. Supported: text | json
      * @param {function} fn(Result)? - Response function
      * @param {string} msg? - Show progress bar with message
+     * @throws
      */
     async function get(url, decoder, msg) {
         let progressBar = null;
@@ -418,10 +447,23 @@ function Network(os) {
                 }
             })
             .then(data => {
-                // NOTE: This will not work for `text` decoded responses. This
-                // relies on `response.ok`. Even then, that won't work if the
-                // server responds with custom error message w/ 200 because
-                // it can't find the resource.
+                // Typically the text decoder is only for HTML. With that
+                // assumption, if the response looks like JSON it's because
+                // there's an error.
+                if (decoder === "text" && data.startsWith("{")) {
+                    let obj = null;
+                    try {
+                        obj = JSON.parse(jsonString);
+                    }
+                    catch (error) {
+                        console.log("Attempting to decode JSON object that wasn't JSON");
+                    }
+
+                    if (!isEmpty(obj?.error)) {
+                        throw new Error(data.error.message);
+                    }
+                }
+
                 if (isEmpty(data.error)) {
                     return data;
                 }
@@ -430,7 +472,9 @@ function Network(os) {
                 }
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                console.log(`failure: GET ${url}`);
+                progressBar?.ui.close();
+                throw error;
             })
             .then(data => {
                 progressBar?.ui.close();
@@ -447,6 +491,7 @@ function Network(os) {
      * @param {string} url
      * @param {File} body - Object to pass as JSON
      * @param {string} msg? - Show progress bar with message
+     * @throws
      */
     async function json(url, body, msg) {
         if (body === null || body.length < 1) {
@@ -480,7 +525,9 @@ function Network(os) {
                 return data;
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                console.log(`failure: POST ${url}`);
+                progressBar?.ui.close();
+                throw error;
             })
             .then(data => {
                 progressBar?.ui.close();
@@ -500,6 +547,7 @@ function Network(os) {
      * @param {string} url
      * @param {File} file - File object to upload
      * @param {string} msg? - Show progress bar with message
+     * @throws
      */
     async function upload(url, file, msg) {
         let formData = new FormData();
@@ -528,7 +576,9 @@ function Network(os) {
                 return data;
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                console.log(`failure upload: POST ${url}`);
+                progressBar?.ui.close();
+                throw error;
             })
             .then(data => {
                 progressBar?.ui.close();
@@ -560,7 +610,9 @@ function Network(os) {
                 return data;
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                console.log(`failure: DELETE ${url}`);
+                progressBar?.ui.close();
+                throw error;
             })
             .then(data => {
                 progressBar?.ui.close();
@@ -577,6 +629,7 @@ function Network(os) {
      * @param {object} body - request object to send as JSON to `url`
      * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
+     * @throws
      */
     async function _delete(url, msg, fn, dmsg) {
         if (msg === null) {
@@ -599,6 +652,7 @@ function Network(os) {
      * @param {object} body - request object to send as JSON to `url`
      * @param {function} fn? - Response function
      * @param {string} msg? - Show progress bar with message
+     * @throws
      */
     async function patch(url, body, msg) {
         if (body === null || body.length < 1) {
@@ -634,7 +688,9 @@ function Network(os) {
                 return data;
             })
             .catch(error => {
-                os.ui.showErrorModal(error.message);
+                console.log(`failure: PATCH ${url}`);
+                progressBar?.ui.close();
+                throw error;
             })
             .then(data => {
                 progressBar?.ui.close();

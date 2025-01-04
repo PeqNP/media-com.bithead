@@ -1,5 +1,5 @@
 {
-    "io.bithead.applications": "Applications",
-    "io.bithead.boss": "BOSS",
-    "io.bithead.image-viewer": "Image Viewer"
+    "io.bithead.applications": {"name": "Applications", "icon": null, "system": true},
+    "io.bithead.boss": {"name": "BOSS", "icon": null, "system": true},
+    "io.bithead.image-viewer": {"name": "Image Viewer", "icon": null, "system": true}
 }

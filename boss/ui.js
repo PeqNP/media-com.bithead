@@ -457,33 +457,23 @@ function UI(os) {
      * FIXME: This needs to use the latest patterns to instantiate, show,
      * and hide windows/modals.
      */
-    function showInstalledApplications() {
-        os.openApplication("io.bithead.applications");
+    async function showInstalledApplications() {
+        await os.openApplication("io.bithead.applications");
     }
     this.showInstalledApplications = showInstalledApplications;
 
-    /**
-     * Close a (modal) window.
-     *
-     * Removes the window from the view hierarchy.
-     *
-     * FIXME: Needs to be updated to use latest UI patterns.
-     *
-     * - Parameter win: The window to close.
-     */
-    function closeWindow(win) {
-        const parent = win.parentNode;
-        parent.removeChild(win);
-    }
     /**
      * Show an error modal above all other content.
      *
      * FIXME: Needs to be updated to use the latest patterns.
      */
-    function showErrorModal(error) {
-        let modal = makeModal("error-modal-fragment", true);
-        var message = modal.querySelector("p.message");
-        message.innerHTML = error;
+    async function showErrorModal(error) {
+        if (!os.isLoaded()) {
+            return console.error(error);
+        }
+        let app = await os.openApplication("io.bithead.boss");
+        let modal = await app.loadController("Error");
+        modal.querySelector("p.message").innerHTML = error;
         modal.ui.show();
     }
     this.showErrorModal = showErrorModal;
@@ -499,17 +489,17 @@ function UI(os) {
      * @param {async function} ok - A function that is called when user presses `OK`
      * @throws
      */
-    function showDeleteModal(msg, cancel, ok) {
+    async function showDeleteModal(msg, cancel, ok) {
         if (!isAsyncFunction(cancel)) {
             throw new Error(`Cancel function for msg (${msg}) is not async function`);
         }
         if (!isAsyncFunction(ok)) {
             throw new Error(`OK function for msg (${msg}) is not async function`);
         }
-        let modal = makeModal("delete-modal-fragment");
-        var message = modal.querySelector("p.message");
-        message.innerHTML = msg;
-        // TODO: Configure controller
+        let app = await os.openApplication("io.bithead.boss");
+        let modal = await app.loadController("Delete");
+        modal.querySelector("p.message").innerHTML = msg;
+        modal.controller.configure(cancel, ok);
         modal.ui.show();
     }
     this.showDeleteModal = showDeleteModal;
@@ -521,16 +511,15 @@ function UI(os) {
      *
      * @param {string} msg - Message to display to user.
      */
-    function showAlert(msg) {
+    async function showAlert(msg) {
         if (!os.isLoaded()) {
             console.error(msg);
             return;
         }
 
-        let modal = makeModal("alert-modal-fragment");
-
-        let message = modal.querySelector("p.message");
-        message.innerHTML = msg;
+        let app = await os.openApplication("io.bithead.boss");
+        let modal = await app.loadController("Alert");
+        modal.querySelector("p.message").innerHTML = msg;
         modal.ui.show();
     }
     this.showAlert = showAlert;
@@ -809,6 +798,9 @@ function UIWindow(id, container, isModal) {
         if (typeof window[id] === 'function') {
             controller = new window[id](container);
             os.ui.addController(id, controller);
+
+            // This allows the window to be configured by consumer
+            container.controller = controller;
         }
 
         // TODO: Register embedded controllers
