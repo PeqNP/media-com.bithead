@@ -1,5 +1,5 @@
 <div class="ui-modal">
-  <script language="text/javascript">
+  <script type="text/javascript">
     function $(this.id)(view) {
       function ok() {
         view.ui.close();
@@ -10,8 +10,8 @@
   <div class="container">
     <p class="message center-text">Bithead OS aka BOSS v0.9a</p>
     <div class="controls">
-      <button class="default" onclick="$(this.controller).close();">OK</button>
+      <button class="default" onclick="$(this.controller).ok();">OK</button>
     </div>
-    <p class="footer">Have questions? Please call <a href="tel:$(os.phone)">$(os.phone)</a>.</p>
+    <p class="footer">Have questions? Contact us at $(os.phone).</p>
   </div>
 </div>

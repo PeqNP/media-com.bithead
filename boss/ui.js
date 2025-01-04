@@ -208,7 +208,10 @@ function UI(os) {
                 controller: null
             },
             os: {
-                phone: "253-329-1280"
+                email: "bitheadRL AT proton.me",
+                // Too much spam. For clients that have the OS installed locally,
+                // set this to the correct value.
+                phone: "bitheadRL AT proton.me"
             },
             "this": {
                 id: id,
@@ -217,6 +220,37 @@ function UI(os) {
         };
 
         return attr;
+    }
+
+    /**
+     * Creates temporary element that parses HTML and re-attached Javascript to
+     * work-around HTML5 preventing untrusted scripts from parsing when setting
+     * innerHTML w/ dynamic content.
+     *
+     * @param {Object} attr - Attributes to assign to window
+     * @param {string} html - HTML to add to window container
+     * @returns `div` that contains parsed HTML and re-attached Javascript
+     */
+    function parseHTML(attr, html) {
+        // You must re-attach any scripts that are part of the HTML. Since HTML5
+        // javascript is not parsed or ran when assigning values to innerHTML.
+        let div = document.createElement("div");
+        div.innerHTML = interpolate(html, attr);
+        let script = div.querySelector("script");
+
+        // Attach script, if any
+        if (!isEmpty(script)) {
+            let parentNode = script.parentNode;
+            parentNode.removeChild(script);
+
+            let sc = document.createElement("script");
+            sc.setAttribute("type", "text/javascript");
+            let inline = document.createTextNode(script.innerHTML);
+            sc.appendChild(inline);
+            parentNode.append(sc);
+        }
+
+        return div;
     }
 
     /**
@@ -232,22 +266,7 @@ function UI(os) {
     function makeWindow(html) {
         const attr = makeWindowAttributes();
 
-        // To get around the fact that you can't add javascript using innerHTML
-        // you have to go about this long round about way of adding a new script tag.
-        // Wtaf. Yes. I understand you want to avoid XSS and vulnerabilities, but if
-        // you're downloading content from your own site, there is no reason for this.
-        // It is a trusted source.
-        let div = document.createElement("div");
-        div.innerHTML = interpolate(html, attr);
-        let script = div.querySelector("script");
-        let parentNode = script.parentNode;
-        parentNode.removeChild(script);
-
-        let sc = document.createElement("script");
-        sc.language = "text/javascript";
-        let inline = document.createTextNode(script.innerHTML);
-        sc.appendChild(inline);
-        parentNode.append(sc);
+        let div = parseHTML(attr, html);
 
         let container = document.createElement("div");
         container.appendChild(div.firstChild);
@@ -280,6 +299,8 @@ function UI(os) {
     function makeModal(html) {
         const attr = makeWindowAttributes();
 
+        let div = parseHTML(attr, html);
+
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
         overlay.classList.add("ui-modal-overlay");
@@ -287,12 +308,13 @@ function UI(os) {
         // Container is used for positioning
         let container = document.createElement("div");
         container.classList.add("ui-modal-container");
-        container.innerHTML = interpolate(html, attr);
+        container.appendChild(div.firstChild);
         overlay.appendChild(container);
 
         overlay.ui = new UIWindow(attr.this.id, overlay, true);
         return overlay;
     }
+    this.makeModal = makeModal;
 
     /**
      * Make a modal from an HTML fragment.
@@ -422,16 +444,10 @@ function UI(os) {
      * FIXME: This needs to use the latest patterns to instantiate, show,
      * and hide windows/modals.
      */
-    function showAboutModal() {
-        os.openApplication("io.bithead.boss", function(result) {
-            if (!isEmpty(result.error)) {
-                return;
-            }
-
-            result.value.loadController("About", function(ctrl) {
-                ctrl.show();
-            });
-        });
+    async function showAboutModal() {
+        let app = await os.openApplication("io.bithead.boss");
+        let ctrl = await app.loadController("About");
+        ctrl.ui.show();
     }
     this.showAboutModal = showAboutModal;
 
@@ -599,11 +615,11 @@ function UI(os) {
  */
 function UIApplication(config) {
 
-    readOnly(this, "bundleId", config.bundleId);
-    readOnly(this, "icon", config.icon);
-    readOnly(this, "name", config.name);
-    readOnly(this, "system", config.sytem);
-    readOnly(this, "version", config.version);
+    readOnly(this, "bundleId", config.application.bundleId);
+    readOnly(this, "icon", config.application.icon);
+    readOnly(this, "name", config.application.name);
+    readOnly(this, "system", config.application.sytem);
+    readOnly(this, "version", config.application.version);
 
     // Application function
     let main = null;
@@ -622,27 +638,13 @@ function UIApplication(config) {
      * If error_fn is defined, the Error is returned instead of showing an alert.
      *
      * @param {string} name - Name of controller
-     * @param {function} fn - Callback function with new instance of controller
-     * @param {function?} error_fn - Callback function when error occurs
+     * @returns HTMLElement window container
+     * @throws
      */
-    function loadController(name, fn, error_fn) {
-        function showAlert(msg, error) {
-            if (!isEmpty(error)) {
-                console.error(error);
-            }
-
-            if (isEmpty(error_fn)) {
-                os.ui.showAlert(msg);
-            }
-            else {
-                error_fn(new Error(msg));
-            }
-        }
-
-        let def = config.controllers[def];
-        if (!isEmpty(def)) {
-            showAlert(`Controller (${name}) does not exist in application's (${config.bundleId}) controller list.`);
-            return;
+    async function loadController(name) {
+        let def = config.controllers[name];
+        if (isEmpty(def)) {
+            throw new Error(`Controller (${name}) does not exist in application's (${config.application.bundleId}) controller list.`);
         }
 
         // FIXME: When loading controller from cache, the renderer may need to
@@ -651,29 +653,38 @@ function UIApplication(config) {
         // Return cached controller
         let html = controllers[name];
         if (!isEmpty(html)) {
-            fn(os.ui.makeWindow(html));
-            return;
+            if (def.modal) {
+                return os.ui.makeModal(html);
+            }
+            else {
+                return os.ui.makeWindow(html);
+            }
         }
 
         if (!isEmpty(def.renderer) && def.renderer !== "html") {
-            showAlert(`Unsupported renderer (${def.renderer}) for controller (${def.name}).`);
-            return;
+            throw new Error(`Unsupported renderer (${def.renderer}) for controller (${def.name}).`);
         }
         else if (isEmpty(def.renderer)) {
             def.renderer = "html";
         }
 
         // Download and cache controller
-        os.network.get(`/boss/app/${config.bundleId}/controller/${name}.${def.renderer}`, "text", function(result) {
-            if (!result.ok) {
-                showAlert(`Failed to load application bundle (${bundleId}) controller (${name}).`, result.error);
-                return;
-            }
+        try {
+            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, "text");
+        }
+        catch (error) {
+            console.log(error);
+            throw new Error(`Failed to load application bundle (${config.application.bundleId}) controller (${name}).`);
+        }
 
-            let html = result.value;
-            controllers[name] = html;
-            fn(os.ui.makeWindow(html));
-        });
+        controllers[name] = html;
+
+        if (def.modal) {
+            return os.ui.makeModal(html);
+        }
+        else {
+            return os.ui.makeWindow(html);
+        }
     }
     this.loadController = loadController;
 
@@ -695,6 +706,7 @@ function UIApplication(config) {
             main.applicationDidStart();
         }
     }
+    this.applicationDidStart = applicationDidStart;
 
     /**
      * Called before the application is removed from the OS's cache.
@@ -708,6 +720,15 @@ function UIApplication(config) {
             main.applicationDidStop();
         }
     }
+    this.applicationDidStop = applicationDidStop;
+
+    /** NOTICE
+     *
+     * System applications will not recieve `applicationDidFocus` or
+     * `applicationDidBlur` signals.
+     *
+     */
+
 
     /**
      * Application became the focused application.
@@ -720,6 +741,7 @@ function UIApplication(config) {
             main.applicationDidFocus();
         }
     }
+    this.applicationDidFocus = applicationDidFocus;
 
     /**
      * Application went out of focus.
@@ -739,6 +761,7 @@ function UIApplication(config) {
             main.applicationDidBlur();
         }
     }
+    this.applicationDidBlur = applicationDidBlur;
 }
 
 /**
@@ -927,7 +950,7 @@ function UIWindow(id, container, isModal) {
  * The `script` tag must have a function with the same name as its `id`.
  * ```
  * <div class="ui-window" id="my_controller">
- *   <script language="javascript">
+ *   <script type="text/javascript">
  *     function my_controller(view) { ... }
  *   </script>
  * </div>
@@ -937,7 +960,7 @@ function UIWindow(id, container, isModal) {
  * window instance ID. e.g.
  * ```
  * <div class="ui-window">
- *   <script language="javascript">
+ *   <script type="text/javascript">
  *     function $(window.id)(view) { ... }
  *   </script>
  * </div>

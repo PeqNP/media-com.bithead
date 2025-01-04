@@ -25,6 +25,7 @@ function OS() {
     function isLoaded() {
         return loaded;
     }
+    this.isLoaded = isLoaded;
 
     // List of installed (registered) apps the OS is aware of.
     // object{bundleId:{name:icon:system:}}
@@ -39,18 +40,24 @@ function OS() {
     // application may be displayed at a time.
     let activeApplication = null;
 
-    function init() {
+    /**
+     * Initialize the BOSS OS.
+     *
+     * Loads installed apps and opens the BOSS app.
+     */
+    async function init() {
         this.ui.init();
         startClock();
 
-        os.openApplication("io.bithead.boss", function(result) {
-            if (!result.ok) {
-                console.error(result.error);
-                return;
-            }
-
+        // Load installed apps
+        try {
+            apps = await os.network.get("/boss/app/installed.json", "json");
+            await os.openApplication("io.bithead.boss");
             loaded = true;
-        });
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
     this.init = init;
 
@@ -169,130 +176,128 @@ function OS() {
     /**
      * Open a BOSS application.
      *
-     * TODO: In the future, this will check if the user has permission to
-     * open the app.
+     * TODO: Check if user has permission to access app.
      *
      * @param {string} bundleId - The Bundle ID of the application to open e.g. 'io.bithead.test-management'
+     * @returns UIApplication
+     * @throws
      */
-    async function openApplication(bundleId, loaded_fn) {
+    async function openApplication(bundleId, fn) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
             // TODO: Switch to non-system application
-            return loaded_fn(new Result(loadedApp));
+            return loadedApp;
         }
 
         if (!(bundleId in apps)) {
-            loaded_fn(new Result(new Error(`Application with Bundle ID (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`)));
-            return;
+            throw new Error(`Application (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`);
         }
 
-        let app = apps[bundleId];
-
-        let progressBar = os.ui.showProgressBar(`Loading application ${app.name}...`);
+        let progressBar = os.ui.showProgressBar(`Loading application ${apps[bundleId].name}...`);
 
         function showError(msg, error) {
             if (!isEmpty(error)) {
                 console.error(error);
             }
-            loaded_fn(new Result(new Error(msg)));
             progressBar?.ui.close();
+            throw new Error(msg);
         }
 
-        os.network.get(`/boss/app/${bundleId}/application.json`, "json", function(result) {
-            if (!result.ok) {
-                showError(`Failed to load application bundle (${bundleId}).`, result.error);
-                return;
+        let config;
+        try {
+            config = await os.network.get(`/boss/app/${bundleId}/application.json`, "json");
+        }
+        catch (error) {
+            showError(`Failed to load application bundle (${bundleId}).`, error);
+        }
+
+        let app = new UIApplication(config);
+        loadedApps[bundleId] = app;
+
+        if (config.application.main === "Application") {
+            let html;
+            try {
+                html = await os.network.get(`/boss/app/${bundleId}/controller/Application.html`, "text");
+            }
+            catch (error) {
+                showError(`Failed to load UIApplication for application bundle (${bundleId}).`, error);
             }
 
-            let app = new UIApplication(config);
-            loadedApps[bundleId] = app;
-
-            let config = result.value;
-
-            if (config.application.main === "Application") {
-                os.network.get(`/boss/app/${bundleId}/controller/Application.html`, "text", function(result) {
-                    if (!result.ok) {
-                        showError(`Failed to load UIApplication for application bundle (${bundleId}).`, result.error);
-                        return;
-                    }
-
-                    let objectId = makeObjectId();
-                    id = `Application_${objectId}`;
-                    const attr = {
-                        "this": {id: id}
-                    }
-
-                    // Like, `UIController`s, the script must be re-attached
-                    // to the body as HTML5 does not parse or execute Javascript
-                    // in `innerHTML`
-                    let div = document.createElement("div");
-                    div.innerHTML = interpolate(result.value, attr);
-                    let script = div.querySelector("script");
-                    script.id = id; // Required to unload script later
-                    let parentNode = script.parentNode;
-                    parentNode.removeChild(script);
-
-                    let sc = document.createElement("script");
-                    sc.language = "text/javascript";
-                    let inline = document.createTextNode(script.innerHTML);
-                    sc.appendChild(inline);
-                    document.body.appendChild(sc);
-
-                    if (app.system) {
-                        app.applicationDidStart();
-                    }
-                    else {
-                        if (!isEmpty(activeApplication)) {
-                            activeApplication.applicationDidBlur();
-                        }
-
-                        activeApplication = app;
-
-                        app.applicationDidStart();
-                        app.applicationDidFocus();
-                    }
-
-                    progressBar?.ui.close();
-
-                    loaded_fn(new Result(app));
-                });
-
-                showError("Loading an application's UIApplication not yet supported");
-                return;
+            let objectId = makeObjectId();
+            id = `Application_${objectId}`;
+            const attr = {
+                "this": {id: id}
             }
 
-            progressBar?.setProgress(50, "Loading controller...");
+            // Like, `UIController`s, the script must be re-attached
+            // to the body as HTML5 does not parse or execute Javascript
+            // set to `innerHTML`.
+            let div = document.createElement("div");
+            div.innerHTML = interpolate(html, attr);
+            let script = div.querySelector("script");
+            if (isEmpty(script)) {
+                showError(`Application (${bundleId}) UIApplication must have a script tag.`);
+            }
+            script.id = id; // Required to unload script later
+            let parentNode = script.parentNode;
+            parentNode.removeChild(script);
 
-            app.loadController(
-                config.application.main,
-                function(container) {
-                    // TODO: Switch to application context
+            let sc = document.createElement("script");
+            sc.setAttribute("type", "text/javascript");
+            let inline = document.createTextNode(script.innerHTML);
+            sc.appendChild(inline);
+            document.head.appendChild(sc);
 
-                    if (app.system) {
-                        app.applicationDidStart();
-                    }
-                    else {
-                        if (!isEmpty(activeApplication)) {
-                            activeApplication.applicationDidBlur();
-                        }
-
-                        activeApplication = app;
-                        app.applicationDidStart();
-
-                        container.ui.show();
-
-                        app.applicationDidFocus();
-                    }
-
-                    loaded_fn(new Result(app));
-                    progressBar?.ui.close();
-                },
-                function(error) {
-                    showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
-                    progressBar?.ui.close();
+            if (app.system) {
+                app.applicationDidStart();
+            }
+            else {
+                if (!isEmpty(activeApplication)) {
+                    activeApplication.applicationDidBlur();
                 }
-            );
-        });
+
+                activeApplication = app;
+
+                app.applicationDidStart();
+                app.applicationDidFocus();
+            }
+
+            progressBar?.ui.close();
+
+            return app;
+        } // Load UIApplication
+
+        progressBar?.setProgress(50, "Loading controller...");
+
+        try {
+            let container = await app.loadController(config.application.main);
+        }
+        catch (error) {
+            showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
+        }
+
+        // TODO: Switch application context if app is non-system
+
+        if (app.system) {
+            app.applicationDidStart();
+            container.ui.show();
+        }
+        else {
+            if (!isEmpty(activeApplication)) {
+                activeApplication.applicationDidBlur();
+            }
+
+            activeApplication = app;
+            app.applicationDidStart();
+
+            container.ui.show();
+
+            app.applicationDidFocus();
+        }
+
+        progressBar?.ui.close();
+
+        return app;
     }
     this.openApplication = openApplication;
 
@@ -386,12 +391,12 @@ function Network(os) {
      * @param {function} fn(Result)? - Response function
      * @param {string} msg? - Show progress bar with message
      */
-    function get(url, decoder, fn, error_fn, msg) {
+    async function get(url, decoder, fn, msg) {
         let progressBar = null;
         if (!isEmpty(msg)) {
             progressBar = os.ui.showProgressBar(msg);
         }
-        let response = fetch(url, {
+        return fetch(url, {
             method: "GET",
             // FIXME: Required when loading controller files. Failing to do this
             // will prevent controller JSON files from being loaded when changes
@@ -412,16 +417,16 @@ function Network(os) {
                 }
             })
             .then(data => {
-                if (!isEmpty(data.error)) {
+                // NOTE: This will not work for `text` decoded responses. This
+                // relies on `response.ok`. Even then, that won't work if the
+                // server responds with custom error message w/ 200 because
+                // it can't find the resource.
+                if (isEmpty(data.error)) {
+                    return data;
+                }
+                else {
                     throw new Error(data.error.message);
                 }
-                fn(new Result(data));
-            })
-            .catch(error => {
-                fn(new Result(error));
-            })
-            .then(() => {
-                progressBar?.ui.close();
             });
     }
     this.get = get;
