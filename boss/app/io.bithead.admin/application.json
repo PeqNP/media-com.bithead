@@ -3,18 +3,18 @@
         "version": "1.0.0"
     },
     "application": {
-        "bundleId": "io.bithead.boss",
-        "name": "Image Viewer",
+        "bundleId": "io.bithead.admin",
+        "name": "Admin",
         "version": "1.0.0",
-        "system": true,
         "icon": null,
-        "main": "ImageViewer",
+        "main": "Home",
         "author": "Eric Chamberlain",
         "copyright": "2025 Bithead LLC. All rights reserved.",
-        "quitAutomatically": true
+        "quitAutomatically": true,
+        "passive": true
     },
     "controllers": {
-        "ImageViewer": {
+        "Home": {
             "singleton": true
         }
     }

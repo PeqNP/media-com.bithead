@@ -31,6 +31,16 @@ function isString(value) {
 }
 
 /**
+ * Check if value is a dictionary.
+ *
+ * @param {mixed} value - value to test if dict
+ * @returns {bool} `true` if value is a dictionary
+ */
+function isDictionary(value) {
+    return Object.prototype.toString.call(value) === '[object Object]';
+}
+
+/**
  * Returns `true` if the value is `null` or `undefined`.
  *
  * @param {*} value - The value to check
@@ -44,6 +54,12 @@ function isEmpty(value, error) {
         return true;
     }
     if (isString(value) && value.trim() === "") {
+        if (error !== null && error !== undefined) {
+            console.log(error);
+        }
+        return true;
+    }
+    if (isDictionary(value) && Object.keys(value).length === 0) {
         if (error !== null && error !== undefined) {
             console.log(error);
         }

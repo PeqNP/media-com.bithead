@@ -53,7 +53,7 @@ function OS() {
 
         // Load installed apps
         try {
-            apps = await os.network.get("/boss/app/installed.json", "json");
+            apps = await os.network.get("/boss/app/installed.json");
             await os.openApplication("io.bithead.boss");
             loaded = true;
         }
@@ -213,7 +213,7 @@ function OS() {
     async function openApplication(bundleId, fn) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
-            // TODO: Switch to non-system application
+            // TODO: Switch app context, if non-passive
             return loadedApp;
         }
 
@@ -233,7 +233,7 @@ function OS() {
 
         let config;
         try {
-            config = await os.network.get(`/boss/app/${bundleId}/application.json`, "json");
+            config = await os.network.get(`/boss/app/${bundleId}/application.json`);
         }
         catch (error) {
             showError(`Failed to load application bundle (${bundleId}) configuration.`, error);
@@ -245,7 +245,7 @@ function OS() {
         if (config.application.main === "Application") {
             let html;
             try {
-                html = await os.network.get(`/boss/app/${bundleId}/controller/Application.html`, "text");
+                html = await os.network.get(`/boss/app/${bundleId}/controller/Application.html`, null, "text");
             }
             catch (error) {
                 showError(`Failed to load UIApplication for application bundle (${bundleId}).`, error);
@@ -280,6 +280,7 @@ function OS() {
                 app.applicationDidStart();
             }
             else {
+                // TODO: Only blur if application is not passive
                 if (!isEmpty(activeApplication)) {
                     activeApplication.applicationDidBlur();
                 }
@@ -287,6 +288,7 @@ function OS() {
                 activeApplication = app;
 
                 app.applicationDidStart();
+                // TODO: Only focus if application is not passive
                 app.applicationDidFocus();
             }
 
@@ -305,7 +307,7 @@ function OS() {
             showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
         }
 
-        // TODO: Switch application context if app is non-system
+        // TODO: Switch application context if app is not passive
 
         if (app.system) {
             app.applicationDidStart();
@@ -330,12 +332,40 @@ function OS() {
     }
     this.openApplication = openApplication;
 
+    // Tracks the state of closing apps. Sometimes multiple signals may be
+    // sent to close an application.
+    let closingApps = {};
+
     /**
      * Close an application.
      */
     function closeApplication(bundleId) {
-        // TODO: Remove `script` from document.body
+        let app = loadedApps[bundleId];
+        if (isEmpty(app)) {
+            console.warn(`Attempting to close application (${bundleId}) that is not loaded.`);
+            return;
+        }
+
+        // In the process of closing app
+        if (bundleId in closingApps) {
+            return;
+        }
+        closingApps[bundleId] = true;
+
+        // Some of these operations may need to be handled by `UIApplication`
+        // TODO: Remove application menu, if any
+        // TODO: If this is focused application, show empty desktop?
+        // Show a window with open applications to switch to?
+        // TODO: Remove `script` from document.body, if any
+        // TODO: Close any open windows owned by app
+        // Call application delegate methods
+
+        app.applicationDidStop();
+
+        delete closingApps[bundleId];
+        delete loadedApps[bundleId];
     }
+    this.closeApplication = closeApplication;
 
     /**
      * Switch to application context.
@@ -383,7 +413,7 @@ function OS() {
                     name = app.name;
                 }
                 else {
-                    name = `img:${app.icon},app.name`;
+                    name = `img:${app.icon},${app.name}`;
                 }
                 _apps.push({id: key, name: name});
             }
@@ -416,15 +446,18 @@ function Network(os) {
      * Note: Displays error message if request failed.
      *
      * @param {string} url
-     * @param {string} decoder - Response decoder. Supported: text | json
      * @param {function} fn(Result)? - Response function
+     * @param {string} decoder - Response decoder. Supported: text | json. Default is `json`
      * @param {string} msg? - Show progress bar with message
      * @throws
      */
-    async function get(url, decoder, msg) {
+    async function get(url, msg, decoder) {
         let progressBar = null;
         if (!isEmpty(msg)) {
             progressBar = await os.ui.showProgressBar(msg);
+        }
+        if (isEmpty(decoder)) {
+            decoder = "json";
         }
         return fetch(url, {
             method: "GET",
@@ -456,7 +489,7 @@ function Network(os) {
                         obj = JSON.parse(jsonString);
                     }
                     catch (error) {
-                        console.log("Attempting to decode JSON object that wasn't JSON");
+                        console.log("Attempting to decode JSON object that wasn't JSON.");
                     }
 
                     if (!isEmpty(obj?.error)) {

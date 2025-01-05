@@ -56,18 +56,6 @@ function UI(os) {
     }
     this.init = init;
 
-    /**
-     * Create a new instance of an application controller.
-     *
-     * The controller must be registered with the currently focused application.
-     * Otherwise, this raises an exception.
-     *
-     * @param {string} name - Name of controller
-     */
-    function makeController(name) {
-        // TODO: Make controller from current application bundle
-    }
-
     function addController(id, ctrl) {
         controllers[id] = ctrl;
     }
@@ -146,7 +134,7 @@ function UI(os) {
     function removeWindow(container) {
         let index = parseInt(container.style.zIndex) - WINDOW_START_ZINDEX;
         if (index < 0) {
-            console.error(`Window (${container.id}) does not appear to be a registered window`);
+            console.error(`Window (${container.ui.id}) does not appear to be a registered window`);
             return;
         }
         windowIndices.splice(index, 1);
@@ -631,6 +619,36 @@ function UIApplication(config) {
     // (Down)Loaded controllers
     let controllers = {};
 
+    // Visible windows object[windowId:UIController]
+    let launchedControllers = {};
+
+    function makeController(def, html) {
+        // Modals are above everything. Therefore, there is no way apps can
+        // be switched in this context w/o the window being closed first.
+        if (def.modal) {
+            return os.ui.makeModal(html);
+        }
+
+        let container = os.ui.makeWindow(html);
+
+        launchedControllers[container.ui.id] = container;
+
+        // Do not attach this to the controller:
+        // - This should not be accessible publicly
+        // - Avoids polluting (over-writing) user code
+        // - Controller is not shown at this point. Therefore, `UIController`
+        //   will be `undefined` at this point.
+        container.ui.viewDidUnload = function() {
+            delete launchedControllers[container.ui.id];
+
+            if (isEmpty(launchedControllers) && config.application.quitAutomatically === true) {
+                os.closeApplication(config.application.bundleId);
+            }
+        }
+
+        return container;
+    }
+
     /**
      * Load and return new instance of controller.
      *
@@ -651,18 +669,18 @@ function UIApplication(config) {
             throw new Error(`Controller (${name}) does not exist in application's (${config.application.bundleId}) controller list.`);
         }
 
+        let launched = launchedControllers[name];
+        if (!isEmpty(launched) && def.singleton) {
+            return launched;
+        }
+
         // FIXME: When loading controller from cache, the renderer may need to
         // be factord in.
 
         // Return cached controller
         let html = controllers[name];
         if (!isEmpty(html)) {
-            if (def.modal) {
-                return os.ui.makeModal(html);
-            }
-            else {
-                return os.ui.makeWindow(html);
-            }
+            return makeController(def, html);
         }
 
         if (!isEmpty(def.renderer) && def.renderer !== "html") {
@@ -674,7 +692,9 @@ function UIApplication(config) {
 
         // Download and cache controller
         try {
-            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, "text");
+            // FIXME: If renderer requires Object, this may need to change
+            // the decoder to JSON. For now, all controllers are HTML.
+            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, null, "text");
         }
         catch (error) {
             console.log(error);
@@ -683,12 +703,7 @@ function UIApplication(config) {
 
         controllers[name] = html;
 
-        if (def.modal) {
-            return os.ui.makeModal(html);
-        }
-        else {
-            return os.ui.makeWindow(html);
-        }
+        return makeController(def, html);
     }
     this.loadController = loadController;
 
@@ -720,6 +735,12 @@ function UIApplication(config) {
      * automatically.
      */
     function applicationDidStop() {
+        // Close all windows
+        // TODO: Not sure if this works
+        for (windowId in launchedControllers) {
+            launchedControllers[windowId].ui.close();
+        }
+
         if (!isEmpty(main?.applicationDidStop)) {
             main.applicationDidStop();
         }
@@ -778,6 +799,8 @@ function UIApplication(config) {
  * @param {HTMLElement} container - `.ui-window` container
  */
 function UIWindow(id, container, isModal) {
+
+    readOnly(this, "id", id);
 
     let controller = null;
 
@@ -863,7 +886,7 @@ function UIWindow(id, container, isModal) {
         desktop.appendChild(container);
 
         // Allow time for parsing. I'm honestly not sure this is required.
-        setTimeout(function() { init(false); } , 50);
+        init(false);
 
         // TODO: Allow the controller to load its view.
         // Typically used when providing server-side rendered window container.
@@ -898,6 +921,10 @@ function UIWindow(id, container, isModal) {
 
         if (!isModal) {
             os.ui.removeWindow(container);
+        }
+
+        if (!isEmpty(container?.ui.viewDidUnload)) {
+            container.ui.viewDidUnload();
         }
     }
     this.close = close;
