@@ -7,7 +7,7 @@
       }
       this.edit = edit;
 
-      function addUser() {
+      async function addUser() {
         let ctrl = await ${app}.loadController("User");
         ctrl.config();
       }

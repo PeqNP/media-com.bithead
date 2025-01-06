@@ -677,14 +677,14 @@ input[type=checkbox] {
   border: 1px solid #aaa;
 }
 
-/* This is the first option in select */
-.ui-menu-choices-label {
+/* The menu label. This is the first option in select. */
+.ui-menu-label {
   width: fit-content;
   padding: 2px 10px 2px 10px;
 }
-.popup-choices-label { }
+.popup-label { }
 
-.ui-menu-choices-label.popup-arrow-active {
+.ui-menu-label.popup-arrow-active {
   background-color: #000;
   color: #fff;
 }
@@ -697,7 +697,7 @@ input[type=checkbox] {
 }
 
 /* Point arrow down by default */
-.popup-choices-label:after {
+.popup-label:after {
   position: absolute;
   content: "";
   top: 10px;
@@ -707,15 +707,15 @@ input[type=checkbox] {
   border: 5px solid transparent;
   border-color: #000 transparent transparent transparent;
 }
-.disabled .popup-choices-label:after {
+.disabled .popup-label:after {
   border-color: #ddd transparent transparent transparent;
 }
 
-.popup-choices-label.popup-arrow-active:after {
+.popup-label.popup-arrow-active:after {
   border-color: transparent transparent #000 transparent;
   top: 5px;
 }
-.disabled .popup-choices-label.popup-arrow-active:after {
+.disabled .popup-label.popup-arrow-active:after {
   border-color: transparent transparent #aaa transparent;
 }
 
@@ -724,10 +724,10 @@ input[type=checkbox] {
 
 disabled .popup-choice,
 .popup-choice.disabled,
-.disabled .popup-choices-label {
+.disabled .popup-label {
   color: #ddd;
 }
-.popup-choice, .popup-choices-label {
+.popup-choice, .popup-label {
   background-color: #fff;
   color: #000;
   padding: 4px 8px;

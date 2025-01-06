@@ -75,9 +75,10 @@
 
           // `Delete` not available when creating user
           view.ui.button("delete").remove();
-          view.ui.select("file").ui.removeOption("Delete");
+          view.ui.select("file").ui.removeOption("delete");
 
           view.ui.input("email").value = user.email;
+          view.ui.input("full-name").value = user.fullName;
           view.ui.input("verified").checked = user.verified;
           view.ui.input("enabled").checked = user.enabled;
 
@@ -92,10 +93,10 @@
     <div class="ui-menu" style="width: 180px;">
       <select name="file">
         <option>File</option>
-        <option onclick="#(this.controller).save();">Save</option>
+        <option onclick="$(this.controller).save();">Save</option>
         <option class="group"></option>
-        <option onclick="#(this.controller).delete();">Delete</option>
-        <option onclick="#(this.controller).cancel();">Cancel</option>
+        <option onclick="$(this.controller).delete();" value="delete">Delete</option>
+        <option onclick="$(this.controller).cancel();">Cancel</option>
       </select>
     </div>
   </div>
@@ -103,12 +104,12 @@
   <div class="container">
     <div class="text-field add-margin">
       <label for="name">E-mail</label>
-      <input type="text" name="email" value="#(user.email)" autocomplete="new-password">
+      <input type="text" name="email" autocomplete="new-password">
     </div>
 
     <div class="text-field add-margin">
       <label for="full-name">Full name</label>
-      <input type="text" name="full-name" value="#(user.fullName)">
+      <input type="text" name="full-name">
     </div>
 
     <div class="checkbox-field add-margin">
@@ -136,9 +137,9 @@
     </fieldset>
 
     <div class="controls">
-      <button class="primary" onclick="#(this.controller).delete();" name="delete">Delete</button>
-      <button class="primary" onclick="#(this.controller).cancel();">Cancel</button>
-      <button class="default" onclick="#(this.controller).save();">Save</button>
+      <button class="primary" onclick="$(this.controller).delete();" name="delete">Delete</button>
+      <button class="primary" onclick="$(this.controller).cancel();">Cancel</button>
+      <button class="default" onclick="$(this.controller).save();">Save</button>
     </div>
   </div>
 </div>

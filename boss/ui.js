@@ -1086,7 +1086,7 @@ function closeMenuType(className) {
         container.classList.remove("popup-active");
         container.classList.add("popup-inactive");
         // Reset arrow
-        let choicesLabel = container.querySelector("." + className + "-choices-label");
+        let choicesLabel = container.querySelector("." + className + "-label");
         choicesLabel.classList.remove("popup-arrow-active");
     }
 }
@@ -1203,7 +1203,7 @@ function UIPopupMenu(select) {
     let node = select.parentNode;
 
     function updateSelectedOptionLabel() {
-        let label = select.parentNode.querySelector(".popup-choices-label");
+        let label = select.parentNode.querySelector(".popup-label");
         label.innerHTML = select.options[select.selectedIndex].innerHTML;
     }
 
@@ -1411,7 +1411,7 @@ function stylePopupMenus() {
 
         // Displays the selected option when the pop-up is inactive
         let choicesLabel = document.createElement("div");
-        choicesLabel.setAttribute("class", "popup-choices-label");
+        choicesLabel.setAttribute("class", "popup-label");
         // Display the selected default option
         choicesLabel.innerHTML = selectElement.options[selectElement.selectedIndex].innerHTML;
         container.appendChild(choicesLabel);
@@ -1473,6 +1473,52 @@ function stylePopupMenus() {
 }
 
 /**
+ * UI menu displayed in OS bar.
+ *
+ * @param {HTMLElement} select - The `select` backing store
+ * @param {HTMLElement} container - The menu container
+ */
+function UIMenu(select, container) {
+
+    /**
+     * Remove option from menu.
+     *
+     * @param {mixed} value - The value of the option to remove
+     */
+    function removeOption(value) {
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option.value == value) {
+                select.remove(i);
+                option.ui.remove();
+                break;
+            }
+        }
+    }
+    this.removeOption = removeOption;
+
+    /**
+     * Disable a menu option.
+     *
+     * @param {mixed} value - The value of the option to disable
+     */
+    function disableOption(value) {
+        // TODO: Not tested
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option.value == value) {
+                option.disabled = true;
+                if (!option.ui.classList.contains("disabled")) {
+                    option.ui.classList.add("disabled");
+                }
+                break;
+            }
+        }
+    }
+    this.disableOption = disableOption;
+}
+
+/**
  * Style menus displayed in the OS bar.
  */
 function styleOSMenus() {
@@ -1487,27 +1533,28 @@ function styleOSMenus() {
         container.setAttribute("class", "ui-menu-container popup-inactive");
         menus[i].appendChild(container);
 
-        // The first option is the label for the group of choicese. This will be removed upon selecting a choice.
-        let choicesLabel = document.createElement("div");
-        choicesLabel.setAttribute("class", "ui-menu-choices-label");
-        // FIXME: This _should_ always be the `0`th element
-        let label = selectElement.options[selectElement.selectedIndex].innerHTML;
+        selectElement.ui = new UIMenu(selectElement, container);
+
+        // The first option is the label for the menu
+        let menuLabel = document.createElement("div");
+        menuLabel.setAttribute("class", "ui-menu-label");
+        let label = selectElement.options[0].innerHTML;
         if (label.startsWith("img:")) {
             let img = document.createElement("img");
             img.src = label.split(":")[1];
-            choicesLabel.appendChild(img);
+            menuLabel.appendChild(img);
         }
         else {
-            choicesLabel.innerHTML = label;
+            menuLabel.innerHTML = label;
         }
-        container.appendChild(choicesLabel);
+        container.appendChild(menuLabel);
 
         // Container for all choices
         let choices = document.createElement("div");
         choices.setAttribute("class", "popup-choices");
 
         // Create choices
-        // NOTE: This skips the first choice, which is used as the label for the menu.
+        // NOTE: This skips the first choice (menu label)
         for (let j = 1; j < selectElement.length; j++) {
             let option = selectElement.options[j];
             if (option.classList.contains("group")) {
@@ -1537,6 +1584,7 @@ function styleOSMenus() {
                 }
             });
             choices.appendChild(choice);
+            option.ui = choice;
         }
         // Required to display border around options
         let subContainer = document.createElement("div");
@@ -1556,7 +1604,7 @@ function styleOSMenus() {
          * NOTE: Only the first div in the container should have the click
          * event associated to the toggle state.
          */
-        choicesLabel.addEventListener("click", function(e) {
+        menuLabel.addEventListener("click", function(e) {
             var container = this.parentNode; // ui-menu-container
             var isActive = container.classList.contains("popup-active");
             e.stopPropagation();
@@ -1633,8 +1681,7 @@ function UIImageViewer() {
 
 /** List Boxes **/
 
-function UIListBox(select) {
-    let container = select.parentNode.querySelector(".container");
+function UIListBox(select, container) {
 
     let delegate = null;
     function setDelegate(d) {
@@ -1888,7 +1935,7 @@ function styleListBox(list) {
     list.appendChild(container);
 
     let select = list.querySelector("select");
-    let box = new UIListBox(select);
+    let box = new UIListBox(select, container);
     select.ui = box;
 }
 
