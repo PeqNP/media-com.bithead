@@ -943,7 +943,18 @@ function UIWindow(id, container, isModal) {
     /** Helpers **/
 
     /**
-     * Returns the respective input HTMLElement given name.
+     * Returns `button` `HTMLElement` with given name.
+     *
+     * @param {string} name - Name of button element
+     * @returns HTMLElement?
+     */
+    function button(name) {
+        return container.querySelector(`button[name='${name}']`)
+    }
+    this.button = button;
+
+    /**
+     * Returns the respective `input` `HTMLElement` given name.
      *
      * @param {string} name - Name of input element
      * @returns HTMLElement?
@@ -953,6 +964,11 @@ function UIWindow(id, container, isModal) {
     }
     this.input = input;
 
+    /**
+     * Returns `select` `HTMLElement` with given name.
+     *
+     * @param {string} name - Name of select element
+     */
     function select(name) {
         return container.querySelector(`select[name='${name}']`)
     }

@@ -8,7 +8,8 @@
       this.edit = edit;
 
       function addUser() {
-        os.network.request(`/account/user`);
+        let ctrl = await ${app}.loadController("User");
+        ctrl.config();
       }
       this.addUser = addUser;
 
