@@ -1,15 +1,18 @@
 <div class="ui-window">
   <script type="text/javascript">
     function $(this.id)(view) {
-      function edit() {
-        let option = view.ui.select("users").ui.selectedOption();
-        os.network.request(`/account/user/${option.value}`);
+      async function edit() {
+        let ctrl = await $(app.controller).loadController("User");
+        let userId = view.ui.select("users").ui.selectedValue();
+        ctrl.ui.show(function (controller) {
+          controller.configure(userId);
+        });
       }
       this.edit = edit;
 
       async function addUser() {
-        let ctrl = await ${app.controller}.loadController("User");
-        ctrl.config();
+        let ctrl = await $(app.controller).loadController("User");
+        ctrl.ui.show();
       }
       this.addUser = addUser;
 

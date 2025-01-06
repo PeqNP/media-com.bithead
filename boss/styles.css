@@ -619,13 +619,19 @@ input[type=checkbox] {
   /* FIXME: It's possible to change the checkbox shape. It requires hiding the checkbox and drawing a new one using `before`. */
 }
 
-/* Pop-up Menu (select) */
+/* Pop-up & UI Menu (select) */
 
 /* The size of the `select` is expected to be 140px */
 .align-vertically {
   display: flex;
   gap: 165px;
   justify-content: flex-start;
+}
+
+/* Contains all `ui-menu`s for a respective application. */
+.ui-menus {
+  position: relative;
+  display: flex;
 }
 
 .ui-menu {

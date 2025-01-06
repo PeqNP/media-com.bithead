@@ -16,6 +16,9 @@
     "controllers": {
         "Home": {
             "singleton": true
+        },
+        "User": {
+            "singleton": true
         }
     }
 }

@@ -17,7 +17,7 @@ function Result(value) {
  * @returns {bool} `true` if async function
  */
 function isAsyncFunction(fn) {
-    return fn.constructor.name === "AsyncFunction";
+    return fn?.constructor.name === "AsyncFunction";
 }
 
 /**

@@ -414,12 +414,31 @@ function UI(os) {
     }
 
     /**
+     * Adds application menu to OS bar.
+     *
+     * The `menus` HTMLElement is expected to already have the class `ui-menus`.
+     * If it doesn't, it is added, and a warning is emitted.
+     *
+     * @param {string} id - Window ID
+     * @param {HTMLElement .ui-menus} menus - Container of all `ui-menu` elements
+     * @returns {HTMLElement} container for window elements
+     */
+    function addAppMenus(id, menus) {
+        menus.id = `app-ui-menus-${id}`;
+        if (!menus.classList.contains("ui-menus")) {
+            menus.classList.add("ui-menus");
+            console.warn(`Expected UIMenu container, in window (${id}), to have class 'ui-menus'.`);
+        }
+        addOSBarMenu(menus);
+    }
+
+    /**
      * Add a menu to the OS bar.
      */
     function addOSBarMenu(menu) {
         var p = document.getElementById("os-bar-menus");
         if (isEmpty(p)) {
-            console.error("The os-bar-menus is not in the document. Please make sure it is included and configured to be displayed.");
+            console.error("The OS Bar element, `os-bar-menus`, is not in DOM.");
             return;
         }
         p.appendChild(menu);
@@ -806,6 +825,15 @@ function UIApplication(config) {
  * FIXME: You may not close and re-open a window. The window is not
  * re-registered when shown subsequent times.
  *
+ * NOTE: A window controller will not be available until the window
+ * has been shown. The reason is, if the controller is added, but the window
+ * is never shown, controller will not unregister at the end of the `UIWindow`'s
+ * life-cycle. It's possible that this could be fixed if an unload delegate
+ * method existed. Also, the controller can't even be loaded until the view is
+ * added to the DOM.
+ *
+ * tl;dr to access the window's controller, first call `show()`.
+ *
  * @param {UI} ui - Instance of UI
  * @param {HTMLElement} container - `.ui-window` container
  */
@@ -814,6 +842,11 @@ function UIWindow(id, container, isModal) {
     readOnly(this, "id", id);
 
     let controller = null;
+
+    // Reference to the element that contains this window's `UIMenu`s that
+    // are showno in the OS bar. This is necessary when a window wishes to
+    // make changes to the menu after the view is loaded.
+    let menus = null;
 
     /**
      * Prepare the window for display, load controller source, etc.
@@ -824,17 +857,19 @@ function UIWindow(id, container, isModal) {
      *
      * @param {bool} isPreRendered - Window is already rendered to desktop and
      *      not managed by OS.
+     * @param {function?} fn - Callback function that will be called before view is loaded
      */
-    function init(isPreRendered) {
+    function init(isPreRendered, fn) {
         styleListBoxes(container);
 
-        // Add window controller if it exists.
+        // Add window controller, if it exists.
         if (typeof window[id] === 'function') {
             controller = new window[id](container);
             os.ui.addController(id, controller);
 
-            // This allows the window to be configured by consumer
-            container.controller = controller;
+            if (!isEmpty(fn)) {
+                fn(controller);
+            }
         }
 
         // TODO: Register embedded controllers
@@ -866,14 +901,11 @@ function UIWindow(id, container, isModal) {
         // There should only be one ui-menus
         let uiMenus = container.querySelector(".ui-menus");
         if (!isEmpty(uiMenus)) {
-            let menus = uiMenus.getElementsByClassName("ui-menu");
-            for (let i = 0; i < menus.length; i++) {
-                let menu = menus[i];
-                os.ui.addOSBarMenu(menu);
-            }
+            menus = os.ui.addAppMenus(id, uiMenus);
 
             // Remove menu declaration from window
-            uiMenus.parentNode.removeChild(uiMenus);
+            uiMenus.remove(); // Test
+            // uiMenus.parentNode.removeChild(uiMenus);
         }
 
         if (!isModal && !isPreRendered) {
@@ -889,15 +921,17 @@ function UIWindow(id, container, isModal) {
 
     /**
      * Show the window.
+     *
+     * @param {function} fn - The function to call directly before the view is loaded
      */
-    function show() {
+    function show(fn) {
         // NOTE: `container` must be added to DOM before controller can be
         // instantiated.
         let desktop = document.getElementById("desktop");
         desktop.appendChild(container);
 
         // Allow time for parsing. I'm honestly not sure this is required.
-        init(false);
+        init(false, fn);
 
         // TODO: Allow the controller to load its view.
         // Typically used when providing server-side rendered window container.
@@ -973,6 +1007,20 @@ function UIWindow(id, container, isModal) {
         return container.querySelector(`select[name='${name}']`)
     }
     this.select = select;
+
+    /**
+     * Returns the respective `UIMenu` element.
+     *
+     * @param {string} name - Name of `UIMenu` `select` element
+     * @returns {UIMenu}
+     */
+    function menu(name) {
+        let menu = menus?.querySelector(`select[name='${name}']`);
+        if (isEmpty(menu)) {
+            console.warn(`Failed to find UIMenu select with name (${name})`);
+        }
+        return menu.ui;
+    }
 
     /**
      * Returns the value of the input and displays error message if the value

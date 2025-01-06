@@ -98,38 +98,34 @@
         </div>
         <br/>
 
-        <div> <!-- Input -->
+        <div class="add-margin"> <!-- Input -->
           <input type="text" name="fullname" value="Test"><br/>
           <input type="password" name="password" value="Test"><br/>
           <label class="radio"><input type="radio" name="serialize" value="xml">XML</label><br/>
           <label class="radio"><input type="radio" name="serialize" value="json">JSON</label><br/>
           <label class="checkbox"><input type="checkbox" name="color" value="red">Red</label>
         </div>
-        <br/>
-        <br/>
 
         <!-- Shows all options at once in a table.
           `multiple` is added automatically, but prevents users from selecting multiple options. -->
-        <div class="ui-list-box" style="width: 200px;">
-          <select name="option">
-            <option value="opt1">Option 1</option>
-            <option value="opt2">Option 2</option>
-            <option value="opt3">Option 3</option>
-          </select>
-        </div>
-        <br/>
-        <br/>
+        <div style="display: flex; gap: 10px;" class="add-margin">
+          <div class="ui-list-box" style="width: 200px;">
+            <select name="option">
+              <option value="opt1">Option 1</option>
+              <option value="opt2">Option 2</option>
+              <option value="opt3">Option 3</option>
+            </select>
+          </div>
 
-        <!-- Add `multiple` if more than one option can be selected -->
-        <div class="ui-list-box" style="width: 200px;">
-          <select name="option" multiple>
-            <option value="opt1">Option 1</option>
-            <option value="opt2" disabled>Option 2</option>
-            <option value="opt3">Option 3</option>
-          </select>
+          <!-- Add `multiple` if more than one option can be selected -->
+          <div class="ui-list-box" style="width: 200px;">
+            <select name="option" multiple>
+              <option value="opt1">Option 1</option>
+              <option value="opt2" disabled>Option 2</option>
+              <option value="opt3">Option 3</option>
+            </select>
+          </div>
         </div>
-        <br/>
-        <br/>
 
         <!-- Active select box -->
         <div class="popup-menu" style="width: 160px;">
@@ -198,9 +194,6 @@
         <fieldset>
           <legend>Legend<legend>
         </fieldset>
-        <br/>
-        <br/>
-        <br/>
         <br/>
         <div class="little-controls">
           <button class="up"></button>

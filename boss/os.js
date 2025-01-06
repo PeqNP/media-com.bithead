@@ -175,6 +175,7 @@ function OS() {
         }
         return app;
     }
+    this.application = application;
 
     /**
      * Register applications available to BOSS.

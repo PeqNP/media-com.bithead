@@ -42,19 +42,19 @@
           enabled: enabled
         };
         os.network.post('/account/user', request, function() {
-          os.network.request('/admin/users');
+          view.ui.close();
         }, "Saving...");
       }
       this.save = save;
 
       function cancel() {
-        os.network.request('/admin/users');
+        view.ui.close();
       }
       this.cancel = cancel;
 
       function _delete() {
         os.network.delete(`/account/user/${user.id}`, "Are you sure you want to delete this user?", function(data) {
-          os.network.request('/admin/users');
+          view.ui.close();
         });
       }
       this.delete = _delete;
@@ -62,35 +62,36 @@
       function configure(_userId) {
         userId = _userId;
       }
+      this.configure = configure;
 
-      function viewDidLoad() {
+      async function viewDidLoad() {
         if (isEmpty(userId)) {
           console.log("Configuring form as new User");
           return;
         }
 
-        os.network.get(`/users/user/${userId}`, "Loading user", function(form) {
-          isNew = false;
-          user = form.user;
+        isNew = false;
 
-          // `Delete` not available when creating user
-          view.ui.button("delete").remove();
-          view.ui.select("file").ui.removeOption("delete");
+        let form = await os.network.get(`/account/user/${userId}`, "Loading user");
+        user = form.user;
 
-          view.ui.input("email").value = user.email;
-          view.ui.input("full-name").value = user.fullName;
-          view.ui.input("verified").checked = user.verified;
-          view.ui.input("enabled").checked = user.enabled;
+        // `Delete` not available when creating user
+        view.ui.button("delete").remove();
+        view.ui.menu("file-menu").removeOption("delete");
 
-          view.ui.input("email").focus();
-        });
+        view.ui.input("email").value = user.email;
+        view.ui.input("full-name").value = user.fullName;
+        view.ui.input("verified").checked = user.verified;
+        view.ui.input("enabled").checked = user.enabled;
+
+        view.ui.input("email").focus();
       }
       this.viewDidLoad = viewDidLoad;
     }
   </script>
   <div class="ui-menus">
     <div class="ui-menu" style="width: 180px;">
-      <select name="file">
+      <select name="file-menu">
         <option>File</option>
         <option onclick="$(this.controller).save();">Save</option>
         <option class="group"></option>
