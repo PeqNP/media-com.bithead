@@ -179,9 +179,10 @@ function UI(os) {
      *
      * An ID may be provided if the window is pre-rendered.
      *
+     * @param {string} bundleId - The application bundle ID
      * @param {string?} id - The ID of the window instance
      */
-    function makeWindowAttributes(id) {
+    function makeWindowAttributes(bundleId, id) {
         if (isEmpty(id)) {
             // FIXME: This assumes the object ID always exists.
             let objectId = makeObjectId();
@@ -193,7 +194,7 @@ function UI(os) {
                 // TODO: How do I get the app's information in this context?
                 // Attributes may need to be created in the `UIApplication` context.
                 resourcePath: "",
-                controller: null
+                controller: `os.application('${bundleId}')`
             },
             os: {
                 email: "bitheadRL AT proton.me",
@@ -248,11 +249,12 @@ function UI(os) {
      * - `OS` facilities to launch an application
      * - Create new windows from `UI.makeController(name:)`
      *
-     * @param {string} fragmentId: The `id` of the `fragment` in `document`.
-     * @returns Instance of `fragment` as a `UIWindow`
+     * @param {string} bundleId: App bundle ID creating window
+     * @param {string} html: Window HTML to render
+     * @returns `UIWindow`
      */
-    function makeWindow(html) {
-        const attr = makeWindowAttributes();
+    function makeWindow(bundleId, html) {
+        const attr = makeWindowAttributes(bundleId);
 
         let div = parseHTML(attr, html);
 
@@ -276,16 +278,12 @@ function UI(os) {
      * Modals are displayed above all other content. Elements behind the modal
      * may not be interacted with until the modal is dismissed.
      *
-     * To show a modal:
-     * ```javascript
-     * let modal = os.ui.makeModal("my-modal-fragment");
-     * modal.ui.show();
-     * ```
-     *
-     * @param {string} html - The HTML to display
+     * @param {string} bundleId: App bundle ID creating window
+     * @param {string} html: Modal HTML to render
+     * @returns `UIWindow`
      */
-    function makeModal(html) {
-        const attr = makeWindowAttributes();
+    function makeModal(bundleId, html) {
+        const attr = makeWindowAttributes(bundleId);
 
         let div = parseHTML(attr, html);
 
@@ -310,11 +308,13 @@ function UI(os) {
      * Designed only to be used for pre-rendered pages. Modals should be
      * loaded from an application's respective controller registry.
      *
+     * @param {string} bundleId: App bundle ID creating window
      * @param {string} fragmentId - The id of the HTML fragment
+     * @returns `UIWindow`
      */
-    function makeModalFromFragment(fragmentId) {
+    function makeModalFromFragment(bundleId, fragmentId) {
         let fragment = document.getElementById(fragmentId);
-        return makeModal(fragment.innerHTML);
+        return makeModal(bundleId, fragment.innerHTML);
     }
 
     /**
@@ -634,10 +634,10 @@ function UIApplication(config) {
         // Modals are above everything. Therefore, there is no way apps can
         // be switched in this context w/o the window being closed first.
         if (def.modal) {
-            return os.ui.makeModal(html);
+            return os.ui.makeModal(config.application.bundleId, html);
         }
 
-        let container = os.ui.makeWindow(html);
+        let container = os.ui.makeWindow(config.application.bundleId, html);
 
         launchedControllers[container.ui.id] = container;
 

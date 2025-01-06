@@ -8,7 +8,7 @@
       this.edit = edit;
 
       async function addUser() {
-        let ctrl = await ${app}.loadController("User");
+        let ctrl = await ${app.controller}.loadController("User");
         ctrl.config();
       }
       this.addUser = addUser;

@@ -163,6 +163,20 @@ function OS() {
     this.copyToClipboard = copyToClipboard;
 
     /**
+     * Returns bundle ID's application instance.
+     *
+     * @returns UIApplication?
+     */
+    function application(bundleId) {
+        let app = loadedApps[bundleId];
+        if (isEmpty(app)) {
+            console.error(`Application (${bundleId}) is not loaded.`);
+            return null;
+        }
+        return app;
+    }
+
+    /**
      * Register applications available to BOSS.
      *
      * This is designed to display apps that a user has access to. This
