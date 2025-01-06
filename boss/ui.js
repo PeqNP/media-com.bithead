@@ -169,6 +169,11 @@ function UI(os) {
     }
     this.focusWindow = focusWindow;
 
+    function makeWindowId() {
+        let objectId = makeObjectId();
+        return `Window_${objectId}`;
+    }
+
     /**
      * Create window attributes.
      *
@@ -185,8 +190,7 @@ function UI(os) {
     function makeWindowAttributes(bundleId, id) {
         if (isEmpty(id)) {
             // FIXME: This assumes the object ID always exists.
-            let objectId = makeObjectId();
-            id = `Window_${objectId}`;
+            id = makeWindowId();
         }
 
         const attr = {
@@ -365,6 +369,10 @@ function UI(os) {
         // Register window for life-cycle events if it has a controller
         let id = win.getAttribute("id");
 
+        if (isEmpty(id)) {
+            console.error("Pre-rendered windows must have an ID");
+        }
+
         // When windows are pre-rendered, `show` is not called. Therefore, parts
         // of the view life-cycle methods must be managed here.
         win.ui = new UIWindow(id, win, false);
@@ -414,26 +422,7 @@ function UI(os) {
     }
 
     /**
-     * Adds application menu to OS bar.
-     *
-     * The `menus` HTMLElement is expected to already have the class `ui-menus`.
-     * If it doesn't, it is added, and a warning is emitted.
-     *
-     * @param {string} id - Window ID
-     * @param {HTMLElement .ui-menus} menus - Container of all `ui-menu` elements
-     * @returns {HTMLElement} container for window elements
-     */
-    function addAppMenus(id, menus) {
-        menus.id = `app-ui-menus-${id}`;
-        if (!menus.classList.contains("ui-menus")) {
-            menus.classList.add("ui-menus");
-            console.warn(`Expected UIMenu container, in window (${id}), to have class 'ui-menus'.`);
-        }
-        addOSBarMenu(menus);
-    }
-
-    /**
-     * Add a menu to the OS bar.
+     * Add single, or multiple, menus in the OS bar.
      */
     function addOSBarMenu(menu) {
         var p = document.getElementById("os-bar-menus");
@@ -901,11 +890,12 @@ function UIWindow(id, container, isModal) {
         // There should only be one ui-menus
         let uiMenus = container.querySelector(".ui-menus");
         if (!isEmpty(uiMenus)) {
-            menus = os.ui.addAppMenus(id, uiMenus);
-
             // Remove menu declaration from window
-            uiMenus.remove(); // Test
-            // uiMenus.parentNode.removeChild(uiMenus);
+            uiMenus.remove();
+
+            menus = uiMenus;
+            menus.id = `app-ui-menus-${id}`;
+            os.ui.addOSBarMenu(menus);
         }
 
         if (!isModal && !isPreRendered) {
@@ -1018,9 +1008,11 @@ function UIWindow(id, container, isModal) {
         let menu = menus?.querySelector(`select[name='${name}']`);
         if (isEmpty(menu)) {
             console.warn(`Failed to find UIMenu select with name (${name})`);
+            return null;
         }
         return menu.ui;
     }
+    this.menu = menu;
 
     /**
      * Returns the value of the input and displays error message if the value

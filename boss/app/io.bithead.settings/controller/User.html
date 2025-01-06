@@ -67,6 +67,11 @@
       async function viewDidLoad() {
         if (isEmpty(userId)) {
           console.log("Configuring form as new User");
+
+          // `Delete` not available when creating user
+          view.ui.button("delete").remove();
+          view.ui.menu("file-menu").removeOption("delete");
+
           return;
         }
 
@@ -74,10 +79,6 @@
 
         let form = await os.network.get(`/account/user/${userId}`, "Loading user");
         user = form.user;
-
-        // `Delete` not available when creating user
-        view.ui.button("delete").remove();
-        view.ui.menu("file-menu").removeOption("delete");
 
         view.ui.input("email").value = user.email;
         view.ui.input("full-name").value = user.fullName;
