@@ -3,8 +3,8 @@
         "version": "1.0.0"
     },
     "application": {
-        "bundleId": "io.bithead.admin",
-        "name": "Admin",
+        "bundleId": "io.bithead.settings",
+        "name": "Settings",
         "version": "1.0.0",
         "icon": null,
         "main": "Home",

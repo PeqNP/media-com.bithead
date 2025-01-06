@@ -486,7 +486,7 @@ function Network(os) {
                 if (decoder === "text" && data.startsWith("{")) {
                     let obj = null;
                     try {
-                        obj = JSON.parse(jsonString);
+                        obj = JSON.parse(data);
                     }
                     catch (error) {
                         console.log("Attempting to decode JSON object that wasn't JSON.");

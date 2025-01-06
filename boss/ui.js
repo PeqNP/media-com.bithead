@@ -427,6 +427,14 @@ function UI(os) {
     this.addOSBarMenu = addOSBarMenu
 
     /**
+     * Shows the user settings application.
+     */
+    async function openSettings() {
+        await os.openApplication("io.bithead.settings");
+    }
+    this.openSettings = openSettings;
+
+    /**
      * Show Bithead OS About menu.
      *
      * FIXME: This needs to use the latest patterns to instantiate, show,
@@ -639,6 +647,9 @@ function UIApplication(config) {
         // - Controller is not shown at this point. Therefore, `UIController`
         //   will be `undefined` at this point.
         container.ui.viewDidUnload = function() {
+            // Order matters. This prevents circular loop if last visible
+            // controller and app needs to be shut down. When an app is
+            // shut down, all windows are closed.
             delete launchedControllers[container.ui.id];
 
             if (isEmpty(launchedControllers) && config.application.quitAutomatically === true) {

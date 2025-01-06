@@ -18,7 +18,7 @@
       this.close = close;
 
       async function viewDidLoad() {
-        let response = await os.network.get(`/admin/users`, "Loading users...");
+        let response = await os.network.get(`/account/users`, "Loading users...");
         view.ui.select("users").ui.addNewOptions(response.users);
       }
       this.viewDidLoad = viewDidLoad;
@@ -36,7 +36,7 @@
   </div>
   <div class="top">
     <div class="close-button"></div>
-    <div class="title"><span>Admin</span></div>
+    <div class="title"><span>Settings</span></div>
     <div class="zoom-button"></div>
   </div>
   <div class="container">
