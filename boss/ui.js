@@ -45,9 +45,11 @@ function UI(os) {
 
     function init() {
         // TODO: Some of these should go away and be performed only in `makeWindow`.
-        styleOSMenus();
         stylePopupMenus();
         styleFolders();
+
+        // Style hard-coded system menus
+        styleUIMenus(document.getElementById("os-bar"));
 
         /**
          * Close all menus when user clicks outside of `select`.
@@ -124,7 +126,6 @@ function UI(os) {
 
         windowIndices.push(container);
     }
-    this.addWindow = addWindow;
 
     /**
      * Unregister a window container.
@@ -132,9 +133,12 @@ function UI(os) {
      * @param {HTMLElement} container - The window's container
      */
     function removeWindow(container) {
+        if (isEmpty(container.style.zIndex)) {
+            return; // New window
+        }
         let index = parseInt(container.style.zIndex) - WINDOW_START_ZINDEX;
         if (index < 0) {
-            console.error(`Window (${container.ui.id}) does not appear to be a registered window`);
+            console.warn(`Invalid zIndex (${container.style.zIndex}) on container (${container.id})`);
             return;
         }
         windowIndices.splice(index, 1);
@@ -164,10 +168,34 @@ function UI(os) {
             return;
         }
 
+        let topWindow = windowIndices[windowIndices.length - 1];
+
+        if (!isEmpty(topWindow)) {
+            topWindow.ui.didBlurWindow();
+        }
+
         removeWindow(container);
         addWindow(container);
+
+        container.ui.didFocusWindow();
     }
     this.focusWindow = focusWindow;
+
+    /**
+     * Focus the top-most window in the window index.
+     *
+     * This is called directly after a window is removed.
+     */
+    function focusTopWindow() {
+        // No windows to focus
+        if (windowIndices.length === 0) {
+            return;
+        }
+
+        let topWindow = windowIndices[windowIndices.length - 1];
+        topWindow.ui.didFocusWindow();
+    }
+    this.focusTopWindow = focusTopWindow;
 
     function makeWindowId() {
         let objectId = makeObjectId();
@@ -773,7 +801,6 @@ function UIApplication(config) {
      *
      */
 
-
     /**
      * Application became the focused application.
      *
@@ -850,6 +877,7 @@ function UIWindow(id, container, isModal) {
      */
     function init(isPreRendered, fn) {
         styleListBoxes(container);
+        styleUIMenus(container);
 
         // Add window controller, if it exists.
         if (typeof window[id] === 'function') {
@@ -880,11 +908,20 @@ function UIWindow(id, container, isModal) {
                 });
             }
 
+            // NOTE: didViewBlur signal is triggered via focusWindow >
+            // didBlurWindow > controller?.didViewBlur
+
             // Register window drag event
             container.querySelector(".top").onmousedown = function(e) {
                 os.ui.focusWindow(container);
                 os.ui.dragWindow(container);
             };
+        }
+        else if (isPreRendered) {
+            // Allows co-existence of pre-rendered windows with OS managed windows.
+            // The pre-rendered window will still show blurred state, etc.
+            // This also ensures the correct menus are displayed.
+            os.ui.focusWindow(container);
         }
 
         // There should only be one ui-menus
@@ -894,13 +931,12 @@ function UIWindow(id, container, isModal) {
             uiMenus.remove();
 
             menus = uiMenus;
-            menus.id = `app-ui-menus-${id}`;
             os.ui.addOSBarMenu(menus);
         }
 
         if (!isModal && !isPreRendered) {
             // Prepare window to be displayed -- assigns z-index.
-            os.ui.addWindow(container);
+            os.ui.focusWindow(container);
         }
 
         if (!isEmpty(controller?.viewDidLoad)) {
@@ -951,11 +987,14 @@ function UIWindow(id, container, isModal) {
 
         os.ui.removeController(id);
 
+        menus?.remove();
+
         let desktop = document.getElementById("desktop");
         desktop.removeChild(container);
 
         if (!isModal) {
             os.ui.removeWindow(container);
+            os.ui.focusTopWindow();
         }
 
         if (!isEmpty(container?.ui.viewDidUnload)) {
@@ -963,6 +1002,32 @@ function UIWindow(id, container, isModal) {
         }
     }
     this.close = close;
+
+    function didFocusWindow() {
+        // TODO: Remove `blurred` class from container
+
+        if (!isEmpty(menus)) {
+            menus.style.display = "block";
+        }
+
+        if (!isEmpty(controller?.viewDidFocus)) {
+            controller.viewDidFocus();
+        }
+    }
+    this.didFocusWindow = didFocusWindow;
+
+    function didBlurWindow() {
+        // TODO: Add `blurred` class from container
+
+        if (!isEmpty(controller?.viewDidBlur)) {
+            controller.viewDidBlur();
+        }
+
+        if (!isEmpty(menus)) {
+            menus.style.display = "none";
+        }
+    }
+    this.didBlurWindow = didBlurWindow;
 
     /** Helpers **/
 
@@ -1561,9 +1626,9 @@ function UIMenu(select, container) {
 /**
  * Style menus displayed in the OS bar.
  */
-function styleOSMenus() {
+function styleUIMenus(target) {
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
-    let menus = document.getElementsByClassName("ui-menu");
+    let menus = target.getElementsByClassName("ui-menu");
     for (let i = 0; i < menus.length; i++) {
         let selectElement = menus[i].getElementsByTagName("select")[0];
 
