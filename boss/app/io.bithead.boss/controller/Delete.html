@@ -8,8 +8,8 @@
       /**
        * Configure with Cancel and OK button actions.
        *
-       * @param {async function} c_fn - Cancel fn
-       * @param {async function} o_fn - OK fn
+       * @param {async function?} c_fn - Cancel fn
+       * @param {async function?} o_fn - OK fn
        */
       function configure(c_fn, o_fn) {
         cancel_fn = c_fn;
@@ -18,7 +18,7 @@
       this.configure = configure;
 
       async function cancel() {
-        if (!isEmpty(cancel)) {
+        if (!isEmpty(cancel_fn)) {
           await cancel_fn();
         }
         view.ui.close();

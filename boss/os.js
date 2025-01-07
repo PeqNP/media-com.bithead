@@ -6,7 +6,7 @@
  * Provides system-level features
  * - Access to UI API
  * - Access to Network API
- * - Signing in and out
+ * - Logging in and out
  * - Clock
  */
 function OS() {
@@ -67,7 +67,7 @@ function OS() {
      * Log user out of system.
      */
     function logOut() {
-        os.ui.showDeleteModal("Are you sure you want to log out?", null, function() {
+        os.ui.showDeleteModal("Are you sure you want to log out?", null, async function() {
             os.network.redirect('/account/signout');
         });
     }

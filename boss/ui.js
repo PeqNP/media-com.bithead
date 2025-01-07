@@ -522,17 +522,18 @@ function UI(os) {
      * @throws
      */
     async function showDeleteModal(msg, cancel, ok) {
-        if (!isAsyncFunction(cancel)) {
+        if (!isEmpty(cancel) && !isAsyncFunction(cancel)) {
             throw new Error(`Cancel function for msg (${msg}) is not async function`);
         }
-        if (!isAsyncFunction(ok)) {
+        if (!isEmpty(ok) && !isAsyncFunction(ok)) {
             throw new Error(`OK function for msg (${msg}) is not async function`);
         }
         let app = await os.openApplication("io.bithead.boss");
         let modal = await app.loadController("Delete");
         modal.querySelector("p.message").innerHTML = msg;
-        modal.controller.configure(cancel, ok);
-        modal.ui.show();
+        modal.ui.show(function(controller) {
+            controller.configure(cancel, ok);
+        });
     }
     this.showDeleteModal = showDeleteModal;
 
@@ -1632,6 +1633,11 @@ function UIMenu(select, container) {
  * Style menus displayed in the OS bar.
  */
 function styleUIMenus(target) {
+    if (isEmpty(target)) {
+        console.warn("Attempting to style UI menus in null target.");
+        return;
+    }
+
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
     let menus = target.getElementsByClassName("ui-menu");
     for (let i = 0; i < menus.length; i++) {

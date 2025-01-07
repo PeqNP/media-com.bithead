@@ -223,7 +223,10 @@ body {
   flex-shrink: 0;
   color: #000;
 }
-#desktop .ui-window.blurred .top {
+/* The `blurred` state is placed on the container for OS managed windows.
+ * It's applied directly to the .ui-window for pre-rendered windows. */
+#desktop .ui-window.blurred .top,
+#desktop .blurred > .ui-window .top {
   background-image: none;
   color: #a5a5a5;
 }
