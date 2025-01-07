@@ -1007,7 +1007,8 @@ function UIWindow(id, container, isModal) {
         // TODO: Remove `blurred` class from container
 
         if (!isEmpty(menus)) {
-            menus.style.display = "block";
+            // NOTE: Setting this to `block` aligns items vertically.
+            menus.style.display = null;
         }
 
         if (!isEmpty(controller?.viewDidFocus)) {
