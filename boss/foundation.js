@@ -118,6 +118,66 @@ function property(obj, name, get, set) {
 }
 
 /**
+ * Defines a delegate method.
+ *
+ * @param {string} name - Name of method
+ * @param {bool} required - If `true`, enforces method to be implemented
+ */
+function DelegateMethod(name, required) {
+    return {
+        name: name,
+        required: required
+    }
+}
+
+/**
+ * Define a set of methods that must exist on a delegate.
+ *
+ * Delegate methods may be a list of `string`s or `DelegateMethod`s. For
+ * convenience, this will transform `string` methods into optional
+ * `DelegateMethod`s.
+ *
+ * @param {object} obj - Object to assign property
+ * @param {string} name - Name of public property
+ * @param {[DelegateMethod]} methods - Delegate methods.
+ * @param {function} get - The getter function
+ * @param {function} set - The setter function
+ * @throws if a required protocol method is not implemented
+ */
+function protocol(name, obj, prop_name, _methods, get, set) {
+    let methods = [];
+    let methodNames = [];
+    for (let i = 0; i < _methods.length; i++) {
+        let method = _methods[i];
+        if (typeof method === "string") {
+            methods.push(DelegateMethod(method, false));
+            methodNames.push(method);
+        }
+        else {
+            methods.push(method);
+            methodNames.push(method.name);
+        }
+    }
+    property(obj, prop_name, get, function(value) {
+        // Check delegate methods
+        let implemented = Object.keys(value);
+        for (let i = 0; i < implemented.length; i++) {
+            let method = implemented[i];
+            if (!methodNames.includes(method)) {
+                console.warn(`Protocol (${name}) does not contain method (${method})`);
+            }
+        }
+        for (let i = 0; i < methods.length; i++) {
+            let method = methods[i];
+            if (method.required && !implemented.includes(method)) {
+                throw new Error(`Protocol (${name}) requires method (${method}) to be implemented`);
+            }
+        }
+        set(value);
+    });
+}
+
+/**
  * Call function, if it exists.
  *
  * This is a convenience method. It was designed for delegate callbacks.

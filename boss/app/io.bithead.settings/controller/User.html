@@ -9,13 +9,10 @@
       // Loaded user
       let user;
 
-      // Delegate
-      // - didSaveUser
-      // - didCancelUser
-      // - didDeleteUser
       let delegate;
-      property(
-        this, "delegate",
+      protocol(
+        "UserDelegate", this, "delegate",
+        ["didSaveUser", "didCancelUser", "didDeleteUser"],
         function() {
           return delegate;
         },
