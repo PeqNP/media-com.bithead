@@ -287,7 +287,7 @@ function OS() {
 
             let sc = document.createElement("script");
             sc.setAttribute("type", "text/javascript");
-            let inline = document.createTextNode(script.innerHTML);
+            let inline = document.createTextNode(script.innerHTML + `\n//@ sourceURL=/application/${bundleId}`);
             sc.appendChild(inline);
             document.head.appendChild(sc);
 
