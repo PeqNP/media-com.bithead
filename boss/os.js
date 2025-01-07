@@ -484,10 +484,15 @@ function Network(os) {
             cache: "no-cache"
         })
             .then(response => {
-                if (!response.ok) {
+                // TODO: Test this
+                if (response.redirected) {
+                    redirect(response.url);
+                    return;
+                }
+                else if (!response.ok) {
                     throw new Error(`GET request (${url}) unexpectedly failed`);
                 }
-                if (decoder === "json") {
+                else if (decoder === "json") {
                     return response.json();
                 }
                 else {

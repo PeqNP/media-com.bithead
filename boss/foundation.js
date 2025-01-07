@@ -83,7 +83,7 @@ function generateUUID() {
  * Define a read-only function on an object.
  *
  * @param {object} obj - Object that will contain the property to be read-only
- * @param {name} name - Name of property that will be read-only
+ * @param {string} name - Name of property that will be read-only
  * @param {any} value - The value of the read-only property
  */
 function readOnly(obj, name, value) {
@@ -93,6 +93,41 @@ function readOnly(obj, name, value) {
         enumerable: true, // Allow it to be enumerated
         configurable: false // Do not allow property to be redefined
     });
+}
+
+/**
+ * Define a property on an object.
+ *
+ * This is designed to encapsulate a local variable and expose it as
+ * a computed property on `obj`.
+ *
+ * This was primarily designed to support delegation.
+ *
+ * @param {object} obj - Object to assign property
+ * @param {string} name - Name of public property
+ * @param {function} get - The getter function
+ * @param {function} set - The setter function
+ */
+function property(obj, name, get, set) {
+    Object.defineProperty(obj, name, {
+        get: get,
+        set: set,
+        configurable: false,
+        enumerable: true
+    });
+}
+
+/**
+ * Call function, if it exists.
+ *
+ * This is a convenience method. It was designed for delegate callbacks.
+ *
+ * @param {function} fn - Call fn, if it has been set
+ */
+function call(fn) {
+    if (!isEmpty(fn)) {
+        fn();
+    }
 }
 
 /**
