@@ -1004,7 +1004,9 @@ function UIWindow(id, container, isModal) {
     this.close = close;
 
     function didFocusWindow() {
-        // TODO: Remove `blurred` class from container
+        if (container.classList.contains("blurred")) {
+            container.classList.remove("blurred");
+        }
 
         if (!isEmpty(menus)) {
             // NOTE: Setting this to `block` aligns items vertically.
@@ -1018,7 +1020,9 @@ function UIWindow(id, container, isModal) {
     this.didFocusWindow = didFocusWindow;
 
     function didBlurWindow() {
-        // TODO: Add `blurred` class from container
+        if (!container.classList.contains("blurred")) {
+            container.classList.add("blurred");
+        }
 
         if (!isEmpty(controller?.viewDidBlur)) {
             controller.viewDidBlur();

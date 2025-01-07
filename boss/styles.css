@@ -221,6 +221,11 @@ body {
   background-size: auto 38px;
   background-repeat: repeat-x;
   flex-shrink: 0;
+  color: #000;
+}
+#desktop .ui-window.blurred .top {
+  background-image: none;
+  color: #a5a5a5;
 }
 
 #desktop .ui-window .close-button {
