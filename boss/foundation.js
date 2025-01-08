@@ -131,20 +131,32 @@ function DelegateMethod(name, required) {
 }
 
 /**
+ * Provides protocol abstraction layer for a protocol's methods.
+ *
+ * NOTE: This is fully managed by `protocol` method.
+ */
+function Protocol() { }
+
+/**
  * Define a set of methods that must exist on a delegate.
  *
  * Delegate methods may be a list of `string`s or `DelegateMethod`s. For
  * convenience, this will transform `string` methods into optional
  * `DelegateMethod`s.
  *
- * @param {object} obj - Object to assign property
- * @param {string} name - Name of public property
+ * When an Object requests to be a delegate, they should NOT pass in
+ * `this`. JavaScript scoping prevents this from working. Instead, a
+ * new Object must be provided which implements only the methods defined
+ * by the protocol.
+ *
+ * @param {string} name - Name of protocol
+ * @param {string} obj - Object to assign public property to
+ * @param {string} prop_name - Name of public property
  * @param {[DelegateMethod]} methods - Delegate methods.
- * @param {function} get - The getter function
- * @param {function} set - The setter function
+ * @returns Protocol
  * @throws if a required protocol method is not implemented
  */
-function protocol(name, obj, prop_name, _methods, get, set) {
+function protocol(name, obj, prop_name, _methods) {
     let methods = [];
     let methodNames = [];
     for (let i = 0; i < _methods.length; i++) {
@@ -158,23 +170,42 @@ function protocol(name, obj, prop_name, _methods, get, set) {
             methodNames.push(method.name);
         }
     }
-    property(obj, prop_name, get, function(value) {
-        // Check delegate methods
-        let implemented = Object.keys(value);
-        for (let i = 0; i < implemented.length; i++) {
-            let method = implemented[i];
-            if (!methodNames.includes(method)) {
-                console.warn(`Protocol (${name}) does not contain method (${method})`);
+
+    // Instance of object implementing protocol
+    let instance;
+    let proto = new Protocol();
+
+    property(
+        obj, prop_name,
+        function() {
+            // FIXME: Is this even needed?
+            return instance;
+        },
+        function(value) {
+            // Wrap and validate implemented methods
+            let implemented = Object.keys(value);
+            for (let i = 0; i < implemented.length; i++) {
+                let method = implemented[i];
+                if (!methodNames.includes(method)) {
+                    throw new Error(`Protocol (${name}) does not contain method (${method})`);
+                }
+                proto[method] = function() {
+                    value[method]();
+                }
             }
-        }
-        for (let i = 0; i < methods.length; i++) {
-            let method = methods[i];
-            if (method.required && !implemented.includes(method)) {
-                throw new Error(`Protocol (${name}) requires method (${method}) to be implemented`);
+
+            // Ensure required methods are implemented
+            for (let i = 0; i < methods.length; i++) {
+                let method = methods[i];
+                if (method.required && !implemented.includes(method)) {
+                    throw new Error(`Protocol (${name}) requires method (${method}) to be implemented`);
+                }
             }
+            instance = value;
         }
-        set(value);
-    });
+    );
+
+    return proto;
 }
 
 /**

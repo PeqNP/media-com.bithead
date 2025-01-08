@@ -367,11 +367,15 @@ function OS() {
         }
         closingApps[bundleId] = true;
 
+        // Do this first. I want to see if this removes the dyanmically loaded script
+        // from the debugger. It's a PITA to see all of the apps, even if it is reloaded,
+        // in the debug view.
+        // TODO: Remove `script` from document.body, if any
+
         // Some of these operations may need to be handled by `UIApplication`
         // TODO: Remove application menu, if any
         // TODO: If this is focused application, show empty desktop?
         // Show a window with open applications to switch to?
-        // TODO: Remove `script` from document.body, if any
         // TODO: Close any open windows owned by app
         // Call application delegate methods
 
