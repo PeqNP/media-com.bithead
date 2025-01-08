@@ -488,7 +488,6 @@ function Network(os) {
             cache: "no-cache"
         })
             .then(response => {
-                // TODO: Test this
                 if (response.redirected) {
                     redirect(response.url);
                     return;
@@ -569,7 +568,11 @@ function Network(os) {
             body: body
         })
             .then(response => {
-                if (!response.ok) {
+                if (response.redirected) {
+                    redirect(response.url);
+                    return;
+                }
+                else if (!response.ok) {
                     throw new Error("Request unexpectedly failed");
                 }
                 return response.json();
@@ -620,14 +623,18 @@ function Network(os) {
             body: formData
         })
             .then(response => {
-                if (!response.ok) {
+                if (response.redirected) {
+                    redirect(response.url);
+                    return;
+                }
+                else if (!response.ok) {
                     throw new Error("Request unexpectedly failed");
                 }
                 return response.json();
             })
             .then(data => {
-                // If there is an `error` struct, the response is considered to be in error
-                if (data.error !== undefined) {
+                // If there is an `error` struct, the response is in error
+                if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
                 }
                 return data;
@@ -654,7 +661,11 @@ function Network(os) {
             method: "DELETE"
         })
             .then(response => {
-                if (!response.ok) {
+                if (response.redirected) {
+                    redirect(response.url);
+                    return;
+                }
+                else if (!response.ok) {
                     throw new Error("Request unexpectedly failed");
                 }
                 return response.json();
@@ -732,7 +743,11 @@ function Network(os) {
             body: body
         })
             .then(response => {
-                if (!response.ok) {
+                if (response.redirected) {
+                    redirect(response.url);
+                    return;
+                }
+                else if (!response.ok) {
                     throw new Error("Request unexpectedly failed");
                 }
                 return response.json();
