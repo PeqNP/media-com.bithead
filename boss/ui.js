@@ -815,6 +815,7 @@ function UIApplication(id, config) {
     function controller() {
         return main;
     }
+    this.controller = controller;
 
     function makeController(def, html) {
         // Modals are above everything. Therefore, there is no way apps can
