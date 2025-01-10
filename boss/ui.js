@@ -793,8 +793,8 @@ function UIApplication(id, config) {
     readOnly(this, "bundleId", config.application.bundleId);
     readOnly(this, "icon", config.application.icon);
     readOnly(this, "name", config.application.name);
-    readOnly(this, "passive", config.application.passive);
-    readOnly(this, "system", config.application.system);
+    readOnly(this, "passive", isEmpty(config.application.passive) ? false : config.application.passive);
+    readOnly(this, "system", isEmpty(config.application.system) ? false : config.application.system);
     readOnly(this, "version", config.application.version);
 
     // Application function

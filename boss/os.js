@@ -326,11 +326,18 @@ function OS() {
             menus.id = app.menuId;
             let menu = document.createElement("div");
             menu.classList.add("ui-menu");
+            menu.style.width = "180px";
             let select = document.createElement("select");
+            let title = document.createElement("option");
+            title.innerHTML = config.application.name;
+            select.appendChild(title);
             let option = document.createElement("option");
-            // TODO: Add Command + Q in future to the right
+            // TODO: Add Command + Q in future
             option.innerHTML = `Quit ${config.application.name}`;
+            option.setAttribute("onclick", `os.closeApplication('${bundleId}');`);
             select.appendChild(option);
+            menu.appendChild(select);
+            menus.appendChild(menu);
             os.ui.styleUIMenus(menus);
             os.ui.addOSBarMenu(menus);
         }
@@ -419,7 +426,6 @@ function OS() {
 
         // TODO: If this is focused application, show empty desktop?
         // Show a window that lists all open applications to switch to?
-        // TODO: Close any open windows owned by app
 
         let script = document.getElementById(app.scriptId);
         if (!isEmpty(script)) {
