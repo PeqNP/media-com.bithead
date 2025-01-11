@@ -230,6 +230,12 @@ function OS() {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
             // TODO: Switch app context, if not passive
+
+            // Load/focus on the app's main controller
+            if (!loadedApp.system && loadedApp.main != "Application") {
+                let ctrl = await loadedApp.loadController(loadedApp.main);
+                ctrl.ui.show();
+            }
             return loadedApp;
         }
 

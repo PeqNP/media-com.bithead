@@ -225,7 +225,7 @@ function UI(os) {
             app: {
                 bundleId: bundleId,
                 resourcePath: `/boss/app/${bundleId}`,
-                controller: `os.application('${bundleId}').controller()`
+                controller: `os.application('${bundleId}')`
             },
             os: {
                 email: "bitheadRL AT proton.me",
@@ -792,6 +792,7 @@ function UIApplication(id, config) {
 
     readOnly(this, "bundleId", config.application.bundleId);
     readOnly(this, "icon", config.application.icon);
+    readOnly(this, "main", config.application.main);
     readOnly(this, "name", config.application.name);
     readOnly(this, "passive", isEmpty(config.application.passive) ? false : config.application.passive);
     readOnly(this, "system", isEmpty(config.application.system) ? false : config.application.system);
@@ -817,7 +818,7 @@ function UIApplication(id, config) {
     }
     this.controller = controller;
 
-    function makeController(def, html) {
+    function makeController(name, def, html) {
         // Modals are above everything. Therefore, there is no way apps can
         // be switched in this context w/o the window being closed first.
         if (def.modal) {
@@ -826,7 +827,10 @@ function UIApplication(id, config) {
 
         let container = os.ui.makeWindow(config.application.bundleId, menuId, html);
 
-        launchedControllers[container.ui.id] = container;
+        // Using the controller name to reference the window simplifies logic to
+        // find the respective window and enforce a singleton instance.
+        let windowId = def.singleton ? name : container.ui.id;
+        launchedControllers[windowId] = container;
 
         // Do not attach this to the controller:
         // - This should not be accessible publicly
@@ -837,7 +841,7 @@ function UIApplication(id, config) {
             // Order matters. This prevents circular loop if last visible
             // controller and app needs to be shut down. When an app is
             // shut down, all windows are closed.
-            delete launchedControllers[container.ui.id];
+            delete launchedControllers[windowId];
 
             if (isEmpty(launchedControllers) && config.application.quitAutomatically === true) {
                 os.closeApplication(config.application.bundleId);
@@ -867,8 +871,12 @@ function UIApplication(id, config) {
             throw new Error(`Controller (${name}) does not exist in application's (${config.application.bundleId}) controller list.`);
         }
 
+        // By virtue of singleton windows using the controller name as the key
+        // to the window instance, and not the auto-generated ID for the window
+        // (e.g. `Window_xxxxxx`), a singleton instance can be enforced.
         let launched = launchedControllers[name];
-        if (!isEmpty(launched) && def.singleton) {
+        if (!isEmpty(launched)) {
+            os.ui.focusWindow(launched);
             return launched;
         }
 
@@ -878,7 +886,7 @@ function UIApplication(id, config) {
         // Return cached controller
         let html = controllers[name];
         if (!isEmpty(html)) {
-            return makeController(def, html);
+            return makeController(name, def, html);
         }
 
         if (!isEmpty(def.renderer) && def.renderer !== "html") {
@@ -901,7 +909,7 @@ function UIApplication(id, config) {
 
         controllers[name] = html;
 
-        return makeController(def, html);
+        return makeController(name, def, html);
     }
     this.loadController = loadController;
 
@@ -1152,8 +1160,7 @@ function UIWindow(id, container, isModal, menuId) {
 
         menus?.remove();
 
-        let desktop = document.getElementById("desktop");
-        desktop.removeChild(container);
+        container.remove();
 
         if (!isModal) {
             os.ui.removeWindow(container);
