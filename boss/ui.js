@@ -291,8 +291,8 @@ function UI(os) {
         let div = parseHTML(attr, html);
 
         let container = document.createElement("div");
+        container.classList.add("ui-container");
         container.appendChild(div.firstChild);
-        container.style.position = "absolute";
         // TODO: Stagger position where windows appear. Each new window should
         // be 10-20 px from top and left. When intial position is > 1/3 of page
         // viewport size, reset back to 40/20.
@@ -1035,6 +1035,12 @@ function UIWindow(id, container, isModal, menuId) {
     // make changes to the menu after the view is loaded.
     let menus = null;
 
+    let isFullScreen = false;
+    // When a window zooms in (becomes fullscreen), store the original positions
+    // and restore them if zooming out.
+    let topPosition = null;
+    let leftPosition = null;
+
     /**
      * Prepare the window for display, load controller source, etc.
      *
@@ -1063,6 +1069,13 @@ function UIWindow(id, container, isModal, menuId) {
         // TODO: Register embedded controllers
 
         if (!isModal && !isPreRendered) {
+            let win = container.querySelector(".ui-window");
+            isFullScreen = win.classList.contains("fullscreen");
+            if (isFullScreen) {
+                // Will get added to `ui-container` later
+                win.classList.remove("fullscreen");
+            }
+
             // Register buttons, if they exist
             let closeButton = container.querySelector(".close-button");
             if (!isEmpty(closeButton)) {
@@ -1084,6 +1097,9 @@ function UIWindow(id, container, isModal, menuId) {
 
             // Register window drag event
             container.querySelector(".top").onmousedown = function(e) {
+                if (isFullScreen) {
+                    return;
+                }
                 os.ui.focusWindow(container);
                 os.ui.dragWindow(container);
             };
@@ -1108,6 +1124,14 @@ function UIWindow(id, container, isModal, menuId) {
         if (!isModal && !isPreRendered) {
             // Prepare window to be displayed -- assigns z-index.
             os.ui.focusWindow(container);
+
+            // TODO: Untested fullscreen on init
+            // NOTE: `zoom` doesn't use `isFullScreen` to determine if window
+            // is zoomed. It checks if the class exists. The class will not
+            // exist by default, therefore, the window will be zoomed.
+            if (isFullScreen) {
+                zoom();
+            }
         }
 
         if (!isEmpty(controller?.viewDidLoad)) {
@@ -1142,10 +1166,34 @@ function UIWindow(id, container, isModal, menuId) {
     this.show = show;
 
     /**
-     * Toggle fullscreen window.
+     * Zoom (fullscreen) in window.
      */
     function zoom() {
-        console.log("zoom() not yet implemented");
+        if (container.classList.contains("fullscreen")) {
+            container.classList.remove("fullscreen");
+
+            // Restore previous window position
+            container.style.top = topPosition;
+            container.style.left = leftPosition;
+
+            isFullScreen = false;
+        }
+        else {
+            os.ui.focusWindow(container);
+
+            topPosition = container.style.top;
+            leftPosition = container.style.left;
+
+            // NOTE: top/left is defined in stylesheet. This is done so top/left
+            // positions, for fullscreen config, are managed in one place for both
+            // pre-rendered and OS contexts. They may eventually move here.
+            container.style.top = null;
+            container.style.left = null;
+
+            container.classList.add("fullscreen");
+
+            isFullScreen = true;
+        }
     }
 
     /**
