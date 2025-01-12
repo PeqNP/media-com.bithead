@@ -1036,6 +1036,8 @@ function UIWindow(id, container, isModal, menuId) {
     let menus = null;
 
     let isFullScreen = false;
+    let isFocused = false;
+
     // When a window zooms in (becomes fullscreen), store the original positions
     // and restore them if zooming out.
     let topPosition = null;
@@ -1103,6 +1105,19 @@ function UIWindow(id, container, isModal, menuId) {
                 os.ui.focusWindow(container);
                 os.ui.dragWindow(container);
             };
+            container.addEventListener("mousedown", function(e) {
+                // Future me: `isFocused` is already `true` at this point if the
+                // `.top` mousedown event is triggered. Therefore, this signal is
+                // ignored as `isFocused` is set before the event signal is sent
+                // to this listener. Test this by uncommenting below log. The reason
+                // the log statement is left here is to debug possible issues that
+                // may occur with different JS engines. This logic may need to
+                // change.
+                if (!isFullScreen && !isFocused) {
+                    // console.log("focusing"); Uncomment this to ensure correct behavior
+                    os.ui.focusWindow(container);
+                }
+            });
         }
         else if (isPreRendered) {
             // Allows co-existence of pre-rendered windows with OS managed windows.
@@ -1222,6 +1237,8 @@ function UIWindow(id, container, isModal, menuId) {
     this.close = close;
 
     function didFocusWindow() {
+        isFocused = true;
+
         if (container.classList.contains("blurred")) {
             container.classList.remove("blurred");
         }
@@ -1238,6 +1255,8 @@ function UIWindow(id, container, isModal, menuId) {
     this.didFocusWindow = didFocusWindow;
 
     function didBlurWindow() {
+        isFocused = false;
+
         if (!container.classList.contains("blurred")) {
             container.classList.add("blurred");
         }

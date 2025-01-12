@@ -428,9 +428,7 @@ function OS() {
 
         // Remove application menu
         let div = document.getElementById(app.menuId);
-        if (!isEmpty(div)) { // NOTE: System apps do not have menus
-            div.remove();
-        }
+        div?.remove(); // NOTE: System apps do not have menus
 
         // TODO: If this is focused application, show empty desktop?
         // Show a window that lists all open applications to switch to?
