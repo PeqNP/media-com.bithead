@@ -654,6 +654,12 @@ function UI(os) {
     }
     this.showProgressBar = showProgressBar;
 
+    function showBusy() {
+        // Make icon fairly small (32x32) but could be smaller
+        document.body.style.cursor = "url('path/to/your/watch-icon.png'), auto";
+        // TODO: When busy, prevent actions from being taken with cursor. Probably have to put a fullscreen overlay
+    }
+
     /**
      * Style menus displayed in the OS bar.
      *
@@ -1030,6 +1036,10 @@ function UIWindow(id, container, isModal, menuId) {
 
     let controller = null;
 
+    // A controller instance may attempt to be shown more than once. This
+    // gates initialization logic from being called twice.
+    let shown = false;
+
     // Reference to the element that contains this window's `UIMenu`s that
     // are showno in the OS bar. This is necessary when a window wishes to
     // make changes to the menu after the view is loaded.
@@ -1161,6 +1171,10 @@ function UIWindow(id, container, isModal, menuId) {
      * @param {function} fn - The function to call directly before the view is loaded
      */
     function show(fn) {
+        if (shown) {
+            return;
+        }
+
         // NOTE: `container` must be added to DOM before controller can be
         // instantiated.
         let desktop = document.getElementById("desktop");
@@ -1168,6 +1182,8 @@ function UIWindow(id, container, isModal, menuId) {
 
         // Allow time for parsing. I'm honestly not sure this is required.
         init(false, fn);
+
+        shown = true;
 
         // TODO: Allow the controller to load its view.
         // Typically used when providing server-side rendered window container.
@@ -1965,9 +1981,11 @@ function UIListBox(select, container) {
     function removeAllOptions() {
         // Remove all options from the select and facade
         for (;select.options.length > 0;) {
-            select.removeChild(select.lastElementChild);
-            container.removeChild(container.lastElementChild);
+            let option = select.options[0];
+            option.remove();
+            option.ui.remove();
         }
+        // Remove elements from container
     }
 
     /**
