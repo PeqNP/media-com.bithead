@@ -276,7 +276,7 @@ function OS() {
         if (hasAppController) {
             let html;
             try {
-                html = await os.network.get(`/boss/app/${bundleId}/controller/Application.html`, null, "text");
+                html = await os.network.get(`/boss/app/${bundleId}/controller/Application.html`, "text");
             }
             catch (error) {
                 showError(`Failed to load UIApplication for application bundle (${bundleId}).`, error);

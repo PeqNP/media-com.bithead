@@ -31,7 +31,7 @@
       this.close = close;
 
       async function loadUsers() {
-        let response = await os.network.get(`/account/users`, "Loading users...");
+        let response = await os.network.get(`/account/users`);
         view.ui.select("users").ui.addNewOptions(response.users);
       }
 

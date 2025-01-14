@@ -939,10 +939,10 @@ function UIApplication(id, config) {
         try {
             // FIXME: If renderer requires Object, this may need to change
             // the decoder to JSON. For now, all controllers are HTML.
-            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, null, "text");
+            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, "text");
         }
         catch (error) {
-            console.log(error);
+            console.error(error);
             throw new Error(`Failed to load application bundle (${config.application.bundleId}) controller (${name}).`);
         }
 
