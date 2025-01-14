@@ -654,11 +654,32 @@ function UI(os) {
     }
     this.showProgressBar = showProgressBar;
 
+    // Used by "busy" state to prevent touches from being made to UI
+    let busyOverlay = null;
+
+    /**
+     * Show "busy" cursor.
+     */
     function showBusy() {
-        // Make icon fairly small (32x32) but could be smaller
-        document.body.style.cursor = "url('path/to/your/watch-icon.png'), auto";
-        // TODO: When busy, prevent actions from being taken with cursor. Probably have to put a fullscreen overlay
+        document.body.style.cursor = "url('/boss/img/watch.png'), auto";
+
+        busyOverlay = document.createElement("div");
+        busyOverlay.classList.add("ui-modal-overlay");
+
+        let desktop = document.getElementById("desktop");
+        desktop.appendChild(busyOverlay);
     }
+    this.showBusy = showBusy;
+
+    /**
+     * Hide "busy" state.
+     */
+    function hideBusy() {
+        document.body.style.cursor = null;
+        busyOverlay.remove();
+        busyOverlay = null;
+    }
+    this.hideBusy = hideBusy;
 
     /**
      * Style menus displayed in the OS bar.
