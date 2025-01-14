@@ -657,10 +657,14 @@ function UI(os) {
     // Used by "busy" state to prevent touches from being made to UI
     let busyOverlay = null;
 
+    let busyCounter = 0;
+
     /**
      * Show "busy" cursor.
      */
     function showBusy() {
+        busyCounter += 1;
+
         document.body.style.cursor = "url('/boss/img/watch.png'), auto";
 
         busyOverlay = document.createElement("div");
@@ -675,9 +679,17 @@ function UI(os) {
      * Hide "busy" state.
      */
     function hideBusy() {
-        document.body.style.cursor = null;
-        busyOverlay.remove();
-        busyOverlay = null;
+        busyCounter -= 1;
+
+        if (busyCounter < 0) {
+            console.warn("Attempting to hide busy state when not shown");
+            busyCounter = 0;
+        }
+        else if (busyCounter < 1) {
+            document.body.style.cursor = null;
+            busyOverlay.remove();
+            busyOverlay = null;
+        }
     }
     this.hideBusy = hideBusy;
 
