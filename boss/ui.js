@@ -2013,6 +2013,22 @@ function UIListBox(select, container) {
     }
     this.setDelegate = setDelegate;
 
+    // Default action to take when an item in the list box is double tapped
+    let defaultAction = null;
+
+    /**
+     * Set the default action to take when an option is double-tapped.
+     *
+     * Note: This only works on single select list boxes.
+     */
+    function setDefaultAction(fn) {
+        if (select.multiple) {
+            return;
+        }
+        defaultAction = fn;
+    }
+    this.setDefaultAction = setDefaultAction;
+
     /**
      * Select an option by its value.
      *
@@ -2247,6 +2263,12 @@ function UIListBox(select, container) {
     }
 
     styleOptions();
+
+    container.addEventListener("dblclick", function(event) {
+        if (!isEmpty(defaultAction)) {
+            defaultAction();
+        }
+    });
 }
 
 function styleListBox(list) {

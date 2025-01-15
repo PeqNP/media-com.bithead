@@ -37,6 +37,7 @@
 
       async function viewDidLoad() {
         await loadUsers();
+        view.ui.select("users").ui.setDefaultAction(edit);
       }
       this.viewDidLoad = viewDidLoad;
     }
