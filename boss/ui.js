@@ -1,5 +1,10 @@
 /// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
+function Point(x, y) {
+    readOnly(this, "x", x);
+    readOnly(this, "y", y);
+}
+
 /**
  * Provides access to UI library.
  */
@@ -17,6 +22,16 @@ function UI(os) {
     // Contains a list of displayed windows. The index of the array is the window's
     // respective z-index + WINDOW_START_ZINDEX.
     let windowIndices = [];
+
+    // Tracks the number of stagger steps have been made when windows are opened.
+    // When a new window is opened, it is staggered by 10px top & left from the
+    // previously opened window.
+    // When all windows are closed, this reverts to 0.
+    let windowStaggerStep = 0;
+    // The total number of times to stagger before resetting back to 0.
+    const MAX_WINDOW_STAGGER_STEPS = 5;
+    // Number of pixels to stagger from top & left in each step
+    const WINDOW_STAGGER_STEP = 10;
 
     // Provides a way to access an instance of a controller and call a function
     // on the instance.
@@ -274,6 +289,28 @@ function UI(os) {
     }
 
     /**
+     * Returns the next window's staggered position.
+     *
+     * @returns Point
+     */
+    function nextWindowStaggerPoint() {
+        windowStaggerStep += 1;
+        if (windowStaggerStep > MAX_WINDOW_STAGGER_STEPS) {
+            windowStaggerStep = 1;
+        }
+
+        // The amount of space to offset the Y position due to the OS bar
+        const TOP_OFFSET = 40;
+        // Slight padding on left
+        const LEFT_OFFSET = 10;
+
+        let posTop = windowStaggerStep * WINDOW_STAGGER_STEP + TOP_OFFSET;
+        let posLeft = windowStaggerStep * WINDOW_STAGGER_STEP + LEFT_OFFSET;
+
+        return new Point(posTop, posLeft);
+    }
+
+    /**
      * Creates an instance of a `UIWindow` from an HTML string.
      *
      * This is designed to work with:
@@ -293,11 +330,9 @@ function UI(os) {
         let container = document.createElement("div");
         container.classList.add("ui-container");
         container.appendChild(div.firstChild);
-        // TODO: Stagger position where windows appear. Each new window should
-        // be 10-20 px from top and left. When intial position is > 1/3 of page
-        // viewport size, reset back to 40/20.
-        container.style.top = "40px";
-        container.style.left = "20px";
+        let point = nextWindowStaggerPoint();
+        container.style.top = `${point.x}px`;
+        container.style.left = `${point.y}px`;
 
         container.ui = new UIWindow(attr.this.id, container, false, menuId);
         return container;
