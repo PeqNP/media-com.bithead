@@ -170,6 +170,12 @@ function ApplicationManager(os) {
         // When `true`, the app controller defines its own menu
         let hasAppMenu = false;
 
+        // Create container for all app windows
+        let appContainer = document.createElement("div");
+        appContainer.id = `app-container-${bundleId}`;
+        let desktop = document.getElementById("desktop");
+        desktop.appendChild(appContainer);
+
         let controller;
         if (hasAppController) {
             let html;
@@ -337,6 +343,12 @@ function ApplicationManager(os) {
         }
 
         app.applicationDidStop();
+
+        // Remove container. All windows should be hidden at this point.
+        let container = document.getElementById(`app-container-${bundleId}`);
+        if (!isEmpty(container)) {
+            container.remove();
+        }
 
         delete closingApps[bundleId];
         delete loadedApps[bundleId];

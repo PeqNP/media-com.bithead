@@ -334,7 +334,7 @@ function UI(os) {
         container.style.top = `${point.x}px`;
         container.style.left = `${point.y}px`;
 
-        container.ui = new UIWindow(attr.this.id, container, false, menuId);
+        container.ui = new UIWindow(bundleId, attr.this.id, container, false, menuId);
         return container;
     }
     this.makeWindow = makeWindow;
@@ -364,7 +364,7 @@ function UI(os) {
         container.appendChild(div.firstChild);
         overlay.appendChild(container);
 
-        overlay.ui = new UIWindow(attr.this.id, overlay, true);
+        overlay.ui = new UIWindow(bundleId, attr.this.id, overlay, true);
         return overlay;
     }
     this.makeModal = makeModal;
@@ -419,7 +419,7 @@ function UI(os) {
     this.registerWindows = registerWindows;
 
     /**
-     * Register a window with the OS.
+     * Register a pre-rendered window with the OS.
      *
      * This allows the OS to display the window's menus in the OS bar.
      *
@@ -438,7 +438,7 @@ function UI(os) {
 
         // When windows are pre-rendered, `show` is not called. Therefore, parts
         // of the view life-cycle methods must be managed here.
-        win.ui = new UIWindow(id, win, false);
+        win.ui = new UIWindow(null, id, win, false);
         win.ui.init(true);
     }
 
@@ -1098,7 +1098,7 @@ function UIApplication(id, config) {
  * @param {bool} isModal - `true`, if modal
  * @param {string} menuId - The menu ID to attach window menus to
  */
-function UIWindow(id, container, isModal, menuId) {
+function UIWindow(bundleId, id, container, isModal, menuId) {
 
     readOnly(this, "id", id);
 
@@ -1245,8 +1245,16 @@ function UIWindow(id, container, isModal, menuId) {
 
         // NOTE: `container` must be added to DOM before controller can be
         // instantiated.
-        let desktop = document.getElementById("desktop");
-        desktop.appendChild(container);
+
+        // Pre-rendered window
+        if (isEmpty(bundleId)) {
+            let desktop = document.getElementById("desktop");
+            desktop.appendChild(container);
+        }
+        else {
+            let context = document.getElementById(`app-container-${bundleId}`);
+            context.appendChild(container);
+        }
 
         // Allow time for parsing. I'm honestly not sure this is required.
         init(false, fn);
