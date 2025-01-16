@@ -132,7 +132,7 @@ function ApplicationManager(os) {
             // TODO: Switch app context, if not passive
 
             // Load/focus on the app's main controller
-            if (!loadedApp.system && loadedApp.main != "Application") {
+            if (loadedApp.main != "Application") {
                 let ctrl = await loadedApp.loadController(loadedApp.main);
                 ctrl.ui.show();
             }
@@ -167,7 +167,11 @@ function ApplicationManager(os) {
 
         // Application may contain app delegate and menus
         let hasAppController = Object.keys(config.controllers).includes("Application");
-        // When `true`, the app controller defines its own menu
+        // When `true`, the app controller defines its own menu. This
+        // menu displays on left when app is focused.
+        let hasMenu = false;
+        // When `true`, app defines its own app menu. This menu displays
+        // on the right of OS bar when app is blurred.
         let hasAppMenu = false;
 
         // Create container for all app windows
@@ -218,7 +222,7 @@ function ApplicationManager(os) {
             // Load app menu, if any
             let menus = div.querySelector(".ui-menus");
             if (!isEmpty(menus) && !app.system) {
-                hasAppMenu = true;
+                hasMenu = true;
 
                 // Remove menu declaration from app
                 menus.remove();
@@ -227,10 +231,27 @@ function ApplicationManager(os) {
                 os.ui.styleUIMenus(menus);
                 os.ui.addOSBarMenu(menus);
             }
+
+            // Load mini app menu, if any
+            let appMenu = div.querySelector(".ui-app-menu");
+            let uiMenu = appMenu?.querySelector(".ui-menu");
+            if (!isEmpty(uiMenu)) {
+                hasAppMenu = true;
+                appMenu.remove();
+                uiMenu.id = app.appMenuId;
+                os.ui.styleUIMenu(uiMenu);
+                os.ui.addOSBarApp(uiMenu);
+            }
+            if (!isEmpty(config.application.menu)) {
+                hasAppMenu = true;
+                let win = os.ui.makeAppButton(config);
+                win.id = app.appMenuId;
+                os.ui.addOSBarApp(win);
+            }
         }
 
         // Create menu with only `Quit <app_name>` if app menu is not defined
-        if (!hasAppMenu && !app.system) {
+        if (!hasMenu && !app.system) {
             let menus = document.createElement("div");
             menus.classList.add("ui-menus");
             menus.id = app.menuId;
@@ -250,6 +271,12 @@ function ApplicationManager(os) {
             menus.appendChild(menu);
             os.ui.styleUIMenus(menus);
             os.ui.addOSBarMenu(menus);
+        }
+
+        if (!hasAppMenu && !app.system) {
+            let win = os.ui.makeAppButton(config);
+            win.id = app.appMenuId;
+            os.ui.addOSBarApp(win);
         }
 
         // Application delegate will manage which controller is shown, if any
@@ -342,6 +369,11 @@ function ApplicationManager(os) {
             script.remove();
         }
 
+        let appMenu = document.getElementById(app.appMenuId);
+        if (!isEmpty(appMenu)) {
+            appMenu.remove();
+        }
+
         app.applicationDidStop();
 
         // Remove container. All windows should be hidden at this point.
@@ -354,6 +386,20 @@ function ApplicationManager(os) {
         delete loadedApps[bundleId];
     }
     this.closeApplication = closeApplication;
+
+    function blurActiveApplication() {
+        if (isEmpty(activeApplication)) {
+            return;
+        }
+
+        activeApplication.applicationDidBlur();
+
+        // Add app's icon in menu bar that allows user to switch back to the
+        // application's context.
+        os.ui.addMiniAppMenu(activeApplication.menu);
+
+        activeApplication = null;
+    }
 
     /**
      * Switch to a different application context.
@@ -368,9 +414,7 @@ function ApplicationManager(os) {
             return;
         }
 
-        if (!isEmpty(activeApplication)) {
-            activeApplication.applicationDidBlur();
-        }
+        blurActiveApplication();
 
         activeApplication = app;
 
