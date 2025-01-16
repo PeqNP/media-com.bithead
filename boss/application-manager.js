@@ -7,9 +7,13 @@
  * OS bar that switch applications), etc.
  */
 function ApplicationManager(os) {
-    // List of installed (registered) apps the OS is aware of.
+    // All BOSS apps. These apps can not be changed.
     // object{bundleId:{name:icon:system:}}
-    let apps = {};
+    let bossApps = {};
+
+    // Registered apps that user has access to.
+    // Same structure as `bossApps`.
+    let registeredApps = {};
 
     // Represents any app that was loaded. Loaded apps are considered
     // to be running, even if their application context is not active.
@@ -21,39 +25,38 @@ function ApplicationManager(os) {
     // application may be displayed at a time.
     let activeApplication = null;
 
-    function init(_apps) {
-        apps = _apps;
+    function init(apps) {
+        bossApps = apps;
+        registeredApps = apps;
     }
     this.init = init;
 
     /**
      * Register applications available to BOSS.
      *
-     * This is designed to display apps that a user has access to. This
-     * over-writes any registered applications, except system apps, that may
-     * have been initialized or registered at a previous time.
+     * This helps display apps that a user has access to.
+     *
+     * This over-writes any previously registered applications.
      *
      * @param {object{bundleId:{name:system:icon:}}} apps - List of installed apps
      */
-    function registerApplications(_apps) {
+    function registerApplications(apps) {
         let rapps = {};
 
         // Re-create app list. Include only system apps.
-        for (bundleId in apps) {
-            let app = apps[bundleId];
-            if (app.system) {
-                rapps[bundleId] = app;
-            }
+        for (bundleId in bossApps) {
+            let app = bossApps[bundleId];
+            rapps[bundleId] = app;
         }
 
         // Add apps to list
-        for (bundleId in _apps) {
+        for (bundleId in apps) {
             if (bundleId in rapps) {
                 console.log("You may not overwrite a system app");
                 continue;
             }
 
-            let app = _apps[bundleId];
+            let app = apps[bundleId];
             if (app.system) {
                 console.log("System apps may not be registered");
                 continue;
@@ -61,7 +64,7 @@ function ApplicationManager(os) {
             rapps[bundleId] = app;
         }
 
-        apps = rapps;
+        registeredApps = rapps;
     }
     this.registerApplications = registerApplications;
 
@@ -74,21 +77,21 @@ function ApplicationManager(os) {
      * @returns [object{id:value:}]
      */
     function installedApplications() {
-        let _apps = [];
-        for (key in apps) {
-            let app = apps[key];
+        let apps = [];
+        for (key in registeredApps) {
+            let app = registeredApps[key];
             if (app.system !== true) {
                 let name = null;
                 if (isEmpty(app.icon)) {
                     name = app.name;
                 }
                 else {
-                    name = `img:${app.icon},${app.name}`;
+                    name = `img:/boss/app/${key}/${app.icon},${app.name}`;
                 }
-                _apps.push({id: key, name: name});
+                apps.push({id: key, name: name});
             }
         }
-        return _apps;
+        return apps;
     }
     this.installedApplications = installedApplications;
 
@@ -130,11 +133,11 @@ function ApplicationManager(os) {
             return loadedApp;
         }
 
-        if (!(bundleId in apps)) {
+        if (!(bundleId in registeredApps)) {
             throw new Error(`Application (${bundleId}) is not installed. Make sure to register the app with the OS before attempting to open.`);
         }
 
-        let progressBar = await os.ui.showProgressBar(`Loading application ${apps[bundleId].name}...`);
+        let progressBar = await os.ui.showProgressBar(`Loading application ${registeredApps[bundleId].name}...`);
 
         function showError(msg, error) {
             if (!isEmpty(error)) {
