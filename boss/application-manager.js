@@ -25,6 +25,12 @@ function ApplicationManager(os) {
     // application may be displayed at a time.
     let activeApplication = null;
 
+    // Stores application contexts. The HTMLElement is the container for all
+    // of the application's windows.
+    //
+    // Object{bundleId:HTMLElement}
+    let appContexts = {};
+
     function init(apps) {
         bossApps = apps;
         registeredApps = apps;
