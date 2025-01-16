@@ -189,7 +189,7 @@ function OS() {
      * @throws
      */
     async function openApplication(bundleId, fn) {
-        return await app.open(bundleId, fn);
+        return await app.openApplication(bundleId, fn);
     }
     this.openApplication = openApplication;
 
@@ -197,7 +197,7 @@ function OS() {
      * Close an application.
      */
     function closeApplication(bundleId) {
-        app.close(bundleId);
+        app.closeApplication(bundleId);
     }
     this.closeApplication = closeApplication;
 
@@ -209,7 +209,7 @@ function OS() {
      * @param {string} bundleId
      */
     function switchApplication(bundleId) {
-        app.switchTo(bundleId);
+        app.switchApplication(bundleId);
     }
     this.switchApplication = switchApplication;
 

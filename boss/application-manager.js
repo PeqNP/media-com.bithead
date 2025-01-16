@@ -120,7 +120,7 @@ function ApplicationManager(os) {
      * @returns UIApplication
      * @throws
      */
-    async function open(bundleId, fn) {
+    async function openApplication(bundleId, fn) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
             // TODO: Switch app context, if not passive
@@ -296,7 +296,7 @@ function ApplicationManager(os) {
 
         return app;
     }
-    this.open = open;
+    this.openApplication = openApplication;
 
     // Tracks the state of closing apps. Sometimes multiple signals may be
     // sent to close an application.
@@ -305,7 +305,7 @@ function ApplicationManager(os) {
     /**
      * Close an application.
      */
-    function close(bundleId) {
+    function closeApplication(bundleId) {
         let app = loadedApps[bundleId];
         if (isEmpty(app)) {
             console.warn(`Attempting to close application (${bundleId}) that is not loaded.`);
@@ -335,12 +335,15 @@ function ApplicationManager(os) {
         delete closingApps[bundleId];
         delete loadedApps[bundleId];
     }
-    this.close = close;
+    this.closeApplication = closeApplication;
 
     /**
      * Switch to a different application context.
+     *
+     * This caches windows from a previous app's session which allows them
+     * to be restored upon being switched.
      */
-    function switchTo(bundleId) {
+    function switchApplication(bundleId) {
         let app = loadedApps[bundleId];
         if (isEmpty(app)) {
             os.ui.showAlert(`Application bundle (${bundleId}) is not loaded.`);
@@ -361,6 +364,6 @@ function ApplicationManager(os) {
         // Essentially, the window needs to store the state of an application before it is
         // switched. This function may even need to exist in UI.
     }
-    this.switchTo = switchTo;
+    this.switchApplication = switchApplication;
 
 }
