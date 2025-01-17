@@ -212,6 +212,11 @@ function UI(os) {
     }
     this.focusTopWindow = focusTopWindow;
 
+    function appContainerId(bundleId) {
+        return `app-container-${bundleId}`;
+    }
+    this.appContainerId = appContainerId;
+
     function makeWindowId() {
         let objectId = makeObjectId();
         return `Window_${objectId}`;
@@ -925,21 +930,28 @@ function UI(os) {
  */
 function UIApplication(id, config) {
 
-    // Menu displayed on left, next to OS menus
-    let menuId = `AppMenu_${id}`;
+    let menuId = `Menu_${id}`;
+    let appMenuId = `AppMenu_${id}`;
 
-    // NOTE: Ideally, I would like to use the Bundle ID, but that can have hyphens.
-    // Using `makeObjectId` ensures only valid characters are used which would cause
-    // app delegate function name not to work.
+    // Menu displayed on left, next to OS menus
     readOnly(this, "menuId", menuId);
+    // Menu displayed on right of OS bar, next to clock
+    readOnly(this, "appMenuId", appMenuId);
+    // AppDelegate controller for this application
     readOnly(this, "scriptId", `AppScript_${id}`);
+
+    let system = isEmpty(config.application.system) ? false : config.application.system
+    let passive = isEmpty(config.application.passive) ? false : config.application.passive;
+    if (system) {
+        passive = true;
+    }
 
     readOnly(this, "bundleId", config.application.bundleId);
     readOnly(this, "icon", config.application.icon);
     readOnly(this, "main", config.application.main);
     readOnly(this, "name", config.application.name);
-    readOnly(this, "passive", isEmpty(config.application.passive) ? false : config.application.passive);
-    readOnly(this, "system", isEmpty(config.application.system) ? false : config.application.system);
+    readOnly(this, "passive", passive);
+    readOnly(this, "system", system);
     readOnly(this, "version", config.application.version);
 
     // Application function
@@ -1322,7 +1334,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
             desktop.appendChild(container);
         }
         else {
-            let context = document.getElementById(`app-container-${bundleId}`);
+            let context = document.getElementById(os.ui.appContainerId(bundleId));
             context.appendChild(container);
         }
 

@@ -6,7 +6,7 @@
         "bundleId": "io.bithead.boss",
         "name": "Image Viewer",
         "version": "1.0.0",
-        "system": true,
+        "passive": true,
         "icon": null,
         "main": "ImageViewer",
         "author": "Eric Chamberlain",

@@ -129,7 +129,7 @@ function ApplicationManager(os) {
     async function openApplication(bundleId, fn) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
-            // TODO: Switch app context, if not passive
+            switchApplication(bundleId);
 
             // Load/focus on the app's main controller
             if (loadedApp.main != "Application") {
@@ -176,7 +176,7 @@ function ApplicationManager(os) {
 
         // Create container for all app windows
         let appContainer = document.createElement("div");
-        appContainer.id = `app-container-${bundleId}`;
+        appContainer.id = os.ui.appContainerId(bundleId);
         let desktop = document.getElementById("desktop");
         desktop.appendChild(appContainer);
 
@@ -219,34 +219,38 @@ function ApplicationManager(os) {
                 controller = new window[app.scriptId]();
             }
 
-            // Load app menu, if any
-            let menus = div.querySelector(".ui-menus");
-            if (!isEmpty(menus) && !app.system) {
-                hasMenu = true;
+            // NOTE: System apps may not have a menu or app menu
+            if (!app.system) {
+                // Load app menu, if any
+                let menus = div.querySelector(".ui-menus");
+                if (!isEmpty(menus) && !app.system) {
+                    hasMenu = true;
 
-                // Remove menu declaration from app
-                menus.remove();
-                menus.id = app.menuId;
+                    // Remove menu declaration from app
+                    menus.remove();
+                    menus.id = app.menuId;
 
-                os.ui.styleUIMenus(menus);
-                os.ui.addOSBarMenu(menus);
-            }
+                    os.ui.styleUIMenus(menus);
+                    os.ui.addOSBarMenu(menus);
+                }
 
-            // Load mini app menu, if any
-            let appMenu = div.querySelector(".ui-app-menu");
-            let uiMenu = appMenu?.querySelector(".ui-menu");
-            if (!isEmpty(uiMenu)) {
-                hasAppMenu = true;
-                appMenu.remove();
-                uiMenu.id = app.appMenuId;
-                os.ui.styleUIMenu(uiMenu);
-                os.ui.addOSBarApp(uiMenu);
-            }
-            if (!isEmpty(config.application.menu)) {
-                hasAppMenu = true;
-                let win = os.ui.makeAppButton(config);
-                win.id = app.appMenuId;
-                os.ui.addOSBarApp(win);
+                // Load app menus -- the menu that allows user to switch apps.
+                // NOTE: Passive apps may not be switched
+                let appMenu = div.querySelector(".ui-app-menu");
+                let uiMenu = appMenu?.querySelector(".ui-menu");
+                if (!isEmpty(uiMenu) && !app.passive) {
+                    hasAppMenu = true;
+                    appMenu.remove();
+                    uiMenu.id = app.appMenuId;
+                    os.ui.styleUIMenu(uiMenu);
+                    os.ui.addOSBarApp(uiMenu);
+                }
+                if (!isEmpty(config.application.menu) && !app.passive) {
+                    hasAppMenu = true;
+                    let win = os.ui.makeAppButton(config);
+                    win.id = app.appMenuId;
+                    os.ui.addOSBarApp(win);
+                }
             }
         }
 
@@ -273,7 +277,9 @@ function ApplicationManager(os) {
             os.ui.addOSBarMenu(menus);
         }
 
-        if (!hasAppMenu && !app.system) {
+        // Add default app menu to allow user to switch to app
+        // NOTE: System and passive apps may not be switched
+        if (!hasAppMenu && !app.system && !app.passive) {
             let win = os.ui.makeAppButton(config);
             win.id = app.appMenuId;
             os.ui.addOSBarApp(win);
@@ -281,21 +287,8 @@ function ApplicationManager(os) {
 
         // Application delegate will manage which controller is shown, if any
         if (config.application.main == "Application") {
-            if (app.system) {
-                app.applicationDidStart(controller);
-            }
-            else {
-                if (!isEmpty(activeApplication)) {
-                    activeApplication.applicationDidBlur();
-                }
-
-                // TODO: Switch application context
-
-                activeApplication = app;
-
-                app.applicationDidStart(controller);
-                app.applicationDidFocus();
-            }
+            app.applicationDidStart(controller);
+            switchApplication(bundleId);
 
             progressBar?.ui.close();
 
@@ -312,24 +305,10 @@ function ApplicationManager(os) {
             showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
         }
 
-        // TODO: Switch application context if app is not passive
+        app.applicationDidStart(controller);
+        container.ui.show();
 
-        if (app.system) {
-            app.applicationDidStart(controller);
-            container.ui.show();
-        }
-        else {
-            if (!isEmpty(activeApplication)) {
-                activeApplication.applicationDidBlur();
-            }
-
-            activeApplication = app;
-            app.applicationDidStart(controller);
-
-            container.ui.show();
-
-            app.applicationDidFocus();
-        }
+        switchApplication(bundleId);
 
         progressBar?.ui.close();
 
@@ -377,7 +356,7 @@ function ApplicationManager(os) {
         app.applicationDidStop();
 
         // Remove container. All windows should be hidden at this point.
-        let container = document.getElementById(`app-container-${bundleId}`);
+        let container = document.getElementById(os.ui.appContainerId(bundleId));
         if (!isEmpty(container)) {
             container.remove();
         }
@@ -394,9 +373,23 @@ function ApplicationManager(os) {
 
         activeApplication.applicationDidBlur();
 
-        // Add app's icon in menu bar that allows user to switch back to the
-        // application's context.
-        os.ui.addMiniAppMenu(activeApplication.menu);
+        // Hide application popup menu
+        let menu = document.getElementById(activeApplication.menuId);
+        if (!isEmpty(menu)) {
+            menu.style.display = "none";
+        }
+
+        // Display app's icon on right side of OS bar
+        let appMenu = document.getElementById(activeApplication.appMenuId);
+        if (!isEmpty(appMenu)) {
+            appMenu.style.display = null;
+        }
+
+        // Hide all app windows
+        let windows = document.getElementById(os.ui.appContainerId(activeApplication.bundleId));
+        if (!isEmpty(windows)) {
+            windows.style.display = "none";
+        }
 
         activeApplication = null;
     }
@@ -413,10 +406,46 @@ function ApplicationManager(os) {
             os.ui.showAlert(`Application bundle (${bundleId}) is not loaded.`);
             return;
         }
+        if (app.passive) {
+            return;
+        }
 
         blurActiveApplication();
 
         activeApplication = app;
+
+        // Show application menu
+        let menu = document.getElementById(app.menuId);
+        if (!isEmpty(menu)) {
+            menu.style.display = null;
+        }
+
+        // Hide the application button
+        let appMenu = document.getElementById(app.appMenuId);
+        if (!isEmpty(appMenu)) {
+            appMenu.style.display = "none";
+        }
+
+        // Show app windows
+        let windows = document.getElementById(os.ui.appContainerId(app.bundleId));
+        if (!isEmpty(windows)) {
+            windows.style.display = null;
+
+            // Focus on the top-most window
+            let highestWindow = null;
+            let highestZIndex = 0;
+            for (let i = 0; i < windows.childNodes.length; i++) {
+                let win = windows.childNodes[i];
+                let zIndex = parseInt(win.style.zIndex);
+                if (zIndex > highestZIndex) {
+                    highestZIndex = zIndex;
+                    highestWindow = win;
+                }
+            }
+            if (!isEmpty(highestWindow)) {
+                os.ui.focusWindow(highestWindow);
+            }
+        }
 
         app.applicationDidFocus();
 
