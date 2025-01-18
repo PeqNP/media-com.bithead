@@ -306,9 +306,10 @@ function ApplicationManager(os) {
         }
 
         app.applicationDidStart(controller);
-        container.ui.show();
-
         switchApplication(bundleId);
+
+        // Order matters here. The application must be switched before showing controller.
+        container.ui.show();
 
         progressBar?.ui.close();
 
@@ -397,18 +398,32 @@ function ApplicationManager(os) {
     /**
      * Switch which application app menu is displayed.
      *
+     * Returns true:
+     * - App menu is switched between combinatino of passive or active apps
+     * - App menu is already displayed
+     *
+     * Returns false:
+     * - App is not loaded
+     * - App is inactive
+     *
      * @param {string} bundleId - The bundle ID of the app to switch to
+     * @returns `true` if the application menu was switched
      */
     function switchApplicationMenu(bundleId) {
         let app = loadedApps[bundleId];
         if (isEmpty(app)) {
             console.warn(`Attempting to switch active app menu for bundle (${bundleId}) that is not loaded.`);
-            return;
+            return false;
+        }
+
+        // Do not switch menu if this is not the active app
+        if (!app.passive && !isEmpty(activeApplication) && activeApplication?.bundleId !== bundleId) {
+            return false;
         }
 
         // Already active
         if (app.menuId == activeAppMenu?.id) {
-            return;
+            return true;
         }
 
         // Hide previous app menu
@@ -421,6 +436,8 @@ function ApplicationManager(os) {
         if (!isEmpty(activeAppMenu)) {
             activeAppMenu.style.display = null;
         }
+
+        return true;
     }
     this.switchApplicationMenu = switchApplicationMenu;
 

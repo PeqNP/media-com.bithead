@@ -214,16 +214,21 @@ function OS() {
     this.switchApplication = switchApplication;
 
     /**
-     * Show the app's menu.
+     * Switch which application app menu is displayed.
      *
-     * Hides the previously shown app's menu.
+     * Returns true:
+     * - App menu is switched between combinatino of passive or active apps
+     * - App menu is already displayed
      *
-     * Does nothing if the current app's menu is shown.
+     * Returns false:
+     * - App is not loaded
+     * - App is inactive
      *
-     * @param {string} bundleId - Bundle ID of app to show
+     * @param {string} bundleId - The bundle ID of the app to switch to
+     * @returns `true` if the application menu was switched
      */
     function switchApplicationMenu(bundleId) {
-        app.switchApplicationMenu(bundleId);
+        return app.switchApplicationMenu(bundleId);
     }
     this.switchApplicationMenu = switchApplicationMenu;
 

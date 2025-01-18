@@ -178,8 +178,19 @@ function UI(os) {
     function focusWindow(container) {
         let topZIndex = windowIndices.length - 1 + WINDOW_START_ZINDEX;
 
-        // Already the top window
-        if (parseInt(container.style.zIndex) === topZIndex) {
+        let isTopWindow = parseInt(container.style.zIndex) === topZIndex;
+
+        // NOTE: The top-most window may be blurred as the previous top-most
+        // window may have just been removed from the stack. When this happens
+        // focus immediately.
+        let isBlurred = container.classList.contains("blurred")
+        if (isTopWindow && isBlurred) {
+            os.switchApplicationMenu(container.ui.bundleId);
+            container.ui.didFocusWindow();
+            return;
+        }
+        // Already the top window. No-op.
+        else if (isTopWindow) {
             return;
         }
 
@@ -189,19 +200,22 @@ function UI(os) {
             topWindow.ui.didBlurWindow();
         }
 
+        // Move container to the top of the window stack.
         removeWindow(container);
         addWindow(container);
 
         os.switchApplicationMenu(container.ui.bundleId);
-
         container.ui.didFocusWindow();
     }
     this.focusWindow = focusWindow;
 
     /**
-     * Focus the top-most window in the window index that is not hidden.
+     * Focus the top-most window.
      *
-     * This is called directly after a window is removed.
+     * This only focuses on passive and active windows.
+     *
+     * This is generally called directly after a window is removed from the
+     * desktop.
      */
     function focusTopWindow() {
         // No windows to focus
@@ -211,8 +225,7 @@ function UI(os) {
 
         for (let i = windowIndices.length; i > 0; i--) {
             let topWindow = windowIndices[i - 1];
-            if (topWindow.style.display !== "none") {
-                os.switchApplicationMenu(topWindow.ui.bundleId);
+            if (os.switchApplicationMenu(topWindow.ui.bundleId)) {
                 topWindow.ui.didFocusWindow();
                 break;
             }
