@@ -20,9 +20,15 @@ function ApplicationManager(os) {
     // {bundleId:UIApplication}
     let loadedApps = {};
 
+    // The active application menu. This is the menu on the left (not the app menu
+    // switch button). A passive and active application may live in the same context.
+    // When switching between the two app types, the respective app menu needs
+    // to be switched too.
+    let activeAppMenu = null;
+
     // Defines the "active" application. When an application is "active", it
-    // means the application has focus on the desktop. Only one non-system
-    // application may be displayed at a time.
+    // means the application has focus on the desktop. Active applications are
+    // not system or passive apps.
     let activeApplication = null;
 
     // Stores application contexts. The HTMLElement is the container for all
@@ -387,6 +393,36 @@ function ApplicationManager(os) {
 
         activeApplication = null;
     }
+
+    /**
+     * Switch which application app menu is displayed.
+     *
+     * @param {string} bundleId - The bundle ID of the app to switch to
+     */
+    function switchApplicationMenu(bundleId) {
+        let app = loadedApps[bundleId];
+        if (isEmpty(app)) {
+            console.warn(`Attempting to switch active app menu for bundle (${bundleId}) that is not loaded.`);
+            return;
+        }
+
+        // Already active
+        if (app.menuId == activeAppMenu?.id) {
+            return;
+        }
+
+        // Hide previous app menu
+        if (!isEmpty(activeAppMenu)) {
+            activeAppMenu.style.display = "none";
+        }
+
+        // Show current app menu
+        activeAppMenu = document.getElementById(app.menuId);
+        if (!isEmpty(activeAppMenu)) {
+            activeAppMenu.style.display = null;
+        }
+    }
+    this.switchApplicationMenu = switchApplicationMenu;
 
     /**
      * Focus on the top-most app window within an app container group.

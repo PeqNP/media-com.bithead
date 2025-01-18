@@ -214,6 +214,20 @@ function OS() {
     this.switchApplication = switchApplication;
 
     /**
+     * Show the app's menu.
+     *
+     * Hides the previously shown app's menu.
+     *
+     * Does nothing if the current app's menu is shown.
+     *
+     * @param {string} bundleId - Bundle ID of app to show
+     */
+    function switchApplicationMenu(bundleId) {
+        app.switchApplicationMenu(bundleId);
+    }
+    this.switchApplicationMenu = switchApplicationMenu;
+
+    /**
      * Returns all user-space installed applications.
      *
      * This is assumed to be used in a `UIListBox`. Therefore, `name` also

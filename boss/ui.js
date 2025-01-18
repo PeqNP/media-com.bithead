@@ -192,12 +192,14 @@ function UI(os) {
         removeWindow(container);
         addWindow(container);
 
+        os.switchApplicationMenu(container.ui.bundleId);
+
         container.ui.didFocusWindow();
     }
     this.focusWindow = focusWindow;
 
     /**
-     * Focus the top-most window in the window index.
+     * Focus the top-most window in the window index that is not hidden.
      *
      * This is called directly after a window is removed.
      */
@@ -207,8 +209,14 @@ function UI(os) {
             return;
         }
 
-        let topWindow = windowIndices[windowIndices.length - 1];
-        topWindow.ui.didFocusWindow();
+        for (let i = windowIndices.length; i > 0; i--) {
+            let topWindow = windowIndices[i - 1];
+            if (topWindow.style.display !== "none") {
+                os.switchApplicationMenu(topWindow.ui.bundleId);
+                topWindow.ui.didFocusWindow();
+                break;
+            }
+        }
     }
     this.focusTopWindow = focusTopWindow;
 
@@ -946,7 +954,9 @@ function UIApplication(id, config) {
         passive = true;
     }
 
-    readOnly(this, "bundleId", config.application.bundleId);
+    let bundleId = config.application.bundleId;
+
+    readOnly(this, "bundleId", bundleId);
     readOnly(this, "icon", config.application.icon);
     readOnly(this, "main", config.application.main);
     readOnly(this, "name", config.application.name);
@@ -978,10 +988,10 @@ function UIApplication(id, config) {
         // Modals are above everything. Therefore, there is no way apps can
         // be switched in this context w/o the window being closed first.
         if (def.modal) {
-            return os.ui.makeModal(config.application.bundleId, html);
+            return os.ui.makeModal(bundleId, html);
         }
 
-        let container = os.ui.makeWindow(config.application.bundleId, menuId, html);
+        let container = os.ui.makeWindow(bundleId, menuId, html);
 
         // Using the controller name to reference the window simplifies logic to
         // find the respective window and enforce a singleton instance.
@@ -1000,7 +1010,7 @@ function UIApplication(id, config) {
             delete launchedControllers[windowId];
 
             if (isEmpty(launchedControllers) && config.application.quitAutomatically === true) {
-                os.closeApplication(config.application.bundleId);
+                os.closeApplication(bundleId);
             }
         }
 
@@ -1024,7 +1034,7 @@ function UIApplication(id, config) {
     async function loadController(name) {
         let def = config.controllers[name];
         if (isEmpty(def)) {
-            throw new Error(`Controller (${name}) does not exist in application's (${config.application.bundleId}) controller list.`);
+            throw new Error(`Controller (${name}) does not exist in application's (${bundleId}) controller list.`);
         }
 
         // By virtue of singleton windows using the controller name as the key
@@ -1056,11 +1066,11 @@ function UIApplication(id, config) {
         try {
             // FIXME: If renderer requires Object, this may need to change
             // the decoder to JSON. For now, all controllers are HTML.
-            html = await os.network.get(`/boss/app/${config.application.bundleId}/controller/${name}.${def.renderer}`, "text");
+            html = await os.network.get(`/boss/app/${bundleId}/controller/${name}.${def.renderer}`, "text");
         }
         catch (error) {
             console.error(error);
-            throw new Error(`Failed to load application bundle (${config.application.bundleId}) controller (${name}).`);
+            throw new Error(`Failed to load application bundle (${bundleId}) controller (${name}).`);
         }
 
         controllers[name] = html;
@@ -1183,6 +1193,7 @@ function UIApplication(id, config) {
 function UIWindow(bundleId, id, container, isModal, menuId) {
 
     readOnly(this, "id", id);
+    readOnly(this, "bundleId", bundleId);
 
     let controller = null;
 
