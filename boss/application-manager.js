@@ -130,12 +130,6 @@ function ApplicationManager(os) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
             switchApplication(bundleId);
-
-            // Load/focus on the app's main controller
-            if (loadedApp.main != "Application") {
-                let ctrl = await loadedApp.loadController(loadedApp.main);
-                ctrl.ui.show();
-            }
             return loadedApp;
         }
 
@@ -395,6 +389,35 @@ function ApplicationManager(os) {
     }
 
     /**
+     * Focus on the top-most app window within an app container group.
+     *
+     * @param {Array<HTMLElement>} windows - Windows that belong to app container group
+     */
+    function focusTopMostAppWindow(windows) {
+        if (isEmpty(windows)) {
+            console.warn("Attempting to focus on an app container group that does not exist");
+            return;
+        }
+
+        windows.style.display = null;
+
+        // Focus on the top-most window
+        let highestWindow = null;
+        let highestZIndex = 0;
+        for (let i = 0; i < windows.childNodes.length; i++) {
+            let win = windows.childNodes[i];
+            let zIndex = parseInt(win.style.zIndex);
+            if (zIndex > highestZIndex) {
+                highestZIndex = zIndex;
+                highestWindow = win;
+            }
+        }
+        if (!isEmpty(highestWindow)) {
+            os.ui.focusWindow(highestWindow);
+        }
+    }
+
+    /**
      * Switch to a different application context.
      *
      * This caches windows from a previous app's session which allows them
@@ -406,7 +429,15 @@ function ApplicationManager(os) {
             os.ui.showAlert(`Application bundle (${bundleId}) is not loaded.`);
             return;
         }
+        if (app.system) {
+            return;
+        }
+
+        let windows = document.getElementById(os.ui.appContainerId(app.bundleId));
+
+        // For passive apps, simply focus on the top-most window in its window group
         if (app.passive) {
+            focusTopMostAppWindow(windows);
             return;
         }
 
@@ -426,35 +457,10 @@ function ApplicationManager(os) {
             appMenu.style.display = "none";
         }
 
-        // Show app windows
-        let windows = document.getElementById(os.ui.appContainerId(app.bundleId));
-        if (!isEmpty(windows)) {
-            windows.style.display = null;
-
-            // Focus on the top-most window
-            let highestWindow = null;
-            let highestZIndex = 0;
-            for (let i = 0; i < windows.childNodes.length; i++) {
-                let win = windows.childNodes[i];
-                let zIndex = parseInt(win.style.zIndex);
-                if (zIndex > highestZIndex) {
-                    highestZIndex = zIndex;
-                    highestWindow = win;
-                }
-            }
-            if (!isEmpty(highestWindow)) {
-                os.ui.focusWindow(highestWindow);
-            }
-        }
+        // Focus on top-most app in window group
+        focusTopMostAppWindow(windows);
 
         app.applicationDidFocus();
-
-        // TODO: Switch controllers being viewed
-        // There's a lot that needs to be done here. For example, the controllers must be
-        // associated to an application. They need to be managed by UI and the window.
-        // Essentially, the window needs to store the state of an application before it is
-        // switched. This function may even need to exist in UI.
     }
     this.switchApplication = switchApplication;
-
 }
