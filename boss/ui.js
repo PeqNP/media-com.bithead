@@ -978,10 +978,11 @@ function UIApplication(id, config) {
      * @throws
      */
     async function loadController(name) {
-        let def = config.controllers[name];
-        if (isEmpty(def)) {
+        let controllers = Object.keys(config.controllers);
+        if (!controllers.includes(name)) {
             throw new Error(`Controller (${name}) does not exist in application's (${bundleId}) controller list.`);
         }
+        let def = config.controllers[name];
 
         // By virtue of singleton windows using the controller name as the key
         // to the window instance, and not the auto-generated ID for the window

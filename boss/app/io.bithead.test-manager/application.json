@@ -23,7 +23,9 @@
         "Project": {
             "singleton": true
         },
-        "SearchResults": { },
+        "SearchResults": {
+            "modal": true
+        },
         "TestRun": {
             "singleton": true
         },
