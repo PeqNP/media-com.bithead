@@ -289,20 +289,24 @@ function UI(os) {
      * @returns `div` that contains parsed HTML and re-attached Javascript
      */
     function parseHTML(bundleId, attr, html) {
-        // You must re-attach any scripts that are part of the HTML. Since HTML5
-        // javascript is not parsed or ran when assigning values to innerHTML.
         let div = document.createElement("div");
         div.innerHTML = interpolate(html, attr);
-        let script = div.querySelector("script");
 
-        // Attach script, if any
-        if (!isEmpty(script)) {
+        // You must re-attach any scripts that are part of the HTML. Since HTML5
+        // JavaScript is not parsed or ran when assigning values to innerHTML.
+        //
+        // Attach scripts, if any.
+        //
+        // A window may have more than one script if there are embedded controllers.
+        let scripts = div.querySelectorAll("script");
+        for (let i = 0; i < scripts.length; i++) {
+            let script = scripts[i];
             let parentNode = script.parentNode;
             parentNode.removeChild(script);
 
             let sc = document.createElement("script");
             sc.setAttribute("type", "text/javascript");
-            let inline = document.createTextNode(script.innerHTML + `\n//@ sourceURL=/${bundleId}/${attr.this.id}`);
+            let inline = document.createTextNode(script.innerHTML + `\n//@ sourceURL=/${bundleId}/${attr.this.id}/${i}`);
             sc.appendChild(inline);
             parentNode.append(sc);
         }
@@ -400,8 +404,8 @@ function UI(os) {
      * Controllers may reference their respective Javascript model the same
      * way as `UIWindow`s. e.g. `os.ui.controller.ControllerName`.
      */
-    function registerControllers() {
-        let controllers = document.getElementsByClassName("ui-controller");
+    function registerControllers(container) {
+        let controllers = container.getElementsByClassName("ui-controller");
         for (let i = 0; i < controllers.length; i++) {
             registerController(controllers[i]);
         }
@@ -411,7 +415,11 @@ function UI(os) {
     /**
      * Register a controller with the OS.
      *
-     * TODO: Refactor to work with non-pre-rendered windows
+     * TODO: Disambiguate embedded controllers w/ containing window
+     * In order for embedded controllers to work with windows, there must
+     * be a way to distinguish `$(this.id)` from window and controller. For
+     * now, embedded controllers must define their own ID and must not use
+     * `$(this.x)`.
      */
     function registerController(component) {
         let id = component.getAttribute("id");
@@ -420,13 +428,18 @@ function UI(os) {
             return;
         }
 
-        let code = `new window.${id}(component);`;
-        let ctrl = eval(code);
-        if (!isEmpty(ctrl)) {
-            if (!isEmpty(ctrl.viewDidLoad)) {
-                ctrl.viewDidLoad();
+        if (typeof window[id] === "function") {
+            let code = new window[id](component);
+            let ctrl = eval(code);
+            if (!isEmpty(ctrl)) {
+                if (!isEmpty(ctrl.viewDidLoad)) {
+                    ctrl.viewDidLoad();
+                }
+                addController(id, ctrl);
             }
-            addController(id, ctrl);
+        }
+        else {
+            console.warn(`Expected embedded controller (${id}) to have a script`);
         }
     }
 
@@ -1178,7 +1191,8 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
             }
         }
 
-        // TODO: Register embedded controllers
+        // Register embedded controllers
+        os.ui.registerControllers(container);
 
         if (!isModal) {
             let win = container.querySelector(".ui-window");

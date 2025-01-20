@@ -23,6 +23,7 @@
         "Project": {
             "singleton": true
         },
+        "SearchResults": { },
         "TestRun": {
             "singleton": true
         },
