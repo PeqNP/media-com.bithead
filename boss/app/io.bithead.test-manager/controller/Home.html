@@ -8,10 +8,17 @@
       delegate.didSaveProject = loadHome;
       delegate.didDeleteProject = loadHome;
 
-      // TODO:
+      let trDelegate = {};
+      trDelegate.didFinishTestRun = loadHome;
+
+      ntrDelegate = {};
+      ntrDelegate.didStartTestRun = loadHome;
+
       async function addTestRun() {
         let win = await $(app.controller).loadController("TestRun");
-        win.ui.show();
+        win.ui.show(function (ctrl) {
+          ctrl.delegate = ntrDelegate;
+        });
       }
       this.addTestRun = addTestRun;
 
@@ -53,9 +60,9 @@
 
       async function openActiveTestRun() {
         let option = runs.ui.selectedOption();
-        let win = await $(app.controller).loadController("TestRun");
+        let win = await $(app.controller).loadController("ActiveTestRun");
         win.ui.show(function (ctrl) {
-          // TODO: Test
+          ctrl.delegate = trDelegate;
           ctrl.configure(option.value);
         });
       }

@@ -700,14 +700,11 @@ function UI(os) {
     function hideBusy() {
         busyCounter -= 1;
 
-        if (busyCounter < 0) {
-            console.warn("Attempting to hide busy state when not shown");
-            busyCounter = 0;
-        }
-        else if (busyCounter < 1) {
+        if (busyCounter < 1) {
             document.body.style.cursor = null;
             busyOverlay.remove();
             busyOverlay = null;
+            busyCounter = 0;
         }
     }
     this.hideBusy = hideBusy;
@@ -980,13 +977,18 @@ function UIApplication(id, config) {
      * If a controller is not found in the application's controller list, or could
      * not be created, the callback function is _not_ called.
      *
-     * If error_fn is defined, the Error is returned instead of showing an alert.
+     * When a window is loaded from an endpoint, it is expected that the window
+     * is rendered server-side. The controller must still exist in the list of
+     * application controllers.
+     *
+     * The `endpoint` overrides any `path` set in app controller config.
      *
      * @param {string} name - Name of controller
+     * @param {string} endpoint - Full path, or resource path, of server-side rendered window
      * @returns HTMLElement window container
      * @throws
      */
-    async function loadController(name) {
+    async function loadController(name, endpoint) {
         let controllers = Object.keys(config.controllers);
         if (!controllers.includes(name)) {
             throw new Error(`Controller (${name}) does not exist in application's (${bundleId}) controller list.`);
@@ -1022,7 +1024,10 @@ function UIApplication(id, config) {
         }
 
         let path;
-        if (isEmpty(def.path)) {
+        if (!isEmpty(endpoint)) {
+            path = endpoint
+        }
+        else if (isEmpty(def.path)) {
             path = `/boss/app/${bundleId}/controller/${name}.${def.renderer}`
         }
         else {

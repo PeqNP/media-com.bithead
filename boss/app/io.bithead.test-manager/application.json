@@ -33,7 +33,8 @@
             "singleton": true
         },
         "TestRunResults": {
-            "singleton": true
+            "singleton": true,
+            "path": "/test/test-run-results"
         },
         "TestSuite": {
             "singleton": true

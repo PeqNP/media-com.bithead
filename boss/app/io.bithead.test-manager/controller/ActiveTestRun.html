@@ -10,6 +10,11 @@
       // Every test case result - even ones that aren't statused.
       let results = {};
 
+      let delegate = protocol(
+        "ActiveTestRunDelegate", this, "delegate",
+        ["didFinishTestRun"]
+      );
+
       function addResourceWidget(line, resource) {
         let html;
         if (resource.type == "image") {
@@ -58,21 +63,21 @@
         }
       }
 
-      function getStatusName(statusID) {
-        if (statusID == 0) {
+      function getStatusName(statusId) {
+        if (statusId == 0) {
           return "Pending";
         }
-        else if (statusID == 1) {
+        else if (statusId == 1) {
           return "Passed";
         }
-        else if (statusID == 2) {
+        else if (statusId == 2) {
           return "Failed";
         }
-        else if (statusID == 3) {
+        else if (statusId == 3) {
           return "Skipped";
         }
         else {
-          console.error(`Unknown status ID (${statusID})`);
+          console.error(`Unknown status ID (${statusId})`);
         }
       }
 
@@ -236,9 +241,10 @@
           determination: parseInt(determination.value),
           notes: notes
         };
-        let data = await os.network.json('/test/finish-test-run', request);
-        // TODO: Open test run and close this window
-        os.network.request(`/test/test-run-results/${data.testRunID}`);
+        let resp = await os.network.json('/test/finish-test-run', request);
+        let win = await $(app.controller).loadController("TestRunResults", `/test/test-run-results/${resp.testRunID}`);
+        win.ui.show();
+        delegate.didFinishTestRun();
         view.ui.close();
       }
 
@@ -267,37 +273,43 @@
         view.ui.span("num-tests-remaining").innerHTML = status.pending;
       }
 
-      function moveToNextTestCase(modelID, statusID) {
-        let widget = widgets[modelID];
+      /**
+       * Set the status and close the widget of the just recently statused
+       * test. Then focus on the next widget in the editor.
+       */
+      function moveToNextTestCase(modelId, statusId) {
+        let widget = widgets[modelId];
         if (isEmpty(widget)) {
-          console.warn(`There is not test case status widget for ID (${modelID})`);
+          console.warn(`There is not test case status widget for ID (${modelId})`);
           return;
         }
         let details = widget.node.querySelector("details");
         details.open = false;
         let span = details.querySelector(".status-name");
-        span.innerHTML = getStatusName(statusID);
+        span.innerHTML = getStatusName(statusId);
+        widget.data.result.status = statusId;
+
         // TODO: The background color can change depending on status. Or a dot.
         // Gray - Pending
         // Green - Passed
         // Red - Failed
         // Blue - Skipped
+        // TODO: Focus on the next test case?
       }
 
-      // TODO: Buttons need to be added to each of the test cases. Their names should map to the inputs in this fn.
-      async function statusTestCaseResult(testCaseResultID, statusID, modelID) {
-        let widget = widgets[modelID];
+      async function statusTestCaseResult(testCaseResultID, statusId, modelId) {
+        let widget = widgets[modelId];
         let notes = widget.node.querySelector("textarea[name='notes']").value.trim();
-        console.log("Saving test case result (" + testCaseResultID + ")");
+        console.log(`Saving test case result (${testCaseResultID})`);
         let request = {
           testCaseResultID: testCaseResultID,
-          status: statusID,
+          status: statusId,
           notes: notes
         };
         // TODO: On error, should this select the previous option?
-        let data = await os.network.json('/test/status-test-case', request);
-        moveToNextTestCase(modelID, statusID);
-        updateTestRunStatus(data.status);
+        let resp = await os.network.json('/test/status-test-case', request);
+        moveToNextTestCase(modelId, statusId);
+        updateTestRunStatus(resp.status);
       }
       this.statusTestCaseResult = statusTestCaseResult;
 
@@ -308,8 +320,9 @@
       this.showImage = showImage;
 
       function configure(id) {
-        testRunId = id;
+        testRunId = parseInt(id);
       }
+      this.configure = configure;
 
       async function viewDidLoad() {
         if (isEmpty(testRunId)) {
@@ -332,7 +345,8 @@
       this.viewDidLoad = viewDidLoad;
 
       async function loadTestRun() {
-        let testRun = await os.network.get(`/test/test-run/${testRunId}`);
+        let resp = await os.network.get(`/test/test-run/${testRunId}`);
+        let testRun = resp.testRun;
         updateTestRunStatus(testRun.status);
         view.ui.span("test-run-name").innerHTML = testRun.name;
         view.ui.textarea("editor").value = testRun.text;
@@ -352,6 +366,7 @@
           };
         }
       }
+      this.loadTestRun = loadTestRun;
     }
   </script>
   <div class="ui-menus">
