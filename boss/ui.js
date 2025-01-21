@@ -248,7 +248,7 @@ function UI(os) {
         // removed from the DOM are still in the list of scripts that can be
         // debugged.
         windowNumber += 1;
-        let num = windowNumber.toString().padStart(8, "0");
+        let num = windowNumber.toString().padStart(6, "0");
         return `Window_${num}`;
     }
 
