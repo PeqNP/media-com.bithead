@@ -1800,11 +1800,11 @@ function UIPopupMenu(select) {
         _removeAllOptions();
 
         for (let i = 0; i < options.length; i++) {
-          var option = document.createElement('option');
-          var opt = options[i];
-          option.value = opt["id"];
-          option.text = opt["name"];
-          select.appendChild(option);
+            var option = document.createElement('option');
+            var opt = options[i];
+            option.value = opt["id"];
+            option.text = opt["name"];
+            select.appendChild(option);
         }
         select.selectedIndex = 0;
         styleOptions();
@@ -2154,7 +2154,7 @@ function UIListBox(select, container) {
      *
      * This will remove all existing options.
      *
-     * @param {[object[id:name:]]} Options to add.
+     * @param {[object[id:string,name:string,child:bool?,data:mixed?]]} options - Options to add.
      */
     function addNewOptions(options) {
         removeAllOptions();
@@ -2164,6 +2164,10 @@ function UIListBox(select, container) {
             let opt = options[i];
             option.value = opt.id;
             option.text = opt.name;
+            if (opt?.child === true) {
+                option.classList.append("child");
+            }
+            option.data = opt.data;
             select.appendChild(option);
         }
 
