@@ -63,6 +63,7 @@
       function configure(id) {
         projectId = id;
       }
+      this.configure = configure;
 
       async function viewDidLoad() {
         if (isEmpty(projectId)) {
@@ -70,11 +71,11 @@
           return;
         }
 
-        await loadProject();
-
         editButton = view.ui.button("show-editor");
         showEditorButton = view.ui.button("show-editor");
         tree = view.ui.select("project-tree");
+
+        await loadProject();
 
         tree.ui.setDelegate(this);
         // Pre-select test suite or case ID
@@ -115,14 +116,14 @@
         let project = resp.project;
         for (let i = 0; i < project.testSuites.length; i++) {
           let suite = project.testSuites[i];
-          options.append({
+          options.push({
             id: `TS-${suite.id}`,
             name: `TS-${suite.id}: ${suite.name}`
           });
 
           for (let j = 0; j < suite.testCases.length; j++) {
-            let testCase = suite.testCases[i];
-            options.append({
+            let testCase = suite.testCases[j];
+            options.push({
               id: `TC-${testCase.id}`,
               name: `TC-${testCase.id}: ${testCase.name}`,
               child: true,

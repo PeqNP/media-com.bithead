@@ -2165,7 +2165,7 @@ function UIListBox(select, container) {
             option.value = opt.id;
             option.text = opt.name;
             if (opt?.child === true) {
-                option.classList.append("child");
+                option.classList.add("child");
             }
             option.data = opt.data;
             select.appendChild(option);
