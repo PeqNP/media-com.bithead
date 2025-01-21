@@ -281,3 +281,16 @@ function getValue(obj, keyPath) {
 function interpolate(str, obj) {
     return str.replace(/\$\((.*?)\)/g, (x, g) => getValue(obj, g));
 }
+
+/**
+ * Transforms `undefined` | `null` string value to an empty string.
+ *
+ * @param {string?} value - Possible string value
+ * @returns empty string if `value` is empty.
+ */
+function emptyString(value) {
+    if (isEmpty(value)) {
+        return "";
+    }
+    return value;
+}
