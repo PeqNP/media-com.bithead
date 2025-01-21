@@ -22,14 +22,12 @@
       }
       this.addTestRun = addTestRun;
 
-      // TODO:
       async function showTestRuns() {
         let win = await $(app.controller).loadController("TestRuns");
         win.ui.show();
       }
       this.showTestRuns = showTestRuns;
 
-      // TODO: Test this
       async function addProject() {
         let win = await $(app.controller).loadController("Project");
         win.ui.show(function (ctrl) {
