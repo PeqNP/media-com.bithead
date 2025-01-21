@@ -40,7 +40,7 @@
        * Delete project.
        */
       function _delete() {
-        os.network.delete('/test/project/#(id)', "Are you sure you want to delete this project?", function(data) {
+        os.network.delete(`/test/project/${projectId}`, "Are you sure you want to delete this project?", function(data) {
           delegate.didDeleteProject();
           view.ui.close();
         });

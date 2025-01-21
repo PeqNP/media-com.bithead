@@ -60,8 +60,7 @@ function UI(os) {
 
     function init() {
         // TODO: Some of these should go away and be performed only in `makeWindow`.
-        stylePopupMenus();
-        styleFolders();
+        stylePopupMenus(document);
 
         // Style hard-coded system menus
         os.ui.styleUIMenus(document.getElementById("os-bar"));
@@ -1189,6 +1188,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
      * @param {function?} fn - Callback function that will be called before view is loaded
      */
     function init(fn) {
+        stylePopupMenus(container);
         styleListBoxes(container);
         os.ui.styleUIMenus(container);
 
@@ -1420,7 +1420,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
     /**
      * Returns `div` `HTMLElement` with given class name.
      *
-     * @param {string} name - Name of div element
+     * @param {string} name - Class name of div element
      */
     function div(name) {
         return container.querySelector(`div.${name}`);
@@ -1447,6 +1447,37 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
         return container.querySelector(`select[name='${name}']`);
     }
     this.select = select;
+
+    /**
+     * Returns `radio` `HTMLElement` with given name and value.
+     *
+     * @param {string} name - Name of radio element
+     * @param {string} value - Value of radio element
+     */
+    function radio(name, value) {
+        return container.querySelector(`input[name='${name}'][value='${value}']`);
+    }
+    this.radio = radio;
+
+    /**
+     * Returns `span` `HTMLElement` with given name.
+     *
+     * @param {string} name - Name of span element
+     */
+    function span(name) {
+        return container.querySelector(`span[name='${name}']`);
+    }
+    this.span = span;
+
+    /**
+     * Returns `textarea` `HTMLElement` with given name.
+     *
+     * @param {string} name - Name of textarea element
+     */
+    function textarea(name) {
+        return container.querySelector(`textarea[name='${name}']`);
+    }
+    this.textarea = textarea;
 
     /**
      * Returns the respective `UIMenu` element.
@@ -1851,9 +1882,9 @@ function UIPopupMenu(select) {
 /**
  * Style all popup menu elements.
  */
-function stylePopupMenus() {
+function stylePopupMenus(element) {
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
-    let menus = document.getElementsByClassName("popup-menu");
+    let menus = element.getElementsByClassName("popup-menu");
     for (let i = 0; i < menus.length; i++) {
         let selectElement = menus[i].getElementsByTagName("select")[0];
         selectElement.ui = new UIPopupMenu(selectElement);
