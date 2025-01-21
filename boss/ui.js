@@ -238,9 +238,19 @@ function UI(os) {
     }
     this.appContainerId = appContainerId;
 
+    let windowNumber = 0;
+
     function makeWindowId() {
-        let objectId = makeObjectId();
-        return `Window_${objectId}`;
+        // let objectId = makeObjectId();
+        // return `Window_${windowNumber}_${objectId}`;
+
+        // This is a much easier way to identify windows. When using the object ID
+        // it's difficult to see which one is the newest one, as script that are
+        // removed from the DOM are still in the list of scripts that can be
+        // debugged.
+        windowNumber += 1;
+        let num = windowNumber.toString().padStart(8, "0");
+        return `Window_${num}`;
     }
 
     /**
@@ -1403,9 +1413,19 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
      * @returns HTMLElement?
      */
     function button(name) {
-        return container.querySelector(`button[name='${name}']`)
+        return container.querySelector(`button[name='${name}']`);
     }
     this.button = button;
+
+    /**
+     * Returns `div` `HTMLElement` with given class name.
+     *
+     * @param {string} name - Name of div element
+     */
+    function div(name) {
+        return container.querySelector(`div.${name}`);
+    }
+    this.div = div;
 
     /**
      * Returns the respective `input` `HTMLElement` given name.
@@ -1414,7 +1434,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
      * @returns HTMLElement?
      */
     function input(name) {
-        return container.querySelector(`input[name='${name}']`)
+        return container.querySelector(`input[name='${name}']`);
     }
     this.input = input;
 
@@ -1424,7 +1444,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
      * @param {string} name - Name of select element
      */
     function select(name) {
-        return container.querySelector(`select[name='${name}']`)
+        return container.querySelector(`select[name='${name}']`);
     }
     this.select = select;
 

@@ -40,25 +40,33 @@
         return null;
       }
 
-      function didTapEdit() {
+      async function didTapEdit() {
         let result = getSelectedResult();
         if (isEmpty(result)) {
           return;
         }
-        // TODO: Load controller
-        os.network.request(result.modelPath);
+        let value = view.select("search-results").selectedValue();
+        let win = await $(app.controller).loadController("Editor");
+        // TODO: What value is passed?
+        win.show(function (ctrl) {
+          ctrl.configure(value);
+        });
       }
       this.didTapEdit = didTapEdit;
 
-      function didTapOpen() {
+      async function didTapTree() {
         let result = getSelectedResult();
         if (isEmpty(result)) {
           return;
         }
-        // TODO: Load controller
-        os.network.request(result.testSuitePath);
+        let win = $(app.controller).loadController("TestSuites");
+        // TODO: Test this. The test suite path is what I'm concerned about. It can
+        // be any biz object.
+        win.show(function (ctrl) {
+          ctrl.configure(result.testSuitePath);
+        });
       }
-      this.didTapOpen = didTapOpen;
+      this.didTapTree = didTapTree;
 
       function didTapClose() {
         view.ui.close();
@@ -75,7 +83,7 @@
       </div>
       <div class="vbox gap-10" style="width: 100px;">
         <button class="default" onclick="$(this.controller).didTapEdit();">Editor</button>
-        <button class="primary" onclick="$(this.controller).didTapOpen();">Tree</button>
+        <button class="primary" onclick="$(this.controller).didTapTree();">Tree</button>
         <button class="primary" onclick="$(this.controller).didTapClose();">Close</button>
       </div>
     </div>

@@ -17,8 +17,7 @@
             "singleton": true
         },
         "Home": {
-            "singleton": true,
-            "path": "/test/home"
+            "singleton": true
         },
         "Project": {
             "singleton": true

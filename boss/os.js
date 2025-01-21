@@ -350,7 +350,7 @@ function Network(os) {
      * @throws
      */
     async function json(url, body) {
-        if (body === null || body.length < 1) {
+        if (isEmpty(body) || body.length < 1) {
             body = '{}';
         }
         else {
