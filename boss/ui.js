@@ -1032,6 +1032,9 @@ function UIApplication(id, config) {
      *
      * The `endpoint` overrides any `path` set in app controller config.
      *
+     * If the controller config `remote` is `true`, and `endpoint` is not provided,
+     * this will throw an Error.
+     *
      * @param {string} name - Name of controller
      * @param {string} endpoint - Full path, or resource path, of server-side rendered window
      * @returns HTMLElement window container
@@ -1043,6 +1046,13 @@ function UIApplication(id, config) {
             throw new Error(`Controller (${name}) does not exist in application's (${bundleId}) controller list.`);
         }
         let def = config.controllers[name];
+
+        // Consumer must provide endpoint if this controller requires path to
+        // resource that can only be defined at callsite (such as REST paths
+        // that require IDs).
+        if (def.remote === true && isEmpty(endpoint)) {
+            throw new Error(`The endpoint parameter is required when loading controller (${name}). This is caused by the controller 'remote' flag being set to 'true'.`);
+        }
 
         // By virtue of singleton windows using the controller name as the key
         // to the window instance, and not the auto-generated ID for the window

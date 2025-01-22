@@ -1319,6 +1319,9 @@ label {
 .hbox.align-bottom {
   align-items: flex-end;
 }
+.hbox.separated {
+  justify-content: space-between;
+}
 
 .vbox {
   display: -webkit-flex;

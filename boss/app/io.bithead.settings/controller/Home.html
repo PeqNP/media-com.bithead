@@ -1,6 +1,7 @@
 <div class="ui-window">
   <script type="text/javascript">
     function $(this.id)(view) {
+      let editor;
 
       // UserDelegate
       let delegate = {
@@ -40,6 +41,8 @@
       function showDeveloperTools() {
         view.ui.div("users").style.display = "none";
         view.ui.div("developer-tools").style.display = null;
+        view.ui.div("debug-application").style.display = null;
+        view.ui.div("debug-code").style.display = "none";
       }
       this.showDeveloperTools = showDeveloperTools;
 
@@ -47,9 +50,56 @@
        * Opens application and specific window.
        */
       async function debugController() {
-        console.log("debugController");
+        let app = view.ui.select("applications").ui.selectedValue();
+        let name = view.ui.input("controller-name").value;
+        let path = view.ui.input("resource-path").value;
+
+        if (isEmpty(app)) {
+          os.ui.showAlert("Please select an app to debug.");
+          return;
+        }
+
+        if (!isEmpty(path)) {
+        }
+        else if (!isEmpty(name)) {
+        }
+        else {
+          os.ui.showAlert("A controller name or resource path must be provided.");
+        }
       }
       this.debugController = debugController;
+
+      async function debugCode() {
+        console.log("debugCode");
+      }
+      this.debugCode = debugCode;
+
+      /**
+       * Shows the code view that allows user to execute arbitrary code to
+       * load a window.
+       */
+      function showCodeView() {
+        view.ui.div("debug-application").style.display = "none";
+        view.ui.div("debug-code").style.display = null;
+        editor.refresh();
+        editor.focus();
+      }
+      this.showCodeView = showCodeView;
+
+      function initializeEditor() {
+        let editorInput = view.ui.textarea("editor");
+        editor = CodeMirror.fromTextArea(editorInput, {
+          readOnly: false,
+          mode: "javascript",
+          tabSize: 4,
+          indentWithTabs: false,
+          electricChars: true,
+          lineWrapping: false,
+          lineNumbers: true,
+          matchBrackets: true
+        });
+        editor.setSize(null, "80%");
+      }
 
       async function loadUsers() {
         let response = await os.network.get(`/account/users`);
@@ -64,6 +114,18 @@
           return {id: app.bundleId, name: app.name};
         });
         view.ui.select("applications").ui.addNewOptions(apps);
+
+        Promise.all([
+          os.network.stylesheet('/codemirror/lib/codemirror.css'),
+          os.network.javascript('/codemirror/lib/codemirror.js'),
+          os.network.stylesheet('/codemirror/theme/monokai.css'),
+        ])
+          .then(([p1, p2]) => {
+            os.network.javascript('/codemirror/mode/javascript/javascript.js')
+              .then(async function() {
+                initializeEditor();
+              });
+          });
       }
       this.viewDidLoad = viewDidLoad;
     }
@@ -85,7 +147,7 @@
   </div>
   <div class="container">
     <div class="hbox gap-10 add-margin">
-      <div class="ui-list-box" style="width: 100px; height: 220px;">
+      <div class="ui-list-box" style="width: 140px; height: 220px;">
         <select name="settings">
           <option onclick="$(this.controller).showUsers();">Users</option>
           <option onclick="$(this.controller).showDeveloperTools();">Developer</option>
@@ -111,26 +173,42 @@
       </div> <!-- users -->
 
       <div class="developer-tools" style="width: 300px; height: 220px; display: none;">
-        <div class="popup-menu add-margin" style="width: 200px;">
-          <select name="applications">
-            <option>Debug Application</option>
-          </select>
+        <div class="debug-application">
+          <div class="popup-menu add-margin" style="width: 200px;">
+            <select name="applications">
+              <option>Debug Application</option>
+            </select>
+          </div>
+
+          <div class="text-field add-margin">
+            <label for="controller-name">Controller name</label>
+            <input type="text" name="controller-name">
+          </div>
+          <div class="info-message add-margin">e.g. Home</div>
+
+          <div class="text-field add-margin">
+            <label for="resource-path">Resource path</label>
+            <input type="text" name="resource-path">
+          </div>
+          <div class="info-message">Debug server-side window e.g. /test/home</div>
+
+          <div class="controls">
+            <button class="primary" onclick="$(this.controller).showCodeView();">Advanced</button>
+            <button class="default" onclick="$(this.controller).debugController();">Debug</button>
+          </div>
         </div>
 
-        <div class="text-field add-margin">
-          <label for="controller-name">Debug controller</label>
-          <input type="text" name="controller-name">
-        </div>
-        <div class="info-message add-margin">Debug controller by name e.g. Home</div>
+        <div class="debug-code" style="display: none;">
+          <textarea name="editor">
+let app = await os.openApplication("");
+let win = await app.loadController("");
+win.ui.show();
+          </textarea>
 
-        <div class="text-field add-margin">
-          <label for="resource-path">Or by resource path</label>
-          <input type="text" name="resource-path">
-        </div>
-        <div class="info-message">Debug server-side window e.g. /test/home</div>
-
-        <div class="controls">
-          <button class="default" onclick="$(this.controller).debugController();">Debug</button>
+          <div class="controls">
+            <button class="primary" onclick="$(this.controller).showDeveloperTools();">Simple</button>
+            <button class="default" onclick="$(this.controller).debugCode();">Debug</button>
+          </div>
         </div>
       </div> <!-- developer-tools -->
     </div> <!-- hbox -->

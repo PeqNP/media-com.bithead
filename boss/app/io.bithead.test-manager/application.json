@@ -27,16 +27,18 @@
         },
         "TestRun": {
             "singleton": true,
-            "path": "/test/test-run"
+            "remote": true
         },
         "TestRuns": {
             "singleton": true
         },
         "TestRunResults": {
-            "singleton": true
+            "singleton": true,
+            "remote": true
         },
         "TestSuite": {
-            "singleton": true
+            "singleton": true,
+            "remote": true
         },
         "TestSuites": {
             "singleton": true
