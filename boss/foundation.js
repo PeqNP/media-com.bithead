@@ -190,8 +190,13 @@ function protocol(name, obj, prop_name, _methods) {
                 if (!methodNames.includes(method)) {
                     throw new Error(`Protocol (${name}) does not contain method (${method})`);
                 }
-                proto[method] = function() {
-                    value[method]();
+                proto[method] = function(values) {
+                    if (values.length === undefined) {
+                        value[method](values);
+                    }
+                    else {
+                        value[method](...values); // Untested
+                    }
                 }
             }
 
@@ -201,14 +206,18 @@ function protocol(name, obj, prop_name, _methods) {
                 if (method.required && !implemented.includes(method.name)) {
                     throw new Error(`Protocol (${name}) requires method (${method}) to be implemented`);
                 }
-                // Even if unimplemented, allow it to be called. e.g. becomes no-op.
-                if (!implemented.includes(method.name)) {
-                    proto[method.name] = function() { }
-                }
             }
             instance = value;
         }
     );
+
+    // Set default implementation of proto
+    for (let i = 0; i < methods.length; i++) {
+        let method = methods[i];
+        if (!method.required) {
+            proto[method.name] = function() { }
+        }
+    }
 
     return proto;
 }

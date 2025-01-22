@@ -2129,11 +2129,10 @@ function UIImageViewer() {
 
 function UIListBox(select, container) {
 
-    let delegate = null;
-    function setDelegate(d) {
-        delegate = d;
-    }
-    this.setDelegate = setDelegate;
+    let delegate = protocol(
+        "UIListBoxDelegate", this, "delegate",
+        ["didSelectListBoxOption", "didDeselectListBoxOption"]
+    );
 
     // Default action to take when an item in the list box is double tapped
     let defaultAction = null;
@@ -2178,7 +2177,7 @@ function UIListBox(select, container) {
             opt.ui.classList.remove("selected");
             if (opt.selected) {
                 opt.ui.classList.add("selected");
-                didSelectListBoxOption(opt);
+                delegate.didSelectListBoxOption(opt);
             }
         }
     }
@@ -2333,6 +2332,11 @@ function UIListBox(select, container) {
             elem.innerHTML = label;
         }
 
+        // Transfer onclick event
+        if (!isEmpty(option.onclick)) {
+            elem.setAttribute("onclick", option.getAttribute("onclick"));
+        }
+
         elem.classList.add("option");
         if (option.disabled) {
             elem.classList.add("disabled");
@@ -2356,10 +2360,10 @@ function UIListBox(select, container) {
                     elem.classList.add("selected");
                 }
                 if (option.selected) {
-                    didSelectListBoxOption(option);
+                    delegate.didSelectListBoxOption(option);
                 }
                 else {
-                    didDeselectListBoxOption(option);
+                    delegate.didDeselectListBoxOption(option);
                 }
             }
             else {
@@ -2373,19 +2377,6 @@ function UIListBox(select, container) {
             let option = select.options[i];
             styleOption(option);
         }
-    }
-
-    function didSelectListBoxOption(option) {
-        if (isEmpty(delegate?.didSelectListBoxOption)) {
-            return;
-        }
-        delegate.didSelectListBoxOption(option);
-    }
-    function didDeselectListBoxOption(option) {
-        if (isEmpty(delegate?.didDeselectListBoxOption)) {
-            return;
-        }
-        delegate.didDeselectListBoxOption(option);
     }
 
     styleOptions();
