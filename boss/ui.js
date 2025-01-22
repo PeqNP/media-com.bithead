@@ -1922,7 +1922,15 @@ function UIPopupMenu(select) {
             if (option.disabled) {
                 choice.classList.add("disabled");
             }
-            choice.innerHTML = option.innerHTML;
+
+            // TODO: For now, options do not support images
+            let label = option.innerHTML;
+            if (label.startsWith("img:")) {
+                let parts = label.split(",");
+                label = parts[1];
+            }
+
+            choice.innerHTML = label;
 
             // Select a choice
             choice.addEventListener("click", function(e) {

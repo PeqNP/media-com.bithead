@@ -32,18 +32,24 @@
       this.close = close;
 
       function showUsers() {
-        console.log("showUsers");
+        view.ui.div("users").style.display = null;
+        view.ui.div("developer-tools").style.display = "none";
       }
       this.showUsers = showUsers;
 
       function showDeveloperTools() {
-        console.log("showDeveloperTools");
+        view.ui.div("users").style.display = "none";
+        view.ui.div("developer-tools").style.display = null;
       }
       this.showDeveloperTools = showDeveloperTools;
 
-      function didSelectListBoxOption(option) {
-        console.log(option);
+      /**
+       * Opens application and specific window.
+       */
+      async function debugController() {
+        console.log("debugController");
       }
+      this.debugController = debugController;
 
       async function loadUsers() {
         let response = await os.network.get(`/account/users`);
@@ -53,6 +59,11 @@
       async function viewDidLoad() {
         await loadUsers();
         view.ui.select("users").ui.setDefaultAction(edit);
+
+        let apps = os.installedApplications().map(function (app) {
+          return {id: app.bundleId, name: app.name};
+        });
+        view.ui.select("applications").ui.addNewOptions(apps);
       }
       this.viewDidLoad = viewDidLoad;
     }
@@ -73,51 +84,55 @@
     <div class="zoom-button"></div>
   </div>
   <div class="container">
-    <h1>Users</h1>
     <div class="hbox gap-10 add-margin">
-      <div class="ui-list-box" style="width: 100px; height: 180px;">
+      <div class="ui-list-box" style="width: 100px; height: 220px;">
         <select name="settings">
           <option onclick="$(this.controller).showUsers();">Users</option>
           <option onclick="$(this.controller).showDeveloperTools();">Developer</option>
         </select>
       </div>
 
-      <div class="ui-list-box users" style="width: 300px; height: 180px;">
-        <select name="users">
-        </select>
-      </div>
+      <div class="users">
+        <div class="hbox gap-10">
+          <div class="ui-list-box" style="width: 300px; height: 220px;">
+            <select name="users">
+            </select>
+          </div>
 
-      <div class="developer-tools" style="width: 300px; height: 180px; display: none;">
-        <div class="popup-menu add-margin" style="width: 160px;">
-          <label for="projectID">Application</label>
-          <select name="projectID">
-            <option>Select Application</option>
+          <div class="vbox separated" style="width: 140px;">
+            <div class="vbox gap-10">
+              <button class="primary" onclick="$(this.controller).addUser();">Add user</button>
+            </div>
+            <div class="vbox gap-10">
+              <button class="default" onclick="$(this.controller).edit();">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div> <!-- users -->
+
+      <div class="developer-tools" style="width: 300px; height: 220px; display: none;">
+        <div class="popup-menu add-margin" style="width: 200px;">
+          <select name="applications">
+            <option>Debug Application</option>
           </select>
         </div>
 
         <div class="text-field add-margin">
-          <label for="controller-name">Controller name</label>
+          <label for="controller-name">Debug controller</label>
           <input type="text" name="controller-name">
         </div>
-        <p>Debug a window using bundle path e.g. Home</p>
+        <div class="info-message add-margin">Debug controller by name e.g. Home</div>
 
-        <h2>OR</h2>
-
-        <div class="text-field">
-          <label for="resource-path">Resource path</label>
+        <div class="text-field add-margin">
+          <label for="resource-path">Or by resource path</label>
           <input type="text" name="resource-path">
         </div>
-        <p>Debug server-side rendered window e.g. /test/test-suite</p>
-      </div>
+        <div class="info-message">Debug server-side window e.g. /test/home</div>
 
-      <div class="vbox separated" style="width: 140px;">
-        <div class="vbox gap-10">
-          <button class="primary" onclick="$(this.controller).addUser();">Add user</button>
+        <div class="controls">
+          <button class="default" onclick="$(this.controller).debugController();">Debug</button>
         </div>
-        <div class="vbox gap-10">
-          <button class="default" onclick="$(this.controller).edit();">Edit</button>
-        </div>
-      </div>
-    </div>
+      </div> <!-- developer-tools -->
+    </div> <!-- hbox -->
   </div>
 </div>
