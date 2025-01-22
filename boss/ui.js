@@ -293,11 +293,12 @@ function UI(os) {
      * innerHTML w/ dynamic content.
      *
      * @param {string} bundleId - App bundle ID that window belongs to
+     * @param {string} controllerName - Name of controller
      * @param {Object} attr - Attributes to assign to window
      * @param {string} html - HTML to add to window container
      * @returns `div` that contains parsed HTML and re-attached Javascript
      */
-    function parseHTML(bundleId, attr, html) {
+    function parseHTML(bundleId, controllerName, attr, html) {
         let div = document.createElement("div");
         div.innerHTML = interpolate(html, attr);
 
@@ -315,7 +316,7 @@ function UI(os) {
 
             let sc = document.createElement("script");
             sc.setAttribute("type", "text/javascript");
-            let inline = document.createTextNode(script.innerHTML + `\n//@ sourceURL=/${bundleId}/${attr.this.id}/${i}`);
+            let inline = document.createTextNode(script.innerHTML + `\n//@ sourceURL=/${bundleId}/${controllerName}/${attr.this.id}/${i}`);
             sc.appendChild(inline);
             parentNode.append(sc);
         }
@@ -353,14 +354,15 @@ function UI(os) {
      * - Create new windows from `UI.makeController(name:)`
      *
      * @param {string} bundleId: App bundle ID creating window
+     * @param {string} controllerName: Name of controller
      * @param {string} menuId: The app's menu ID
      * @param {string} html: Window HTML to render
      * @returns `UIWindow`
      */
-    function makeWindow(bundleId, menuId, html) {
+    function makeWindow(bundleId, controllerName, menuId, html) {
         const attr = makeWindowAttributes(bundleId);
 
-        let div = parseHTML(bundleId, attr, html);
+        let div = parseHTML(bundleId, controllerName, attr, html);
 
         let container = document.createElement("div");
         container.classList.add("ui-container");
@@ -381,13 +383,14 @@ function UI(os) {
      * may not be interacted with until the modal is dismissed.
      *
      * @param {string} bundleId: App bundle ID creating window
+     * @param {string} controllerName: Name of controller
      * @param {string} html: Modal HTML to render
      * @returns `UIWindow`
      */
-    function makeModal(bundleId, html) {
+    function makeModal(bundleId, controllerName, html) {
         const attr = makeWindowAttributes(bundleId);
 
-        let div = parseHTML(bundleId, attr, html);
+        let div = parseHTML(bundleId, controllerName, attr, html);
 
         // Wrap modal in an overlay to prevent taps from outside the modal
         let overlay = document.createElement("div");
@@ -907,6 +910,22 @@ function UI(os) {
         }
     }
     this.styleUIMenus = styleUIMenus;
+
+    /**
+     * Flicker a message on a button and then revert back to the button's
+     * original label after 2 seconds.
+     *
+     * @param {HTMLElement} button - The button to change label for
+     * @param {string} msg - The message to display for 2 seconds
+     */
+    function flickerButton(button, msg) {
+        let originalHTML = button.innerHTML;
+        button.innerHTML = msg;
+        setInterval(function() {
+            button.innerHTML = originalHTML;
+        }, 2000);
+    }
+    this.flickerButton = flickerButton;
 }
 
 /**
@@ -970,10 +989,10 @@ function UIApplication(id, config) {
         // Modals are above everything. Therefore, there is no way apps can
         // be switched in this context w/o the window being closed first.
         if (def.modal) {
-            return os.ui.makeModal(bundleId, html);
+            return os.ui.makeModal(bundleId, name, html);
         }
 
-        let container = os.ui.makeWindow(bundleId, menuId, html);
+        let container = os.ui.makeWindow(bundleId, name, menuId, html);
 
         // Using the controller name to reference the window simplifies logic to
         // find the respective window and enforce a singleton instance.
