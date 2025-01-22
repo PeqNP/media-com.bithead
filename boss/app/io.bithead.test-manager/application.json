@@ -23,11 +23,11 @@
             "singleton": true
         },
         "SearchResults": {
-            "modal": true
+            "singleton": true
         },
         "TestRun": {
             "singleton": true,
-            "remote": true
+            "path": "/test/test-run"
         },
         "TestRuns": {
             "singleton": true

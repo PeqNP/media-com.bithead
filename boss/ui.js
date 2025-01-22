@@ -1957,7 +1957,6 @@ function UIPopupMenu(select) {
             container.appendChild(choice);
         }
     }
-
     this.styleOptions = styleOptions;
 }
 
@@ -2149,7 +2148,14 @@ function UIListBox(select, container) {
 
     let delegate = protocol(
         "UIListBoxDelegate", this, "delegate",
-        ["didSelectListBoxOption", "didDeselectListBoxOption"]
+        ["didSelectListBoxOption", "didDeselectListBoxOption"],
+        // Allows delegate to update its UI immediately if an option
+        // requires HTMLElements to be enabled/disabled.
+        function () {
+            if (!select.multiple) {
+                selectOption(0);
+            }
+        }
     );
 
     // Default action to take when an item in the list box is double tapped
@@ -2250,6 +2256,7 @@ function UIListBox(select, container) {
         if (!select.multiple) {
             select.selectedIndex = 0;
         }
+
         styleOptions();
     }
     this.addNewOptions = addNewOptions;
