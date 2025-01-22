@@ -50,27 +50,34 @@
        * Opens application and specific window.
        */
       async function debugController() {
-        let app = view.ui.select("applications").ui.selectedValue();
+        let bundleId = view.ui.select("applications").ui.selectedValue();
         let name = view.ui.input("controller-name").value;
         let path = view.ui.input("resource-path").value;
 
-        if (isEmpty(app)) {
+        if (isEmpty(bundleId)) {
           os.ui.showAlert("Please select an app to debug.");
           return;
         }
-
-        if (!isEmpty(path)) {
+        if (isEmpty(name)) {
+          os.ui.showAlert("A controller name must be provided");
+          return;
         }
-        else if (!isEmpty(name)) {
+
+        let app = await os.openApplication(bundleId);
+        if (isEmpty(path)) {
+          let win = await app.loadController(name);
+          win.ui.show();
         }
         else {
-          os.ui.showAlert("A controller name or resource path must be provided.");
+          let win = await app.loadController(name, path);
+          win.ui.show();
         }
       }
       this.debugController = debugController;
 
       async function debugCode() {
-        console.log("debugCode");
+        let text = editor.getValue("\n");
+        eval(`(async () => { ${text} })();`);
       }
       this.debugCode = debugCode;
 
@@ -110,9 +117,7 @@
         await loadUsers();
         view.ui.select("users").ui.setDefaultAction(edit);
 
-        let apps = os.installedApplications().map(function (app) {
-          return {id: app.bundleId, name: app.name};
-        });
+        let apps = os.installedApplications();
         view.ui.select("applications").ui.addNewOptions(apps);
 
         Promise.all([
@@ -172,8 +177,8 @@
         </div>
       </div> <!-- users -->
 
-      <div class="developer-tools" style="width: 300px; height: 220px; display: none;">
-        <div class="debug-application">
+      <div class="developer-tools" style="height: 220px; display: none;">
+        <div class="debug-application" style="width: 300px;">
           <div class="popup-menu add-margin" style="width: 200px;">
             <select name="applications">
               <option>Debug Application</option>
@@ -198,7 +203,7 @@
           </div>
         </div>
 
-        <div class="debug-code" style="display: none;">
+        <div class="debug-code" style="width: 500px; display: none;">
           <textarea name="editor">
 let app = await os.openApplication("");
 let win = await app.loadController("");
@@ -212,5 +217,5 @@ win.ui.show();
         </div>
       </div> <!-- developer-tools -->
     </div> <!-- hbox -->
-  </div>
+  </div> <!-- container -->
 </div>
