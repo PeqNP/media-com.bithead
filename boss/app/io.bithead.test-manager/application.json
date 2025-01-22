@@ -22,9 +22,7 @@
         "Project": {
             "singleton": true
         },
-        "SearchResults": {
-            "singleton": true
-        },
+        "SearchResults": { },
         "TestRun": {
             "singleton": true,
             "path": "/test/test-run"

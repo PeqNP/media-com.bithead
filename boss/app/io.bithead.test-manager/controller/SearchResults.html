@@ -53,10 +53,9 @@
         if (isEmpty(result)) {
           return;
         }
-        let option = view.ui.select("search-results").ui.selectedOption();
         let win = await $(app.controller).loadController("TestSuiteEditor");
         win.ui.show(function (ctrl) {
-          ctrl.configure(option.data.testSuiteID, option.data.testCaseID);
+          ctrl.configure(result.config.testSuiteID, result.config.testCaseID);
         });
       }
       this.didTapEditor = didTapEditor;
@@ -69,7 +68,7 @@
         let option = view.ui.select("search-results").ui.selectedOption();
         let win = await $(app.controller).loadController("TestSuites");
         win.ui.show(function (ctrl) {
-          ctrl.configure(option.data.projectID);
+          ctrl.configure(result.config.projectID);
         });
       }
       this.didTapTree = didTapTree;
