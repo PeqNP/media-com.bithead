@@ -270,7 +270,7 @@ function UI(os) {
             app: {
                 bundleId: bundleId,
                 resourcePath: `/boss/app/${bundleId}`,
-                controller: `os.application('${bundleId}')`
+                controller: `os.application('${bundleId}').proxy`
             },
             os: {
                 email: "bitheadRL AT proton.me",
@@ -981,16 +981,22 @@ function UIApplication(id, config) {
     // Visible windows object[windowId:UIController]
     let launchedControllers = {};
 
-    /**
-     * Reference to application's main controller.
-     *
-     * This is the same controller that contains app delegate methods and any other
-     * app specific logic.
-     */
-    function controller() {
-        return main;
-    }
-    this.controller = controller;
+    // This allows calls to be made on this `UIApplication` instance as well as
+    // pass-thru calls to the `main` function.
+    const proxy = new Proxy(this, {
+        get: function(target, prop, receiver) {
+            if (prop in target) {
+                return Reflect.get(...arguments);
+            }
+            else if (!isEmpty(main) && prop in main) {
+                return main[prop];
+            }
+            else {
+                throw new Error(`Target (${target}) does not have property (${prop})`);
+            }
+        }
+    });
+    this.proxy = proxy;
 
     function makeController(name, def, html) {
         // Modals are above everything. Therefore, there is no way apps can

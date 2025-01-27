@@ -1,0 +1,57 @@
+<div class="ui-window" style="width: 500px">
+  <script type="text/javascript">
+    function $(this.id)(view) {
+      function openProject() {
+        console.log("open");
+      }
+      this.openProject = openProject;
+
+      function save() {
+      }
+      this.save = save;
+
+      function close() {
+      }
+      this.close = close;
+
+      function viewDidLoad() {
+        let version = $(app.controller).version;
+        view.ui.span("version").innerHTML = version;
+
+        // TODO: Query from server
+        let projects = [
+          {id: "io.bithead.boss-code", name: "Bosscode"},
+          {id: "io.bithead.test-manager", name: "Test Manager"}
+        ];
+
+        view.ui.select("projects").ui.addNewOptions(projects);
+      }
+      this.viewDidLoad = viewDidLoad;
+    }
+  </script>
+  <div class="top">
+    <div class="close-button"></div>
+    <div class="title"><span>BOSSCode</span></div>
+    <div class="zoom-button"></div>
+  </div>
+  <div class="container">
+    <div class="hbox gap-10">
+      <div class="vbox gap-10 align-center" style="width: 50%">
+        <div><img src="$(app.resourcePath)/icon.svg" height="64" width="64"></div>
+        <div>BOSSCode</div>
+        <div>Version <span name="version"></span></div>
+        <button class="primary" onclick="$(app.controller).createProject();">Create project</button>
+        <button class="primary" onclick="$(app.controller).importProject();">Import project</button>
+      </div>
+
+      <div class="vbox gap-10" style="width: 50%">
+        <div class="ui-list-box" style="height: 200px">
+          <select name="projects"></select>
+        </div>
+        <div class="controls">
+          <button class="primary" onclick="$(this.controller).openProject();">Open</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

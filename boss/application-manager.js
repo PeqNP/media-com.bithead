@@ -196,7 +196,7 @@ function ApplicationManager(os) {
                 },
                 "this": {
                     id: app.scriptId,
-                    controller: `os.application('${bundleId}').controller()`
+                    controller: `os.application('${bundleId}').proxy`
                 }
             }
 

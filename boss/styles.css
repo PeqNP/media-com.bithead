@@ -1333,6 +1333,7 @@ label {
 }
 .vbox.align-center {
   justify-content: center;
+  align-items: center;
 }
 .vbox.align-right {
   justify-content: flex-end;

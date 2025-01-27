@@ -7,7 +7,7 @@
         "name": "BOSSCode",
         "version": "1.0.0",
         "icon": "icon.svg",
-        "main": "Editor",
+        "main": "Splash",
         "author": "Eric Chamberlain",
         "copyright": "2025 Bithead LLC. All rights reserved.",
         "quitAutomatically": true
@@ -15,6 +15,9 @@
     "controllers": {
         "Application": { },
         "Editor": {
+            "singleton": true
+        },
+        "Splash": {
             "singleton": true
         }
     }
