@@ -230,20 +230,24 @@ function UI(os) {
      *
      * This is generally called directly after a window is removed from the
      * desktop.
+     *
+     * @returns `true` when a window is focused
      */
     function focusTopWindow() {
         // No windows to focus
         if (windowIndices.length === 0) {
-            return;
+            return false;
         }
 
         for (let i = windowIndices.length; i > 0; i--) {
             let topWindow = windowIndices[i - 1];
             if (os.switchApplicationMenu(topWindow.ui.bundleId)) {
                 topWindow.ui.didFocusWindow();
-                break;
+                return true;
             }
         }
+
+        return false; // Should never enter here
     }
     this.focusTopWindow = focusTopWindow;
 

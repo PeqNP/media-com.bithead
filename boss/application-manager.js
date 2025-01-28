@@ -366,9 +366,16 @@ function ApplicationManager(os) {
         delete closingApps[bundleId];
         delete loadedApps[bundleId];
 
+        if (activeApplication.bundleId == bundleId) {
+            activeApplication = null;
+        }
+
         // In some cases, the app being closed has no windows open. If this is
         // the case, we want to focus the top-most window.
-        os.ui.focusTopWindow();
+        if (!os.ui.focusTopWindow() && !isEmpty(activeApplication)) {
+            // If there are no windows, show the active application's menu
+            switchApplication(activeApplication.bundleId);
+        }
     }
     this.closeApplication = closeApplication;
 
