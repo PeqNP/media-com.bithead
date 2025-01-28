@@ -1,12 +1,15 @@
 <div class="ui-window" style="width: 500px">
   <script type="text/javascript">
     function $(this.id)(view) {
-      function openProject() {
+      async function openProject() {
         // TODO: Make calls to open project
-        let win = $(app.controller).loadController("Editor");
-        win.show(function (ctrl) {
+        let win = await $(app.controller).loadController("Editor");
+        win.ui.show(function (ctrl) {
           // TODO: Configure controller with project
+          // NOTE: This is set to 1 to test the menus
+          ctrl.configure(1);
         });
+        view.ui.close();
       }
       this.openProject = openProject;
 
@@ -31,7 +34,7 @@
         <div><img src="$(app.resourcePath)/icon.svg" height="64" width="64"></div>
         <div>BOSSCode</div>
         <div>Version <span name="version"></span></div>
-        <button class="primary" onclick="$(app.controller).createProject();">Create project</button>
+        <button class="primary" onclick="$(app.controller).createProject();">New project</button>
         <button class="primary" onclick="$(app.controller).importProject();">Import project</button>
       </div>
 

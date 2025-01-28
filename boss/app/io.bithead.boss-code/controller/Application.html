@@ -1,15 +1,17 @@
 <div class="ui-application">
   <script type="text/application">
     function $(this.id)(config) {
+      let project;
+
       function close() {
         os.closeApplication('$(app.bundleId)');
       }
       this.close = close;
 
-      function createProject() {
+      async function createProject() {
         // TODO: Make calls to server to create project
-        let win = $(app.controller).loadController("Editor");
-        win.show(function (ctrl) {
+        let win = await $(this.controller).loadController("Editor");
+        win.ui.show(function (ctrl) {
           // TODO: Configure controller with project
         });
       }
@@ -18,18 +20,18 @@
       /**
        * Add a new window, modal, or embedded controller to the project.
        */
-      function createController() {
-        let win = $(app.controller).loadController("ControllerSelector");
-        win.show();
+      async function createController() {
+        let win = await $(this.controller).loadController("ControllerSelector");
+        win.ui.show();
       }
       this.createController = createController;
 
       /**
        * Show menu with list of projects that can be opened.
        */
-      function openProject() {
-        let win = $(app.controller).loadController("Projects");
-        win.show();
+      async function openProject() {
+        let win = await $(this.controller).loadController("Projects");
+        win.ui.show();
       }
       this.openProject = openProject;
 
@@ -47,15 +49,43 @@
         // TODO: Savew the focused project
       }
 
-      function importProject() {
-        // TODO: Make calls to import project with zip file
+      /**
+       * Import a project from an uploaded zip.
+       */
+      async function importProject() {
+        // TODO: Import project
+        let win = await $(this.controller).loadController("ImportProject");
+        win.ui.show();
         // TODO: Show progress bar of import
-        let win = $(app.controller).loadController("Editor");
-        win.show(function (ctrl) {
-          // TODO: Configure controller with project
-        });
+        // TODO: Load imported project
       }
       this.importProject = importProject;
+
+      /**
+       * Focus on project.
+       *
+       * This is called by the Editor for an open project.
+       *
+       * @param {Project} project - Project Editor that gained focus
+       */
+      function didFocusProject(_project) {
+        project = _project;
+
+        let menus = $(this.controller).menus();
+        let menu = menus.ui.select("file-menu");
+
+        if (isEmpty(project)) {
+          menu.ui.disableOption("Add controller");
+          menu.ui.disableOption("Close project");
+          menu.ui.disableOption("Save project");
+        }
+        else {
+          menu.ui.enableOption("Add controller");
+          menu.ui.enableOption("Close project");
+          menu.ui.enableOption("Save project");
+        }
+      }
+      this.didFocusProject = didFocusProject;
     }
   </script>
   <div class="ui-menus">

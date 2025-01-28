@@ -998,6 +998,16 @@ function UIApplication(id, config) {
     });
     this.proxy = proxy;
 
+    /**
+     * Returns reference to application's menu group.
+     */
+    function menus() {
+        let c = document.getElementById(menuId)
+        c.ui = new UIMenus(c);
+        return c;
+    }
+    this.menus = menus;
+
     function makeController(name, def, html) {
         // Modals are above everything. Therefore, there is no way apps can
         // be switched in this context w/o the window being closed first.
@@ -1802,7 +1812,7 @@ function UIPopupMenu(select) {
     /**
      * Disable an option.
      *
-     * @param {integer} index - The option's index
+     * @param {integer|string} index - The option index or label
      */
     function disableOption(index) {
     }
@@ -1811,7 +1821,7 @@ function UIPopupMenu(select) {
     /**
      * Enable an option.
      *
-     * @param {integer} index - The option's index
+     * @param {integer|string} index - The option index or label
      */
     function enableOption(index) {
     }
@@ -2055,6 +2065,18 @@ function stylePopupMenus(element) {
     }
 }
 
+function UIMenus(container) {
+    /**
+     * Returns instance of `select` inside of UIMenus container.
+     *
+     * @param {string} name - Name of select element
+     */
+    function select(name) {
+        return container.querySelector(`select[name='${name}']`);
+    }
+    this.select = select;
+}
+
 /**
  * UI menu displayed in OS bar.
  *
@@ -2079,6 +2101,25 @@ function UIMenu(select, container) {
         }
     }
     this.removeOption = removeOption;
+
+    /**
+     * Enable menu option.
+     *
+     * @param {string} value - The value of the option to disable
+     */
+    function enableOption(value) {
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option.value == value) {
+                option.disabled = false;
+                if (option.ui.classList.contains("disabled")) {
+                    option.ui.classList.remove("disabled");
+                }
+                break;
+            }
+        }
+    }
+    this.enableOption = enableOption;
 
     /**
      * Disable a menu option.
