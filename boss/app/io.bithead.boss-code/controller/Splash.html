@@ -14,17 +14,12 @@
       }
       this.close = close;
 
-      function viewDidLoad() {
+      async function viewDidLoad() {
         let version = $(app.controller).version;
         view.ui.span("version").innerHTML = version;
 
-        // TODO: Query from server
-        let projects = [
-          {id: "io.bithead.boss-code", name: "Bosscode"},
-          {id: "io.bithead.test-manager", name: "Test Manager"}
-        ];
-
-        view.ui.select("projects").ui.addNewOptions(projects);
+        let response = await os.network.get("/bosscode");
+        view.ui.select("projects").ui.addNewOptions(response.projects);
       }
       this.viewDidLoad = viewDidLoad;
     }
