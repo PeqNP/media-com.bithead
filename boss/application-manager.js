@@ -365,6 +365,10 @@ function ApplicationManager(os) {
 
         delete closingApps[bundleId];
         delete loadedApps[bundleId];
+
+        // In some cases, the app being closed has no windows open. If this is
+        // the case, we want to focus the top-most window.
+        os.ui.focusTopWindow();
     }
     this.closeApplication = closeApplication;
 
@@ -490,12 +494,18 @@ function ApplicationManager(os) {
         let windows = document.getElementById(os.ui.appContainerId(app.bundleId));
 
         // For passive apps, simply focus on the top-most window in its window group
+        // FIXME: Passive apps are always assumed to have at least one window open.
+        // Non-passive apps have logic (see below) to blur the top-most window. Not
+        // so in this context.
         if (app.passive) {
             focusTopMostAppWindow(windows);
             return;
         }
 
-        blurActiveApplication();
+        // This app may still be the "focused app" but w/ no windows open.
+        if (bundleId !== activeApplication?.bundleId) {
+            blurActiveApplication();
+        }
 
         activeApplication = app;
 
@@ -511,8 +521,18 @@ function ApplicationManager(os) {
             appMenu.style.display = "none";
         }
 
-        // Focus on top-most app in window group
-        focusTopMostAppWindow(windows);
+        // Blur top-most window. This avoids two app menus showing at the same
+        // time.
+        if (isEmpty(windows.childNodes)) {
+            os.ui.blurTopWindow();
+            // This is usually called by the window that is focused. But there
+            // is no window. Therefore, it must be switched here.
+            switchApplicationMenu(bundleId);
+        }
+        else {
+            // Focus on top-most app in window group
+            focusTopMostAppWindow(windows);
+        }
 
         app.applicationDidFocus();
     }

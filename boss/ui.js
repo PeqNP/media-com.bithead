@@ -209,6 +209,21 @@ function UI(os) {
     this.focusWindow = focusWindow;
 
     /**
+     * Blur top-most window.
+     *
+     * This happens when switching applications.
+     */
+    function blurTopWindow() {
+        // No windows to blur
+        if (windowIndices.length === 0) {
+            return;
+        }
+        let topWindow = windowIndices[windowIndices.length - 1];
+        topWindow.ui.didBlurWindow();
+    }
+    this.blurTopWindow = blurTopWindow;
+
+    /**
      * Focus the top-most window.
      *
      * This only focuses on passive and active windows.
