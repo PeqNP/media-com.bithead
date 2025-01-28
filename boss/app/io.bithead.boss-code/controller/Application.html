@@ -1,15 +1,82 @@
 <div class="ui-application">
   <script type="text/application">
     function $(this.id)(config) {
+      function close() {
+        os.closeApplication('$(app.bundleId)');
+      }
+      this.close = close;
+
       function createProject() {
-        console.log("create");
+        // TODO: Make calls to server to create project
+        let win = $(app.controller).loadController("Editor");
+        win.show(function (ctrl) {
+          // TODO: Configure controller with project
+        });
       }
       this.createProject = createProject;
 
+      /**
+       * Add a new window, modal, or embedded controller to the project.
+       */
+      function createController() {
+        let win = $(app.controller).loadController("ControllerSelector");
+        win.show();
+      }
+      this.createController = createController;
+
+      /**
+       * Show menu with list of projects that can be opened.
+       */
+      function openProject() {
+        let win = $(app.controller).loadController("Projects");
+        win.show();
+      }
+      this.openProject = openProject;
+
+      /**
+       * Close the focused project.
+       */
+      function closeProject() {
+        // TODO: Close the focused project
+      }
+
+      /**
+       * Save the focused project.
+       */
+      function saveProject() {
+        // TODO: Savew the focused project
+      }
+
       function importProject() {
-        console.log("import");
+        // TODO: Make calls to import project with zip file
+        // TODO: Show progress bar of import
+        let win = $(app.controller).loadController("Editor");
+        win.show(function (ctrl) {
+          // TODO: Configure controller with project
+        });
       }
       this.importProject = importProject;
     }
   </script>
+  <div class="ui-menus">
+    <div class="ui-menu" style="width: 180px">
+      <select name="boss-code-menu">
+        <option>BOSSCode</option>
+        <option onclick="$(this.controller).close();">Close BOSSCode</option>
+      </select>
+    </div>
+    <div class="ui-menu" style="width: 180px">
+      <select name="file-menu">
+        <option>File</option>
+        <option onclick="$(this.controller).createProject();">New project</option>
+        <option onclick="$(this.controller).openProject();">Open project</option>
+        <option onclick="$(this.controller).importProject();">Import project</option>
+        <option class="group"></option>
+        <option onclick="$(this.controller).createController();" disabled>Add controller</option>
+        <option class="group"></option>
+        <option onclick="$(this.controller).closeProject();" disabled>Close project</option>
+        <option onclick="$(this.controller).closeProject();" disabled>Save project</option>
+      </select>
+    </div>
+  </div>
 </div>

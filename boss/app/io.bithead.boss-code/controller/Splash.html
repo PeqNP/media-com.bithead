@@ -2,17 +2,13 @@
   <script type="text/javascript">
     function $(this.id)(view) {
       function openProject() {
-        console.log("open");
+        // TODO: Make calls to open project
+        let win = $(app.controller).loadController("Editor");
+        win.show(function (ctrl) {
+          // TODO: Configure controller with project
+        });
       }
       this.openProject = openProject;
-
-      function save() {
-      }
-      this.save = save;
-
-      function close() {
-      }
-      this.close = close;
 
       async function viewDidLoad() {
         let version = $(app.controller).version;
