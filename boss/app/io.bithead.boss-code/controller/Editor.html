@@ -3,6 +3,13 @@
     function $(this.id)(view) {
       let bundleId;
       let project; // Loaded project
+      let history;
+      let historyLogged = false;
+
+      // List of commands that have been executed
+      let commandHistory = [];
+      // The last index used in the search
+      let commandHistoryIndex = null;
 
       /**
        * @param {string} bundleId - App bundle ID
@@ -49,7 +56,7 @@
       }
 
       function initializeConsole() {
-        let history = initializeHistory();
+        history = initializeHistory();
 
         let ta = view.ui.textarea("command");
         let editor = CodeMirror.fromTextArea(ta, {
@@ -61,17 +68,78 @@
           lineWrapping: false,
           lineNumbers: false,
           extraKeys: {
-            "Enter": function(cm) {
-              // TODO: Execute command
+            "Enter": function (cm) {
               let cmd = cm.getValue();
+              let exec = cmd;
+              if (cmd.startsWith("po ")) {
+                exec = cmd.replace("po ", "").trim();
+              }
 
-              // Add command, and result, to history
-              history.replaceRange(`\n${cmd}`, CodeMirror.Pos(history.lastLine()));
-              history.scrollIntoView({line: history.lastLine(), ch: 0}, true);
+              let log;
+              try {
+                log = eval(exec);
+              }
+              catch (error) {
+                log = error;
+              }
+
+              if (log === undefined) {
+                log = cmd;
+              }
+              else {
+                log = `${cmd}\nreturn: ${log}`;
+              }
+              addLogToHistory(log);
 
               cm.setValue("");
 
+              // Add last command issued to history
+              commandHistory.push(cmd);
+              // Reset command history index so that the last command issued
+              // will be the one that was just issued.
+              commandHistoryIndex = null;
+
               return false; // Prevent default behavior
+            },
+            "Up": function (cm) {
+              if (isEmpty(commandHistory) || commandHistoryIndex < 0) {
+                return;
+              }
+
+              // Command history has not been invoked
+              if (isEmpty(commandHistoryIndex)) {
+                commandHistoryIndex = commandHistory.length - 1;
+              }
+              else {
+                commandHistoryIndex -= 1;
+                if (commandHistoryIndex < 0) {
+                  commandHistoryIndex = 0;
+                  return;
+                }
+              }
+
+              let cmd = commandHistory[commandHistoryIndex];
+              cm.setValue(cmd);
+            },
+            "Down": function (cm) {
+              if (isEmpty(commandHistory) || commandHistoryIndex >= commandHistory.length) {
+                return;
+              }
+
+              // History has not been searched yet. Nothing to do.
+              if (isEmpty(commandHistoryIndex)) {
+                return;
+              }
+
+              commandHistoryIndex += 1;
+              // Past fence, reset
+              if (commandHistoryIndex > commandHistory.length - 1) {
+                commandHistoryIndex = commandHistory.length - 1;
+                return;
+              }
+
+              let cmd = commandHistory[commandHistoryIndex];
+              cm.setValue(cmd);
             }
           },
           gutters: ["cm-console-gutter"]
@@ -81,6 +149,22 @@
         editor.setOption("gutter", function (view, line) {
           return '>';
         });
+      }
+
+      function addLogToHistory(log) {
+        // NOTE: It's not enough to check the `history.lastLine()`. This method
+        // can be called in quick succession, preventing the `lastLine()` from
+        // updating. To avoid this, the `historyLogged` bool prevents the 2nd
+        // line from not adding newline, if necessary.
+        if (historyLogged) {
+          log = `\n${log}`;
+        }
+
+        historyLogged = true;
+
+        // Add command, and result, to history
+        history.replaceRange(log, CodeMirror.Pos(history.lastLine()));
+        history.scrollIntoView({line: history.lastLine(), ch: 0}, true);
       }
 
       function viewDidLoad() {
@@ -114,6 +198,8 @@
           didCloseTab: didCloseTab,
           didSelectTab: didSelectTab
         }
+
+        os.patchSystemLogger(addLogToHistory);
 
         // TODO: Auto-save files if they are changed
       }

@@ -55,6 +55,44 @@ function OS() {
     }
     this.init = init;
 
+    // Original reference to console.log
+    let originalLogger;
+    // Wraps and calls the patched callback fn as well as the original logger
+    let currentLogger;
+
+    /**
+     * Patches `console.log` function so that logs may be observed from OS.
+     *
+     * Only one function may patch the system logger at a time. When finished,
+     * please call `unpatchSystemLogger`.
+     *
+     * @param {function} fn - The function to call when `console.log` is called
+     */
+    function patchSystemLogger(fn) {
+        if (isEmpty(originalLogger)) {
+            originalLogger = console.log;
+        }
+        currentLogger = function (value) {
+            fn(value);
+            originalLogger(value);
+        }
+        console.log = currentLogger;
+    }
+    this.patchSystemLogger = patchSystemLogger;
+
+    /**
+     * Unpatch (reset) the `console.log` function.
+     */
+    function unpatchSystemLogger() {
+        if (isEmpty(originalLogger)) {
+            return;
+        }
+        console.log = originalLogger;
+        currentLogger = null;
+        originalLogger = null;
+    }
+    this.unpatchSystemLogger = unpatchSystemLogger;
+
     /**
      * Log user out of system.
      */
