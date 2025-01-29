@@ -24,3 +24,7 @@ div.console .command {
   top: 4px;
   left: 10px;
 }
+
+div.console .CodeMirror {
+  border: 0px;
+}

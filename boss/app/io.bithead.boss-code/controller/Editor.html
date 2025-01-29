@@ -76,7 +76,7 @@
           },
           gutters: ["cm-console-gutter"]
         });
-        editor.setSize(null, "34px");
+        editor.setSize(null, "100%");
 
         editor.setOption("gutter", function (view, line) {
           return '>';
@@ -147,7 +147,7 @@
     <div class="title"><span>Untitled</span></div>
     <div class="zoom-button"></div>
   </div>
-  <div class="container resizable" style="width: 700px; height: 500px;">
+  <div class="container no-padding resizable group" style="width: 700px; height: 500px;">
     <div class="hbox" style="height: 100%">
       <div class="ui-list-box" style="width: 160px; height: 100%;">
         <select name="project-files">

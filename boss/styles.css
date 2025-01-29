@@ -430,10 +430,31 @@ body {
 #desktop .ui-window > .container.resizable {
   resize: both;
 }
-
 /* Some windows, like folder windows, should have no padding. */
 #desktop .ui-window > .container.no-padding {
   padding: 0px;
+}
+/**
+ * Component groups
+ *
+ * If you want to group all components together, as if they were one component,
+ * define the ui-window as a `group`. This removes borders defined on all
+ * components, but adds a 1px gap between components as a way to visually
+ * separate the components.
+ */
+/* Removes borders from direct descendants */
+#desktop .ui-window > .container.group > * {
+  border: none;
+}
+/* Removes all borders from components */
+#desktop .ui-window > .container.group .ui-list-box,
+#desktop .ui-window > .container.group .CodeMirror {
+  border: none;
+}
+#desktop .ui-window > .container.group .hbox,
+#desktop .ui-window > .container.group .vbox {
+  gap: 1px;
+  background-color: #000;
 }
 
 /**
@@ -1406,7 +1427,6 @@ div.ui-tabs .ui-tab {
   border-right: 1px solid #fff;
 }
 div.ui-tabs .ui-tab.selected {
-  /* TODO: */
   color: #000;
   border-left: 1px solid #000;
   border-right: 1px solid #000;
