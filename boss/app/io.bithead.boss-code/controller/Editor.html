@@ -19,8 +19,21 @@
     <div class="title"><span>BOSSCode</span></div>
     <div class="zoom-button"></div>
   </div>
-  <div class="container">
-    <h1>Editor</h1>
-    <p>Coming soon...</p>
-  </div>
+  <div class="container resizable" style="width: 700px; height: 500px;">
+    <div class="hbox" style="height: 100%">
+      <div class="ui-list-box" style="width: 160px; height: 100%;">
+        <select name="project-files"></select>
+      </div>
+
+      <div class="vbox" style="width: 100%;">
+        <div class="tabs">
+          <select name="open-file-tabs"></select>
+        </div> <!-- tabs -->
+        <div style="flex: 1; background-color: blue;">
+        </div> <!-- editor -->
+        <div style="height: 100px; background-color: red;">
+        </div> <!-- console -->
+      </div> <!-- vbox -->
+    </div> <!-- hbox -->
+  </div> <!-- container -->
 </div>

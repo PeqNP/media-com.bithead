@@ -59,8 +59,8 @@ function UI(os) {
     this.controller = new Proxy(controller, handler);
 
     function init() {
-        // TODO: Some of these should go away and be performed only in `makeWindow`.
-        stylePopupMenus(document);
+        // Pop-up menus are displayed even before windows are shown (e.g. OS bar)
+        styleAllUIPopupMenus(document);
 
         // Style hard-coded system menus
         os.ui.styleUIMenus(document.getElementById("os-bar"));
@@ -1294,8 +1294,9 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
      * @param {function?} fn - Callback function that will be called before view is loaded
      */
     function init(fn) {
-        stylePopupMenus(container);
-        styleListBoxes(container);
+        styleAllUIPopupMenus(container);
+        styleAllUIListBoxes(container);
+        styleAllUITabs(container);
         os.ui.styleUIMenus(container);
 
         // Add window controller, if it exists.
@@ -2005,7 +2006,7 @@ function UIPopupMenu(select) {
 /**
  * Style all popup menu elements.
  */
-function stylePopupMenus(element) {
+function styleAllUIPopupMenus(element) {
     // FIX: Does not select respective select menu. Probably because it has to be reselected.
     let menus = element.getElementsByClassName("popup-menu");
     for (let i = 0; i < menus.length; i++) {
@@ -2486,7 +2487,7 @@ function UIListBox(select, container) {
     });
 }
 
-function styleListBox(list) {
+function styleUIListBox(list) {
     let container = document.createElement("div");
     container.classList.add("container");
     for (let prop in list.style) {
@@ -2507,10 +2508,277 @@ function styleListBox(list) {
     select.ui = box;
 }
 
-function styleListBoxes(elem) {
+function styleAllUIListBoxes(elem) {
     let lists = elem.getElementsByClassName("ui-list-box");
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
-        styleListBox(list);
+        styleUIListBox(list);
+    }
+}
+
+/**
+ * UITabs
+ *
+ * A horizontally aligned list of tabs which may be optionally closed.
+ */
+
+function UITabs(select, container) {
+
+    let delegate = protocol(
+        "UITabsDelegate", this, "delegate",
+        ["didSelectTab"],
+        // Allows delegate to update its UI immediately if an option
+        // requires HTMLElements to be enabled/disabled.
+        function () {
+            selectTabIndex(0);
+        }
+    );
+
+    /**
+     * Select tab by its label value.
+     *
+     * @param {string} value - Value of tab to select
+     */
+    function selectTab(value) {
+        for (let idx = 0; idx < select.options.length; idx++) {
+            if (select.options[idx].value == value) {
+                selectTabIndex(idx);
+                return;
+            }
+        }
+    }
+    this.selectTab = selectTab;
+
+    /**
+     * Select tab by its index.
+     *
+     * @param {int} index - Index of tab to select
+     */
+    function selectTabIndex(index) {
+        select.selectedIndex = index;
+        for (let i = 0; i < select.options.length; i++) {
+            let opt = select.options[i];
+            opt.ui.classList.remove("selected");
+            if (opt.selected) {
+                opt.ui.classList.add("selected");
+                delegate.didSelectTab(opt);
+            }
+        }
+    }
+    this.selectTabIndex = selectTabIndex;
+
+    function removeAllTabs() {
+        // Remove all options from the select and facade
+        for (;select.options.length > 0;) {
+            let option = select.options[0];
+            option.remove();
+            option.ui.remove();
+        }
+        // Remove elements from container
+    }
+
+    /**
+     * Add new tabs.
+     *
+     * This will remove all existing tabs.
+     *
+     * @param {[object[id:string,name:string,child:bool?,data:mixed?]]} tabs - Tabs to add.
+     */
+    function addNewTabs(tabs) {
+        removeAllTabs();
+
+        for (let i = 0; i < tabs.length; i++) {
+            let option = document.createElement("option");
+            let opt = tabs[i];
+            option.value = opt.id;
+            option.text = opt.name;
+            option.data = opt.data;
+            select.appendChild(option);
+        }
+
+        select.selectedIndex = 0;
+
+        styleTabs();
+    }
+    this.addNewTabs = addNewTabs;
+
+    /**
+     * Add tab to end of list.
+     *
+     * @param {object[id:name:]} model - Tab to add to list
+     */
+    function addTab(model) {
+        let option = new Option(model.name, model.id);
+        select.add(option, undefined); // Append to end of list
+        styleTab(option);
+    }
+    this.addTab = addTab;
+
+    /**
+     * Remove tab from list by its value.
+     *
+     * @param {string} value - Value of tab to remove
+     */
+    function removeTab(value) {
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option.value == value) {
+                removeTabIndex(i);
+                break;
+            }
+        }
+    }
+    this.removeTab = removeTab;
+
+    /**
+     * Remove tab from list by its index.
+     */
+    function removeTabIndex(index) {
+        let option = select.options[index];
+        if (isEmpty(option)) {
+            console.warn(`Attempting to remove tab at index (${index}) which does not exist in select (${select.name})`);
+            return;
+        }
+        select.remove(index);
+        container.removeChild(option.ui);
+    }
+    this.removeTabIndex = removeTabIndex;
+
+    /**
+     * Return the selected tab.
+     *
+     * @returns {HTMLOption?} The selected tab. `null` if `select` is disabled.
+     */
+    function selectedTab() {
+        if (select.disabled) {
+            return null;
+        }
+        let idx = select.selectedIndex;
+        return select.options[idx]
+    }
+    this.selectedTab = selectedTab;
+
+    /**
+     * Returns the value of the selected tab, if any.
+     *
+     * @returns {any?}
+     */
+    function selectedValue() {
+        let opt = selectedTab();
+        return opt?.value;
+    }
+    this.selectedValue = selectedValue;
+
+    /**
+     * Selects the first tab, if needed.
+     */
+    function selectTabIfNeeded() {
+        let hasSelectedTab = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].ui.classList.contains("selected")) {
+                hasSelectedTab = true;
+                break;
+            }
+        }
+        if (!hasSelectedTab) {
+            selectTabIndex(0);
+        }
+    }
+
+    function styleTab(option) {
+        let elem = document.createElement("div");
+        elem.classList.add("ui-tab");
+        let label = option.innerHTML;
+        let labels = label.split(",");
+
+        if (option.classList.contains("close-button")) {
+            let button = document.createElement("div");
+            button.classList.add("close-button");
+            button.addEventListener("click", function (e) {
+                e.stopPropagation();
+                removeTabIndex(option.index);
+                selectTabIfNeeded();
+            });
+            // Prevents the tab from being selected
+            button.addEventListener("mouseup", function (e) {
+                e.stopPropagation();
+            });
+            elem.append(button);
+        }
+
+        // Label has an image
+        if (labels.length == 2) {
+            let imgLabel = labels[0].trim();
+            if (!imgLabel.startsWith("img:")) {
+                console.warn("The first label item must be an image");
+                elem.innerHTML = label;
+            }
+            else {
+                let img = document.createElement("img");
+                img.src = imgLabel.split(":")[1];
+                elem.appendChild(img);
+                let span = document.createElement("span");
+                span.innerHTML = labels[1];
+                elem.append(span);
+            }
+        }
+        else {
+            let span = document.createElement("span");
+            span.innerHTML = label;
+            elem.append(span);
+        }
+
+        // Transfer onclick event
+        if (!isEmpty(option.onclick)) {
+            elem.setAttribute("onclick", option.getAttribute("onclick"));
+        }
+
+        if (option.selected) {
+            elem.classList.add("selected");
+        }
+        for (let j = 0; j < option.classList.length; j++) {
+            elem.classList.add(option.classList[j]);
+        }
+        option.ui = elem;
+
+        container.appendChild(elem);
+        elem.addEventListener("mouseup", function(obj) {
+            selectTab(option.value);
+        });
+    }
+
+    function styleTabs() {
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            styleTab(option);
+        }
+    }
+
+    styleTabs();
+}
+
+function styleUITabs(elem) {
+    let container = document.createElement("div");
+    container.classList.add("container");
+    elem.style = null;
+    elem.appendChild(container);
+    let select = elem.querySelector("select");
+    if (isEmpty(select.name)) {
+        throw new Error("UITabs select element must have a name");
+    }
+    if (select.multiple) {
+        throw new Error("UITabs select element may not be multiple select");
+    }
+    // View ID used for automated testing
+    elem.classList.add(`ui-tabs-${select.name}`);
+    let tabs = new UITabs(select, container);
+    select.ui = tabs;
+}
+
+function styleAllUITabs(elem) {
+    let lists = elem.getElementsByClassName("ui-tabs");
+    for (let i = 0; i < lists.length; i++) {
+        let list = lists[i];
+        styleUITabs(list);
     }
 }

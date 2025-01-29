@@ -1372,3 +1372,52 @@ div.info-message:before {
   margin-right: 10px;
   vertical-align: middle;
 }
+
+/**
+ * UITabs
+ *
+ * Display a horizontally aligned list of select options. Used for file tabs, open windows, etc.
+ **/
+
+div.ui-tabs { }
+div.ui-tabs > select {
+  display: none;
+}
+
+/* Contains facade options */
+div.ui-tabs > .container {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+  background-color: #fff;
+}
+div.ui-tabs .ui-tab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  padding-left: 16px;
+  padding-right: 16px;
+  color: #c0c0c0;
+  font-family: "ChicagoFLF";
+  font-size: 14px;
+  cursor: pointer;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #fff;
+}
+div.ui-tabs .ui-tab.selected {
+  /* TODO: */
+  color: #000;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+/* Display a close button on UITab */
+div.ui-tabs .ui-tab > .close-button {
+  position: relative;
+  left: -10px;
+  width: 18px;
+  height: 18px;
+  background-image: url("/boss/img/close-button.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+}
