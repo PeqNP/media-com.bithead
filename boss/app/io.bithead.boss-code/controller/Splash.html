@@ -2,12 +2,15 @@
   <script type="text/javascript">
     function $(this.id)(view) {
       async function openProject() {
-        // TODO: Make calls to open project
+        let bundleId = view.ui.select("projects").ui.selectedValue();
+        if (isEmpty(bundleId)) {
+          console.warn("There are no projects to open");
+          return;
+        }
+
         let win = await $(app.controller).loadController("Editor");
         win.ui.show(function (ctrl) {
-          // TODO: Configure controller with project
-          // NOTE: This is set to 1 to test the menus
-          ctrl.configure(1);
+          ctrl.configure(bundleId);
         });
         view.ui.close();
       }
@@ -17,7 +20,7 @@
         let version = $(app.controller).version;
         view.ui.span("version").innerHTML = version;
 
-        let response = await os.network.get("/bosscode");
+        let response = await os.network.get("/boss-code");
         view.ui.select("projects").ui.addNewOptions(response.projects);
       }
       this.viewDidLoad = viewDidLoad;

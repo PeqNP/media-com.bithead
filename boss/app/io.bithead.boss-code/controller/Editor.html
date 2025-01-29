@@ -1,37 +1,181 @@
 <div class="ui-window">
   <script type="text/javascript">
     function $(this.id)(view) {
-      let project;
+      let bundleId;
+      let project; // Loaded project
 
-      function configure(_project) {
-        project = _project;
+      /**
+       * @param {string} bundleId - App bundle ID
+       */
+      function configure(_bundleId) {
+        bundleId = _bundleId;
       }
       this.configure = configure;
 
+      async function loadProject() {
+        let resp = await os.network.get(`/boss-code/project/${bundleId}`);
+        project = resp;
+      }
+
+      function initializeEditor() {
+        let editorInput = view.ui.textarea("editor");
+        let editor = CodeMirror.fromTextArea(editorInput, {
+          mode: "javascript",
+          tabSize: 4,
+          indentWithTabs: false,
+          electricChars: true,
+          lineWrapping: false,
+          lineNumbers: true,
+          autofocus: true
+        });
+        editor.setSize(null, "100%");
+      }
+
+      function initializeHistory() {
+        let ta = view.ui.textarea("history");
+        let editor = CodeMirror.fromTextArea(ta, {
+          readOnly: true,
+          mode: "javascript",
+          theme: "monokai",
+          tabSize: 4,
+          indentWithTabs: false,
+          electricChars: true,
+          lineWrapping: false,
+          lineNumbers: false,
+          scrollPastEnd: false
+        });
+        editor.setSize(null, "100%");
+        return editor;
+      }
+
+      function initializeConsole() {
+        let history = initializeHistory();
+
+        let ta = view.ui.textarea("command");
+        let editor = CodeMirror.fromTextArea(ta, {
+          mode: "javascript",
+          theme: "monokai",
+          tabSize: 4,
+          indentWithTabs: false,
+          electricChars: true,
+          lineWrapping: false,
+          lineNumbers: false,
+          extraKeys: {
+            "Enter": function(cm) {
+              // TODO: Execute command
+              let cmd = cm.getValue();
+
+              // Add command, and result, to history
+              history.replaceRange(`\n${cmd}`, CodeMirror.Pos(history.lastLine()));
+              history.scrollIntoView({line: history.lastLine(), ch: 0}, true);
+
+              cm.setValue("");
+
+              return false; // Prevent default behavior
+            }
+          },
+          gutters: ["cm-console-gutter"]
+        });
+        editor.setSize(null, "34px");
+
+        editor.setOption("gutter", function (view, line) {
+          return '>';
+        });
+      }
+
+      function viewDidLoad() {
+        if (isEmpty(bundleId)) {
+          console.error("Editor must be configured via configure(bundleId:)");
+          return;
+        }
+
+        Promise.all([
+          os.network.stylesheet('$(app.resourcePath)/css/boss-code.css'),
+          os.network.stylesheet('/codemirror/lib/codemirror.css'),
+          os.network.javascript('/codemirror/lib/codemirror.js'),
+          os.network.stylesheet('/codemirror/theme/monokai.css'),
+        ])
+          .then(([p1, p2]) => {
+            os.network.javascript('/codemirror/mode/javascript/javascript.js')
+              .then(async function() {
+                await loadProject();
+                initializeEditor();
+                initializeConsole();
+                view.ui.setTitle(project.name);
+              });
+          });
+
+        let files = view.ui.select("project-files");
+        files.ui.delegate = {
+          didSelectListBoxOption: didSelectFile
+        }
+        let tabs = view.ui.select("file-tabs");
+        tabs.ui.delegate = {
+          didCloseTab: didCloseTab,
+          didSelectTab: didSelectTab
+        }
+
+        // TODO: Auto-save files if they are changed
+      }
+      this.viewDidLoad = viewDidLoad;
+
+      function didSelectFile(option) {
+        // TODO: Tab already exists for file? Focus it.
+        // TODO: Load file from server, create tab, focus on tab
+      }
+
+      function didCloseTab(tab) {
+        // TODO: Save file, if not saved
+      }
+
+      function didSelectTab(tab) {
+        // TODO: Switch file being edited
+        // TODO: If file associated to tab is not saved, load file from disk
+        // TODO: Save previously selected tab's file, if any
+      }
+
       function viewDidFocus() {
-        $(app.controller).didFocusProject(project);
+        // TODO: Wait for project to be loaded, then let app controller know(?)
+        // OR, maybe the bundleId is good enough?
+        $(app.controller).didFocusProject(bundleId);
       }
       this.viewDidFocus = viewDidFocus;
     }
   </script>
   <div class="top">
     <div class="close-button"></div>
-    <div class="title"><span>BOSSCode</span></div>
+    <div class="title"><span>Untitled</span></div>
     <div class="zoom-button"></div>
   </div>
   <div class="container resizable" style="width: 700px; height: 500px;">
     <div class="hbox" style="height: 100%">
       <div class="ui-list-box" style="width: 160px; height: 100%;">
-        <select name="project-files"></select>
+        <select name="project-files">
+          <option>application.json</option>
+          <option>icon.svg</option>
+          <option>controller</option>
+          <option class="child">Application.html</option>
+          <option class="child">Editor.html</option>
+          <option class="child">Splash.html</option>
+        </select>
       </div>
 
       <div class="vbox" style="width: 100%;">
-        <div class="tabs">
-          <select name="open-file-tabs"></select>
-        </div> <!-- tabs -->
-        <div style="flex: 1; background-color: blue;">
+        <div class="ui-tabs">
+          <select name="file-tabs">
+            <option class="close-button">Editor.html</option>
+            <option class="close-button">Splash.html</option>
+            <option class="close-button">Application.html</option>
+          </select>
+        </div> <!-- file-tabs -->
+
+        <div style="flex-grow: 1;">
+          <textarea name="editor"></textarea>
         </div> <!-- editor -->
-        <div style="height: 100px; background-color: red;">
+
+        <div class="console">
+          <div class="history"><textarea name="history"></textarea></div>
+          <div class="command"><textarea name="command"></textarea></div>
         </div> <!-- console -->
       </div> <!-- vbox -->
     </div> <!-- hbox -->

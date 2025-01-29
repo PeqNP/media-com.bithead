@@ -1391,6 +1391,16 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
     }
     this.init = init;
 
+    function setTitle(title) {
+        let span = container.querySelector(".top .title span");
+        if (isEmpty(span)) {
+            console.warn("The UIWindow does not have a title");
+            return;
+        }
+        span.innerHTML = title;
+    }
+    this.setTitle = setTitle;
+
     /**
      * Show the window.
      *
@@ -2526,7 +2536,7 @@ function UITabs(select, container) {
 
     let delegate = protocol(
         "UITabsDelegate", this, "delegate",
-        ["didSelectTab"],
+        ["didCloseTab", "didSelectTab"],
         // Allows delegate to update its UI immediately if an option
         // requires HTMLElements to be enabled/disabled.
         function () {
@@ -2692,10 +2702,12 @@ function UITabs(select, container) {
         let labels = label.split(",");
 
         if (option.classList.contains("close-button")) {
+            option.classList.remove("close-button");
             let button = document.createElement("div");
             button.classList.add("close-button");
             button.addEventListener("click", function (e) {
                 e.stopPropagation();
+                delegate.didCloseTab(option);
                 removeTabIndex(option.index);
                 selectTabIfNeeded();
             });

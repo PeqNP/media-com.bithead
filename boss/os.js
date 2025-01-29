@@ -537,16 +537,28 @@ function Network(os) {
 
     /**
      * Dynamically load stylesheet.
+     *
+     * @param {string} href
      */
     async function stylesheet(href) {
-        return new Promise((resolve, reject) => {
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.onload = resolve;
-            link.onerror = reject;
-            link.href = '/codemirror/lib/codemirror.css';
-            document.head.appendChild(link);
+        let styles = document.head.querySelectorAll("style");
+        for (let i = 0; i < styles.length; i++) {
+            let style = styles[i];
+            if (style.data == href) {
+                console.log(`link (${href}) already loaded`);
+                return;
+            }
+        }
+
+        return fetch(href, {
+            cache: "no-cache"
+        })
+        .then(response => response.text())
+        .then(css => {
+            let style = document.createElement("style");
+            style.textContent = css;
+            style.data = href;
+            document.head.appendChild(style);
         });
     }
     this.stylesheet = stylesheet;
