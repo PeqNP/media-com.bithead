@@ -22,6 +22,35 @@
       async function loadProject() {
         let resp = await os.network.get(`/boss-code/project/${bundleId}`);
         project = resp;
+
+        // FIXME: Because this uses a `UIListBox`, only two levels of folders
+        // are supported.
+        let options = [];
+        for (let i = 0; i < project.files.length; i++) {
+          let file = project.files[i];
+          let opt = {
+            id: file.path,
+            name: file.name,
+            data: file,
+            child: false
+          }
+          options.push(opt);
+
+          if (!isEmpty(file.files)) {
+            for (let j = 0; j < file.files.length; j++) {
+              let child = file.files[j];
+              let opt = {
+                id: child.path,
+                name: child.name,
+                data: child,
+                child: true
+              }
+              options.push(opt);
+            }
+          }
+        }
+
+        view.ui.select("project-files").ui.addNewOptions(options);
       }
 
       function initializeEditor() {
@@ -206,8 +235,24 @@
       this.viewDidLoad = viewDidLoad;
 
       function didSelectFile(option) {
-        // TODO: Tab already exists for file? Focus it.
-        // TODO: Load file from server, create tab, focus on tab
+        let tabs = view.ui.select("file-tabs").ui;
+        let data = option.data;
+        if (tabs.contains(data.path)) {
+          tabs.selectTab(data.path); // Focus tab
+          return;
+        }
+
+        // Only open json and html files
+        if (!(data.name.endsWith(".json") || data.name.endsWith(".html"))) {
+          return;
+        }
+
+        let idx = tabs.addTab({
+          id: data.path,
+          name: data.name,
+          close: true
+        });
+        tabs.selectTab(data.path);
       }
 
       function didCloseTab(tab) {
@@ -236,23 +281,12 @@
   <div class="container no-padding resizable group" style="width: 700px; height: 500px;">
     <div class="hbox" style="height: 100%">
       <div class="ui-list-box" style="width: 160px; height: 100%;">
-        <select name="project-files">
-          <option>application.json</option>
-          <option>icon.svg</option>
-          <option>controller</option>
-          <option class="child">Application.html</option>
-          <option class="child">Editor.html</option>
-          <option class="child">Splash.html</option>
-        </select>
+        <select name="project-files"></select>
       </div>
 
       <div class="vbox" style="width: 100%;">
         <div class="ui-tabs">
-          <select name="file-tabs">
-            <option class="close-button">Editor.html</option>
-            <option class="close-button">Splash.html</option>
-            <option class="close-button">Application.html</option>
-          </select>
+          <select name="file-tabs"></select>
         </div> <!-- file-tabs -->
 
         <div style="flex-grow: 1;">

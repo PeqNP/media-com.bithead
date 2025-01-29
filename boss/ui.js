@@ -2545,9 +2545,9 @@ function UITabs(select, container) {
     );
 
     /**
-     * Select tab by its label value.
+     * Select tab by value.
      *
-     * @param {string} value - Value of tab to select
+     * @param {string} value - Tab value to select
      */
     function selectTab(value) {
         for (let idx = 0; idx < select.options.length; idx++) {
@@ -2587,6 +2587,18 @@ function UITabs(select, container) {
         // Remove elements from container
     }
 
+    function addOption(model) {
+        let option = document.createElement("option");
+        option.value = model.id;
+        option.text = model.name;
+        option.data = model.data;
+        if (model.close === true) {
+            option.classList.add("close-button");
+        }
+        select.add(option, undefined); // Append to end of list
+        return option;
+    }
+
     /**
      * Add new tabs.
      *
@@ -2598,12 +2610,7 @@ function UITabs(select, container) {
         removeAllTabs();
 
         for (let i = 0; i < tabs.length; i++) {
-            let option = document.createElement("option");
-            let opt = tabs[i];
-            option.value = opt.id;
-            option.text = opt.name;
-            option.data = opt.data;
-            select.appendChild(option);
+            addOption(tabs[i]);
         }
 
         select.selectedIndex = 0;
@@ -2618,16 +2625,31 @@ function UITabs(select, container) {
      * @param {object[id:name:]} model - Tab to add to list
      */
     function addTab(model) {
-        let option = new Option(model.name, model.id);
-        select.add(option, undefined); // Append to end of list
+        let option = addOption(model);
         styleTab(option);
     }
     this.addTab = addTab;
 
     /**
-     * Remove tab from list by its value.
+     * Check if tab is in list.
      *
-     * @param {string} value - Value of tab to remove
+     * @param {string} value - Tab value
+     * @returns `true` if tab, with `value`, is in list
+     */
+    function contains(value) {
+        for (let idx = 0; idx < select.options.length; idx++) {
+            if (select.options[idx].value == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+    this.contains = contains;
+
+    /**
+     * Remove tab by value.
+     *
+     * @param {string} value - Value of tab
      */
     function removeTab(value) {
         for (let i = 0; i < select.options.length; i++) {
