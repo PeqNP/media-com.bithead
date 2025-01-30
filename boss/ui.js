@@ -2634,6 +2634,7 @@ function UITabs(select, container) {
     function addTab(model) {
         let option = addOption(model);
         styleTab(option);
+        scrollToLastTab();
     }
     this.addTab = addTab;
 
@@ -2815,11 +2816,16 @@ function UITabs(select, container) {
         });
     }
 
+    function scrollToLastTab() {
+        container.scrollLeft = container.scrollWidth;
+    }
+
     function styleTabs() {
         for (let i = 0; i < select.options.length; i++) {
             let option = select.options[i];
             styleTab(option);
         }
+        scrollToLastTab();
     }
 
     styleTabs();

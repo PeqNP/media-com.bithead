@@ -61,7 +61,14 @@
 
         // FIXME: Because this uses a `UIListBox`, only two levels of folders
         // are supported.
-        let options = [];
+
+        // The first option is simply a label of `Files` that does nothing
+        let options = [{
+          id: "__files__",
+          name: "Files",
+          child: false
+        }];
+
         for (let i = 0; i < project.files.length; i++) {
           let file = project.files[i];
           let opt = {
@@ -271,6 +278,10 @@
       this.viewDidLoad = viewDidLoad;
 
       async function didSelectFile(option) {
+        if (option.value === "__files__") {
+          return;
+        }
+
         let tabs = view.ui.select("file-tabs").ui;
         let data = option.data;
         let tab = tabs.getTab(data.path);
@@ -282,7 +293,7 @@
         }
 
         // Only open json and html files
-        if (!(data.name.endsWith(".json") || data.name.endsWith(".html"))) {
+        if (!(data.name.endsWith(".json") || data.name.endsWith(".html") || data.name.endsWith(".css") || data.name.endsWith(".js"))) {
           return;
         }
 
