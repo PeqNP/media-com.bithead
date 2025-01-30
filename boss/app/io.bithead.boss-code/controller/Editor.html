@@ -1,8 +1,10 @@
 <div class="ui-window">
   <script type="text/javascript">
-    function DocumentState(data, _contents) {
+    function DocumentState(data, mode) {
       this.path = data.path;
       this.name = data.name;
+      this.mode = mode;
+      this.doc = CodeMirror.Doc("", mode);
 
       let isDirty = false;
       property(this, "isDirty",
@@ -11,16 +13,6 @@
         },
         function(newValue) {
           isDirty = newValue;
-        }
-      );
-
-      let contents = _contents;
-      property(this, "contents",
-        function() {
-          return contents;
-        },
-        function(newValue) {
-          contents = newValue;
         }
       );
     }
@@ -108,6 +100,11 @@
           autofocus: true
         });
         editor.setSize(null, "100%");
+
+        editor.on("keypress", function(instance, changeObj) {
+          if (isEmpty(currentDoc)) { return; }
+          currentDoc.isDirty = true;
+        });
       }
 
       function initializeHistory() {
@@ -250,9 +247,12 @@
           os.network.stylesheet('/codemirror/lib/codemirror.css'),
           os.network.javascript('/codemirror/lib/codemirror.js'),
           os.network.stylesheet('/codemirror/theme/monokai.css'),
+          os.network.javascript('/codemirror/mode/css/css.js'),
+          os.network.javascript('/codemirror/mode/xml/xml.js'),
+          os.network.javascript('/codemirror/mode/javascript/javascript.js'),
         ])
           .then(([p1, p2]) => {
-            os.network.javascript('/codemirror/mode/javascript/javascript.js')
+            os.network.javascript('/codemirror/mode/htmlmixed/htmlmixed.js')
               .then(async function() {
                 await loadProject();
                 initializeEditor();
@@ -273,7 +273,7 @@
 
         os.patchSystemLogger(addLogToHistory);
 
-        // TODO: Auto-save files if they are changed
+        // TODO: Auto-save files if they are changed - use timeout
       }
       this.viewDidLoad = viewDidLoad;
 
@@ -292,7 +292,7 @@
           return;
         }
 
-        // Only open json and html files
+        // Only open certain file types
         if (!(data.name.endsWith(".json") || data.name.endsWith(".html") || data.name.endsWith(".css") || data.name.endsWith(".js"))) {
           return;
         }
@@ -308,9 +308,10 @@
       }
 
       function didCloseTab(tab) {
-        delete documents[tab.data.path];
+        saveCurrentDoc();
+        currentDoc = null;
 
-        // TODO: Save file, if not saved
+        delete documents[tab.data.path];
 
         // Clear editor if no other files exist. If there is a tab, `didSelectTab`
         // will be called.
@@ -335,17 +336,32 @@
           contents: contents
         });
         currentDoc.isDirty = false;
-        currentDoc.contents = contents;
+        currentDoc.doc = editor.getDoc()
       }
 
       async function didSelectTab(tab) {
         let doc = documents[tab.data.path];
 
+        let mode;
+        if (tab.data.name.endsWith(".html")) {
+          mode = "htmlmixed";
+        }
+        else if (tab.data.name.endsWith(".js") || tab.data.name.endsWith(".json")) {
+          mode = "javascript";
+        }
+        else if (tab.data.name.endsWith(".css")) {
+          mode = "css";
+        }
+        else {
+          console.error(`File type (${tab.data.name}) is not supported`);
+          return;
+        }
+
         // New document
         if (isEmpty(doc)) {
           // NOTE: By default, isDirty is false. Therefore, the file's contents will be
           // loaded from disk further in the process.
-          doc = new DocumentState(tab.data, null);
+          doc = new DocumentState(tab.data, mode);
           documents[doc.path] = doc;
         }
 
@@ -358,17 +374,14 @@
           await saveCurrentDoc();
         }
 
-        // If changes are made, display cached contents. Otherwise, load from disk.
-        if (doc.isDirty) {
-          // TODO: This may need to do nothing in this context if using separate editors
-          // Simply switch which editor is visible.
-          editor.setValue(doc.contents);
-        }
-        else {
-          // Load the file from disk
+        // Switch document editor should used. This retains undo/redo history.
+        editor.swapDoc(doc.doc);
+        editor.setOption("mode", doc.mode);
+
+        // If no changes were made, load from disk. This is a convenient way to
+        // always keep the UI updated with what is on the server.
+        if (!doc.isDirty) {
           let resp = await os.network.get(`/boss-code/file/${bundleId}/${doc.path}`);
-          doc.contents = resp.contents;
-          // TODO: Update the respective editor contents and show it
           editor.setValue(resp.contents);
         }
 
@@ -397,7 +410,7 @@
           <select name="file-tabs"></select>
         </div> <!-- file-tabs -->
 
-        <div style="flex-grow: 1;">
+        <div class="editor" style="flex-grow: 1; overflow: auto;">
           <textarea name="editor"></textarea>
         </div> <!-- editor -->
 

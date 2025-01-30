@@ -336,6 +336,10 @@ function Network(os) {
                 }
             })
             .then(data => {
+                if (isEmpty(data)) {
+                    return null;
+                }
+
                 // Typically the text decoder is only for HTML. With that
                 // assumption, if the response looks like JSON it's because
                 // there's an error.
@@ -405,6 +409,10 @@ function Network(os) {
                 return response.json();
             })
             .then(data => {
+                if (isEmpty(data)) {
+                    return null;
+                }
+
                 // If there is an `error` struct, the response is considered to be in error
                 if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
@@ -452,6 +460,10 @@ function Network(os) {
                 return response.json();
             })
             .then(data => {
+                if (isEmpty(data)) {
+                    return null;
+                }
+
                 // If there is an `error` struct, the response is in error
                 if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
@@ -483,8 +495,12 @@ function Network(os) {
                 return response.json();
             })
             .then(data => {
+                if (isEmpty(data)) {
+                    return null;
+                }
+
                 // If there is an `error` struct, the response is considered to be in error
-                if (data.error !== undefined) {
+                if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
                 }
                 return data;
@@ -557,8 +573,12 @@ function Network(os) {
                 return response.json();
             })
             .then(data => {
+                if (isEmpty(data)) {
+                    return null;
+                }
+
                 // If there is an `error` struct, the response is considered to be in error
-                if (data.error !== undefined) {
+                if (!isEmpty(data.error)) {
                     throw new Error(data.error.message);
                 }
                 return data;
