@@ -221,6 +221,11 @@
       }
 
       function addLogToHistory(log) {
+        // It may be possible that logs are emitted before dependencies are loaded
+        if (isEmpty(CodeMirror)) {
+          return;
+        }
+
         // NOTE: It's not enough to check the `history.lastLine()`. This method
         // can be called in quick succession, preventing the `lastLine()` from
         // updating. To avoid this, the `historyLogged` bool prevents the 2nd

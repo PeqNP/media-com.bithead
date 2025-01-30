@@ -11,11 +11,8 @@
       this.close = close;
 
       async function createProject() {
-        // TODO: Make calls to server to create project
-        let win = await $(this.controller).loadController("Editor");
-        win.ui.show(function (ctrl) {
-          // TODO: Configure controller with project
-        });
+        // TODO: Display create new project flow. Then show editor.
+        console.log("Create");
       }
       this.createProject = createProject;
 
@@ -29,10 +26,10 @@
       this.createController = createController;
 
       /**
-       * Show menu with list of projects that can be opened.
+       * Shows splash where a project can be selected.
        */
       async function openProject() {
-        let win = await $(this.controller).loadController("Projects");
+        let win = await $(this.controller).loadController("Splash");
         win.ui.show();
       }
       this.openProject = openProject;
@@ -42,14 +39,47 @@
        */
       function closeProject() {
         // TODO: Close the focused project
+        console.log("Close");
       }
+      this.closeProject = closeProject;
 
       /**
        * Save the focused project.
        */
       function saveProject() {
-        // TODO: Savew the focused project
+        // TODO: Save the focused project
+        console.log("Save");
       }
+      this.saveProject = saveProject;
+
+      /**
+       * Run the project app.
+       */
+      function runProject() {
+        // TODO: Close app, if open. Open app.
+        console.log("Run");
+      }
+      this.runProject = runProject;
+
+      /**
+       * Export app.
+       */
+      function exportProject() {
+        // TODO: Create zip installer and provide download
+        console.log("Export");
+      }
+      this.exportProject = exportProject;
+
+      /**
+       * Deploy app.
+       */
+      function deployProject() {
+        // TODO: Build and deploy app in sandbox and install on live server
+        // This could use pieces of the "OS Installer" (not complete), where it
+        // accepts a zip and then installs it.
+        console.log("Deploy");
+      }
+      this.deployProject = deployProject;
 
       /**
        * Import a project from an uploaded zip.
@@ -75,16 +105,27 @@
 
         let menus = $(this.controller).menus();
         let menu = menus.ui.select("file-menu");
+        let product = menus.ui.select("product-menu");
 
         if (isEmpty(bundleId)) {
           menu.ui.disableOption("Add controller");
           menu.ui.disableOption("Close project");
           menu.ui.disableOption("Save project");
+
+          product.ui.disableOption("Run");
+          product.ui.disableOption("Export");
+          product.ui.disableOption("Deploy");
+          product.ui.disableOption("Live preview");
         }
         else {
           menu.ui.enableOption("Add controller");
           menu.ui.enableOption("Close project");
           menu.ui.enableOption("Save project");
+
+          product.ui.enableOption("Run");
+          product.ui.enableOption("Export");
+          product.ui.enableOption("Deploy");
+          product.ui.enableOption("Live preview");
         }
       }
       this.didFocusProject = didFocusProject;
@@ -111,6 +152,16 @@
         <option class="group"></option>
         <option onclick="$(this.controller).closeProject();" disabled>Close project</option>
         <option onclick="$(this.controller).closeProject();" disabled>Save project</option>
+      </select>
+    </div>
+    <div class="ui-menu" style="width: 180px">
+      <select name="product-menu">
+        <option>Product</option>
+        <option onclick="$(this.controller).runProject();">Run</option>
+        <option onclick="$(this.controller).exportProject();">Export</option>
+        <option onclick="$(this.controller).deployProject();">Deploy</option>
+        <option class="group"></option>
+        <option onclick="$(this.controller).importProject();">Live preview</option>
       </select>
     </div>
   </div>
