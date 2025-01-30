@@ -2565,7 +2565,14 @@ function UITabs(select, container) {
      * @param {int} index - Index of tab to select
      */
     function selectTabIndex(index) {
+        // NOTE: When an option is removed, the `selectedIndex` may automatically
+        // update. When this happens, and selectTabIndex is called directly after,
+        // it's not possible if this was the previously selected state or not.
+        // That is why this _always_ selects the index and reconciles every time.
+
         select.selectedIndex = index;
+
+        // Reconcile class list and then select tab
         for (let i = 0; i < select.options.length; i++) {
             let opt = select.options[i];
             opt.ui.classList.remove("selected");
@@ -2647,6 +2654,16 @@ function UITabs(select, container) {
     this.contains = contains;
 
     /**
+     * Check if tabs are present.
+     *
+     * @returns `true` if at least one tab exists
+     */
+    function hasTabs() {
+        return select.options.length > 0;
+    }
+    this.hasTabs = hasTabs;
+
+    /**
      * Remove tab by value.
      *
      * @param {string} value - Value of tab
@@ -2675,6 +2692,23 @@ function UITabs(select, container) {
         container.removeChild(option.ui);
     }
     this.removeTabIndex = removeTabIndex;
+
+    /**
+     * Returns respective tab option given index.
+     *
+     * @param {int} value - Value of tab
+     * @returns {HTMLElement?} the tab w/ value, if any
+     */
+    function getTab(value) {
+        for (let i = 0; i < select.options.length; i++) {
+            let option = select.options[i];
+            if (option.value == value) {
+                return option;
+            }
+        }
+        return null;
+    }
+    this.getTab = getTab;
 
     /**
      * Return the selected tab.

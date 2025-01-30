@@ -441,7 +441,12 @@ body {
  * define the ui-window as a `group`. This removes borders defined on all
  * components, but adds a 1px gap between components as a way to visually
  * separate the components.
+ *
+ * This removes all padding, similar to `no-padding`.
  */
+#desktop .ui-window > .container.group {
+  padding: 0px;
+}
 /* Removes borders from direct descendants */
 #desktop .ui-window > .container.group > * {
   border: none;
@@ -1327,9 +1332,11 @@ label {
 /** Stack Views **/
 
 .hbox {
-  display: -webkit-flex;
   display: flex;
   flex-direction: row;
+  /* Constrains contents to be visible inside hbox. If element is larger
+   * then hbox, it must specify that it can scroll. */
+  overflow: hidden;
 }
 .hbox.align-top {
   align-items: flex-start;
@@ -1345,9 +1352,9 @@ label {
 }
 
 .vbox {
-  display: -webkit-flex;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .vbox.align-left {
   justify-content: flex-start;
@@ -1401,6 +1408,9 @@ div.info-message:before {
  **/
 
 div.ui-tabs { }
+div.ui-tabs ::-webkit-scrollbar {
+  display: none;
+}
 div.ui-tabs > select {
   display: none;
 }
@@ -1409,7 +1419,12 @@ div.ui-tabs > select {
 div.ui-tabs > .container {
   display: flex;
   flex-direction: row;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
   height: 30px;
+
   background-color: #fff;
 }
 div.ui-tabs .ui-tab {

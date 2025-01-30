@@ -1,7 +1,9 @@
 <div class="ui-application">
   <script type="text/application">
     function $(this.id)(config) {
-      let project;
+      // The current project that is focused.
+      // Focus occurs when the respective project editor is focused.
+      let focusedBundleId;
 
       function close() {
         os.closeApplication('$(app.bundleId)');
@@ -66,15 +68,15 @@
        *
        * This is called by the Editor for an open project.
        *
-       * @param {Project} project - Project Editor that gained focus
+       * @param {string} bundleId - The project's bundle ID
        */
-      function didFocusProject(_project) {
-        project = _project;
+      function didFocusProject(bundleId) {
+        focusedBundleId = bundleId;
 
         let menus = $(this.controller).menus();
         let menu = menus.ui.select("file-menu");
 
-        if (isEmpty(project)) {
+        if (isEmpty(bundleId)) {
           menu.ui.disableOption("Add controller");
           menu.ui.disableOption("Close project");
           menu.ui.disableOption("Save project");

@@ -249,13 +249,26 @@
         <br/>
         <br/>
 
-        <div class="ui-tabs">
-          <select name="my-tabs">
-            <option class="close-button">Window.html</option>
-            <option class="close-button">Controller.js</option>
-            <option class="close-button">Menu.c</option>
-          </select>
-        </div> <!-- ui-tabs -->
+        <!-- Demonstrates how tabs will conform to their parent's size and
+          allow scroll x within a ui-window. -->
+        <div style="width: 380px; height: 80px;">
+          <div class="hbox" style="height: inherit; width: inherit;">
+            <div style="height: 100%; flex-shrink: 0; width: 80px; background-color: purple;">Menu</div>
+            <div class="vbox" style="flex-grow: 1; height: 100%; overflow: hidden;">
+              <div class="ui-tabs">
+                <select name="my-tabs">
+                  <option class="close-button">Window.html</option>
+                  <option class="close-button">Controller.js</option>
+                  <option class="close-button">Menu.c</option>
+                </select>
+              </div> <!-- ui-tabs -->
+
+              <div style="background-color: red; flex-grow: 1;"></div>
+
+              <div style="background-color: orange; height: 20px;"></div>
+            </div> <!-- vbox -->
+          </div> <!-- hbox -->
+        </div>
       </div> <!-- desktop-container -->
     </div> <!-- desktop -->
   </body>

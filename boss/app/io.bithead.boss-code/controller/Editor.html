@@ -1,15 +1,51 @@
 <div class="ui-window">
   <script type="text/javascript">
+    function DocumentState(data, _contents) {
+      this.path = data.path;
+      this.name = data.name;
+
+      let isDirty = false;
+      property(this, "isDirty",
+        function() {
+          return isDirty;
+        },
+        function(newValue) {
+          isDirty = newValue;
+        }
+      );
+
+      let contents = _contents;
+      property(this, "contents",
+        function() {
+          return contents;
+        },
+        function(newValue) {
+          contents = newValue;
+        }
+      );
+    }
+
     function $(this.id)(view) {
       let bundleId;
       let project; // Loaded project
       let history;
       let historyLogged = false;
 
+      // {string: DocumentState} - The key is the `path` of file
+      let documents = {};
+
+      // Reference to CodeMirror editor
+      let editor;
+
       // List of commands that have been executed
       let commandHistory = [];
       // The last index used in the search
       let commandHistoryIndex = null;
+
+      // The (previous) current tab that is selected. When a tab is changed,
+      // this helps determine what the previously opened file was so that
+      // it can be saved before closing.
+      let currentDoc;
 
       /**
        * @param {string} bundleId - App bundle ID
@@ -54,8 +90,8 @@
       }
 
       function initializeEditor() {
-        let editorInput = view.ui.textarea("editor");
-        let editor = CodeMirror.fromTextArea(editorInput, {
+        let ta = view.ui.textarea("editor");
+        editor = CodeMirror.fromTextArea(ta, {
           mode: "javascript",
           tabSize: 4,
           indentWithTabs: false,
@@ -69,7 +105,7 @@
 
       function initializeHistory() {
         let ta = view.ui.textarea("history");
-        let editor = CodeMirror.fromTextArea(ta, {
+        let cm = CodeMirror.fromTextArea(ta, {
           readOnly: true,
           mode: "javascript",
           theme: "monokai",
@@ -80,15 +116,15 @@
           lineNumbers: false,
           scrollPastEnd: false
         });
-        editor.setSize(null, "100%");
-        return editor;
+        cm.setSize(null, "100%");
+        return cm;
       }
 
       function initializeConsole() {
         history = initializeHistory();
 
         let ta = view.ui.textarea("command");
-        let editor = CodeMirror.fromTextArea(ta, {
+        let cm = CodeMirror.fromTextArea(ta, {
           mode: "javascript",
           theme: "monokai",
           tabSize: 4,
@@ -173,9 +209,9 @@
           },
           gutters: ["cm-console-gutter"]
         });
-        editor.setSize(null, "100%");
+        cm.setSize(null, "100%");
 
-        editor.setOption("gutter", function (view, line) {
+        cm.setOption("gutter", function (view, line) {
           return '>';
         });
       }
@@ -234,11 +270,14 @@
       }
       this.viewDidLoad = viewDidLoad;
 
-      function didSelectFile(option) {
+      async function didSelectFile(option) {
         let tabs = view.ui.select("file-tabs").ui;
         let data = option.data;
-        if (tabs.contains(data.path)) {
-          tabs.selectTab(data.path); // Focus tab
+        let tab = tabs.getTab(data.path);
+
+        // File already exists. Focus tab and load contents.
+        if (!isEmpty(tab)) {
+          tabs.selectTab(data.path);
           return;
         }
 
@@ -250,24 +289,82 @@
         let idx = tabs.addTab({
           id: data.path,
           name: data.name,
-          close: true
+          close: true,
+          data: data
         });
+        // Automatically loads file as `didSelectTab` is called
         tabs.selectTab(data.path);
       }
 
       function didCloseTab(tab) {
+        delete documents[tab.data.path];
+
         // TODO: Save file, if not saved
+
+        // Clear editor if no other files exist. If there is a tab, `didSelectTab`
+        // will be called.
+        let tabs = view.ui.select("file-tabs").ui;
+        if (!tabs.hasTabs()) {
+          editor.setValue("");
+        }
       }
 
-      function didSelectTab(tab) {
-        // TODO: Switch file being edited
-        // TODO: If file associated to tab is not saved, load file from disk
-        // TODO: Save previously selected tab's file, if any
+      async function saveCurrentDoc() {
+        // There is no current doc
+        if (isEmpty(currentDoc)) {
+          return;
+        }
+        // Document did not change
+        if (!currentDoc.isDirty) {
+          return;
+        }
+
+        let contents = editor.getValue("\n")
+        await os.network.post(`/boss-code/file/${bundleId}/${currentDoc.path}`, {
+          contents: contents
+        });
+        currentDoc.isDirty = false;
+        currentDoc.contents = contents;
+      }
+
+      async function didSelectTab(tab) {
+        let doc = documents[tab.data.path];
+
+        // New document
+        if (isEmpty(doc)) {
+          // NOTE: By default, isDirty is false. Therefore, the file's contents will be
+          // loaded from disk further in the process.
+          doc = new DocumentState(tab.data, null);
+          documents[doc.path] = doc;
+        }
+
+        // Already focused
+        if (doc.path == currentDoc?.path) {
+          return;
+        }
+        else {
+          // Save previous document before showing tab
+          await saveCurrentDoc();
+        }
+
+        // If changes are made, display cached contents. Otherwise, load from disk.
+        if (doc.isDirty) {
+          // TODO: This may need to do nothing in this context if using separate editors
+          // Simply switch which editor is visible.
+          editor.setValue(doc.contents);
+        }
+        else {
+          // Load the file from disk
+          let resp = await os.network.get(`/boss-code/file/${bundleId}/${doc.path}`);
+          doc.contents = resp.contents;
+          // TODO: Update the respective editor contents and show it
+          editor.setValue(resp.contents);
+        }
+
+        currentDoc = doc;
       }
 
       function viewDidFocus() {
-        // TODO: Wait for project to be loaded, then let app controller know(?)
-        // OR, maybe the bundleId is good enough?
         $(app.controller).didFocusProject(bundleId);
       }
       this.viewDidFocus = viewDidFocus;
@@ -278,13 +375,13 @@
     <div class="title"><span>Untitled</span></div>
     <div class="zoom-button"></div>
   </div>
-  <div class="container no-padding resizable group" style="width: 700px; height: 500px;">
-    <div class="hbox" style="height: 100%">
-      <div class="ui-list-box" style="width: 160px; height: 100%;">
+  <div class="container resizable group" style="width: 700px; height: 500px;">
+    <div class="hbox" style="height: inherit; width: inherit;">
+      <div class="ui-list-box" style="width: 160px; flex-shrink: 0; height: 100%;">
         <select name="project-files"></select>
       </div>
 
-      <div class="vbox" style="width: 100%;">
+      <div class="vbox" style="flex-grow: 1; height: 100%;">
         <div class="ui-tabs">
           <select name="file-tabs"></select>
         </div> <!-- file-tabs -->
