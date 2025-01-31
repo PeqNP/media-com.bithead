@@ -337,7 +337,7 @@ function Network(os) {
             })
             .then(data => {
                 if (isEmpty(data)) {
-                    return null;
+                    return data;
                 }
 
                 // Typically the text decoder is only for HTML. With that
@@ -410,7 +410,7 @@ function Network(os) {
             })
             .then(data => {
                 if (isEmpty(data)) {
-                    return null;
+                    return data;
                 }
 
                 // If there is an `error` struct, the response is considered to be in error
@@ -461,7 +461,7 @@ function Network(os) {
             })
             .then(data => {
                 if (isEmpty(data)) {
-                    return null;
+                    return data;
                 }
 
                 // If there is an `error` struct, the response is in error
@@ -496,7 +496,7 @@ function Network(os) {
             })
             .then(data => {
                 if (isEmpty(data)) {
-                    return null;
+                    return data;
                 }
 
                 // If there is an `error` struct, the response is considered to be in error
@@ -574,7 +574,7 @@ function Network(os) {
             })
             .then(data => {
                 if (isEmpty(data)) {
-                    return null;
+                    return data;
                 }
 
                 // If there is an `error` struct, the response is considered to be in error
