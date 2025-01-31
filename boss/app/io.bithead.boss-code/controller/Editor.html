@@ -20,6 +20,11 @@
     function $(this.id)(view) {
       let bundleId;
       let project; // Loaded project
+
+      // This is called before resetting the editor's value. When this is true,
+      // the `onchange` event is ignored.
+      let resettingEditor = false;
+
       let history;
       let historyLogged = false;
 
@@ -88,6 +93,8 @@
         view.ui.select("project-files").ui.addNewOptions(options);
       }
 
+      let saveTimerId;
+
       function initializeEditor() {
         let ta = view.ui.textarea("editor");
         editor = CodeMirror.fromTextArea(ta, {
@@ -101,9 +108,19 @@
         });
         editor.setSize(null, "100%");
 
-        editor.on("keypress", function(instance, changeObj) {
-          if (isEmpty(currentDoc)) { return; }
+        editor.on("change", function(instance, changeObj) {
+          if (isEmpty(currentDoc) || resettingEditor) {
+            return;
+          }
           currentDoc.isDirty = true;
+          if (!isEmpty(saveTimerId)) {
+            clearTimeout(saveTimerId);
+          }
+          saveTimerId = setTimeout(function () {
+            saveTimerId = null;
+            saveCurrentDoc();
+            updateEditorStatus(`Saved ${currentDoc.path}`, 3);
+          }, 3000);
         });
       }
 
@@ -284,10 +301,33 @@
         }
 
         os.patchSystemLogger(addLogToHistory);
-
-        // TODO: Auto-save files if they are changed - use timeout
       }
       this.viewDidLoad = viewDidLoad;
+
+      let clearId;
+
+      /**
+       * Clear editor status.
+       */
+      function clearEditorStatus() {
+        clearId = null;
+        updateEditorStatus("");
+      }
+
+      /**
+       * Provide message to end-user of what the editor is doing.
+       */
+      function updateEditorStatus(msg, clearInSecs) {
+        if (!isEmpty(clearId)) {
+          clearTimeout(clearId);
+        }
+
+        view.ui.div("editor-status").innerHTML = msg;
+
+        if (!isEmpty(clearInSecs)) {
+          clearId = setTimeout(clearEditorStatus, clearInSecs * 1000);
+        }
+      }
 
       async function didSelectFile(option) {
         view.ui.button("preview").disabled = true;
@@ -338,7 +378,9 @@
         // will be called.
         let tabs = view.ui.select("file-tabs").ui;
         if (!tabs.hasTabs()) {
+          resettingEditor = true;
           editor.setValue("");
+          resettingEditor = false;
         }
       }
 
@@ -403,7 +445,9 @@
         // always keep the UI updated with what is on the server.
         if (!doc.isDirty) {
           let resp = await os.network.get(`/boss-code/source/${bundleId}/${doc.path}`);
+          resettingEditor = true;
           editor.setValue(resp.source ?? "");
+          resettingEditor = false;
         }
 
         currentDoc = doc;
@@ -498,9 +542,13 @@
         <div class="ui-tabs">
           <select name="file-tabs"></select>
         </div> <!-- file-tabs -->
-        <div class="preview-panel">
-          <button name="configure-preview" class="secondary" onclick="$(this.controller).configurePreview();">Configure</button>
-          <button name="preview" class="secondary" onclick="$(this.controller).preview();">Preview</button>
+        <div class="editor-panel">
+          <div class="editor-status"></div>
+
+          <div class="editor-controls">
+            <button name="configure-preview" class="secondary" onclick="$(this.controller).configurePreview();">Configure</button>
+            <button name="preview" class="secondary" onclick="$(this.controller).preview();">Preview</button>
+          </div>
         </div>
 
         <div class="editor" style="flex-grow: 1; overflow: auto;">

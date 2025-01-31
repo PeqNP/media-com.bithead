@@ -30,13 +30,23 @@ div.console .CodeMirror {
 }
 
 /* Buttons display options for previewing the controller */
-div.preview-panel {
+div.editor-panel {
   display: flex;
-  justify-content: end;
+  flex-direction: row;
   align-items: center;
-  gap: 5px;
+  justify-content: space-between;
   height: 20px;
   padding: 5px;
   background-color: #fff;
   flex-shrink: 0;
+}
+div.editor-panel .editor-status {
+  font-family: "Geneva";
+  font-size: 10px;
+}
+div.editor-panel .editor-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  gap: 5px;
 }
