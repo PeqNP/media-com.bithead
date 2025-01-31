@@ -28,3 +28,14 @@ div.console .command {
 div.console .CodeMirror {
   border: 0px;
 }
+
+/* Buttons display options for previewing the controller */
+div.preview-panel {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 5px;
+  background-color: #fff;
+}

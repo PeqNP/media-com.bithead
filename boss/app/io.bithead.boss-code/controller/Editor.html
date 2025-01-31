@@ -247,6 +247,9 @@
           return;
         }
 
+        view.ui.button("preview").disabled = true;
+        view.ui.button("configure-preview").disabled = true;
+
         Promise.all([
           os.network.stylesheet('$(app.resourcePath)/css/boss-code.css'),
           os.network.stylesheet('/codemirror/lib/codemirror.css'),
@@ -305,6 +308,11 @@
         if (!data.isEditable) {
           return;
         }
+
+        // Enable preview options now that a file has been opened and we have a
+        // `currentDoc`.
+        view.ui.button("preview").disabled = false;
+        view.ui.button("configure-preview").disabled = false;
 
         let idx = tabs.addTab({
           id: data.path,
@@ -401,6 +409,23 @@
         $(app.controller).didFocusProject(bundleId);
       }
       this.viewDidFocus = viewDidFocus;
+
+      /**
+       * Configure how the controller gets previewed.
+       */
+      function configurePreview() {
+      }
+      this.configurePreview = configurePreview;
+
+      /**
+       * Live preview the controller.
+       *
+       * This will perform the necessary steps to start the app and display
+       * on the active controller.
+       */
+      function preview() {
+      }
+      this.preview = preview;
     }
   </script>
   <div class="top">
@@ -418,6 +443,10 @@
         <div class="ui-tabs">
           <select name="file-tabs"></select>
         </div> <!-- file-tabs -->
+        <div class="preview-panel">
+          <button name="configure-preview" class="secondary" onclick="$(this.controller).configurePreview();">Configure</button>
+          <button name="preview" class="secondary" onclick="$(this.controller).preview();">Preview</button>
+        </div>
 
         <div class="editor" style="flex-grow: 1; overflow: auto;">
           <textarea name="editor"></textarea>
