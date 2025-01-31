@@ -305,6 +305,7 @@ function UI(os) {
 
         return attr;
     }
+    this.makeWindowAttributes = makeWindowAttributes;
 
     /**
      * Creates temporary element that parses HTML and re-attached Javascript to

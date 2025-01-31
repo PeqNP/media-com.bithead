@@ -14,9 +14,7 @@
     },
     "controllers": {
         "Application": { },
-        "Editor": {
-            "singleton": true
-        },
+        "Editor": { },
         "LivePreviewConfig": {
             "modal": true
         },

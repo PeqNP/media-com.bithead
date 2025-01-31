@@ -38,4 +38,5 @@ div.preview-panel {
   height: 20px;
   padding: 5px;
   background-color: #fff;
+  flex-shrink: 0;
 }

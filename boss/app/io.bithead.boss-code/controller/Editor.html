@@ -312,8 +312,8 @@
           return;
         }
 
-        // Enable preview options for controllers
-        if (data.path.startsWith("controller/")) {
+        // Enable preview options for (non Application) controllers
+        if (data.path.startsWith("controller/") && data.path != "controller/Application.html") {
           view.ui.button("preview").disabled = false;
           view.ui.button("configure-preview").disabled = false;
         }
@@ -403,7 +403,7 @@
         // always keep the UI updated with what is on the server.
         if (!doc.isDirty) {
           let resp = await os.network.get(`/boss-code/source/${bundleId}/${doc.path}`);
-          editor.setValue(resp.source);
+          editor.setValue(resp.source ?? "");
         }
 
         currentDoc = doc;
@@ -431,10 +431,39 @@
        * This will perform the necessary steps to start the app and preview
        * the active controller.
        */
-      function preview() {
-        os.closeApplication(bundleId);
+      async function preview() {
+        let config = await os.network.get(`/boss-code/config/${bundleId}/${currentDoc.path}`);
 
-        let config = os.network.get(`/boss-code/${bundleId}/${currentDoc.path}`);
+        let source;
+        if (!isEmpty(config.source)) {
+          const attr = os.ui.makeWindowAttributes(bundleId);
+          source = interpolate(config.source, attr);
+        }
+
+        // Inception warning! Special edge case. BOSSCode must open the
+        // respective controller w/o closing itself.
+        if (bundleId === "$(app.bundleId)") {
+          if (config.isSimple) {
+            if (isEmpty(config.endpoint)) {
+              let win = await $(app.controller).loadController(config.name);
+              win.ui.show();
+            }
+            else {
+              let win = await $(app.controller).loadController(config.name, config.endpoint);
+              win.ui.show();
+            }
+          }
+          else if (!isEmpty(source)) {
+            eval(`(async () => { ${source} })();`);
+          }
+          else {
+            await os.ui.showAlert("No preview configuration exists.");
+          }
+
+          return;
+        }
+
+        os.closeApplication(bundleId);
 
         if (config.isSimple) {
           if (isEmpty(config.endpoint)) {
@@ -444,8 +473,11 @@
             await os.openApplication(bundleId, new MainController(config.name, config.endpoint));
           }
         }
+        else if (!isEmpty(source)) {
+          eval(`(async () => { ${source} })();`);
+        }
         else {
-          eval(`(async () => { ${config.source} })();`);
+          await os.ui.showAlert("No preview configuration exists.");
         }
       }
       this.preview = preview;

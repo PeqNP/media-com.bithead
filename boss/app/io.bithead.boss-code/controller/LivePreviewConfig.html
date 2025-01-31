@@ -11,14 +11,15 @@
       }
       this.close = close;
 
-      function saveConfig() {
+      async function saveConfig() {
         let request = {
           isNew: false,
-          simple: isEmpty(view.ui.div("debug-advanced").style.display),
+          // Empty means display=null (visible)
+          simple: isEmpty(view.ui.div("debug-simple").style.display),
           endpoint: view.ui.input("endpoint").value,
           source: editor.getValue("\n")
         }
-        os.network.post(`/boss-code/config/${bundleId}/${path}`, request);
+        await os.network.post(`/boss-code/config/${bundleId}/${path}`, request);
         view.ui.close();
       }
       this.saveConfig = saveConfig;
@@ -70,14 +71,14 @@
 
         initializeEditor();
 
-        let resp = os.network.get(`/boss-code/config/${bundleId}/${path}`);
+        let resp = await os.network.get(`/boss-code/config/${bundleId}/${path}`);
 
         if (resp.isNew) {
           let source = `let app = await os.openApplication("${bundleId}", new MainController("${resp.name}"));`
           editor.setValue(source);
         }
         else {
-          editor.setValue(resp.source);
+          editor.setValue(resp.source ?? "");
           view.ui.input("endpoint").value = resp.endpoint;
           if (!resp.simple) {
             showAdvancedView();
