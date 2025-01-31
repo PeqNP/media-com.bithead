@@ -222,7 +222,7 @@
 
       function addLogToHistory(log) {
         // It may be possible that logs are emitted before dependencies are loaded
-        if (isEmpty(CodeMirror)) {
+        if (isEmpty(history)) {
           return;
         }
 
@@ -251,13 +251,17 @@
           os.network.stylesheet('$(app.resourcePath)/css/boss-code.css'),
           os.network.stylesheet('/codemirror/lib/codemirror.css'),
           os.network.javascript('/codemirror/lib/codemirror.js'),
-          os.network.stylesheet('/codemirror/theme/monokai.css'),
-          os.network.javascript('/codemirror/mode/css/css.js'),
-          os.network.javascript('/codemirror/mode/xml/xml.js'),
-          os.network.javascript('/codemirror/mode/javascript/javascript.js'),
         ])
-          .then(([p1, p2]) => {
-            os.network.javascript('/codemirror/mode/htmlmixed/htmlmixed.js')
+          .then(() => {
+            return Promise.all([
+              os.network.stylesheet('/codemirror/theme/monokai.css'),
+              os.network.javascript('/codemirror/mode/css/css.js'),
+              os.network.javascript('/codemirror/mode/xml/xml.js'),
+              os.network.javascript('/codemirror/mode/javascript/javascript.js'),
+            ])
+          })
+          .then(() => {
+            return os.network.javascript('/codemirror/mode/htmlmixed/htmlmixed.js')
               .then(async function() {
                 await loadProject();
                 initializeEditor();
@@ -298,7 +302,7 @@
         }
 
         // Only open certain file types
-        if (!(data.name.endsWith(".json") || data.name.endsWith(".html") || data.name.endsWith(".css") || data.name.endsWith(".js"))) {
+        if (!data.isEditable) {
           return;
         }
 

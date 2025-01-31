@@ -115,7 +115,6 @@
           product.ui.disableOption("Run");
           product.ui.disableOption("Export");
           product.ui.disableOption("Deploy");
-          product.ui.disableOption("Live preview");
         }
         else {
           menu.ui.enableOption("Add controller");
@@ -125,7 +124,6 @@
           product.ui.enableOption("Run");
           product.ui.enableOption("Export");
           product.ui.enableOption("Deploy");
-          product.ui.enableOption("Live preview");
         }
       }
       this.didFocusProject = didFocusProject;
@@ -160,8 +158,6 @@
         <option onclick="$(this.controller).runProject();">Run</option>
         <option onclick="$(this.controller).exportProject();">Export</option>
         <option onclick="$(this.controller).deployProject();">Deploy</option>
-        <option class="group"></option>
-        <option onclick="$(this.controller).importProject();">Live preview</option>
       </select>
     </div>
   </div>

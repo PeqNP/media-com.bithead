@@ -366,7 +366,9 @@ function ApplicationManager(os) {
         delete closingApps[bundleId];
         delete loadedApps[bundleId];
 
-        if (activeApplication.bundleId == bundleId) {
+        // NOTE: This may be a passive app. That means, there may be no active
+        // app at this point.
+        if (activeApplication?.bundleId == bundleId) {
             activeApplication = null;
         }
 
