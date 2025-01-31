@@ -17,6 +17,9 @@
         "Editor": {
             "singleton": true
         },
+        "LivePreviewConfig": {
+            "modal": true
+        },
         "Splash": {
             "singleton": true
         }

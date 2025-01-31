@@ -290,6 +290,9 @@
       this.viewDidLoad = viewDidLoad;
 
       async function didSelectFile(option) {
+        view.ui.button("preview").disabled = true;
+        view.ui.button("configure-preview").disabled = true;
+
         if (option.value === "__files__") {
           return;
         }
@@ -309,10 +312,11 @@
           return;
         }
 
-        // Enable preview options now that a file has been opened and we have a
-        // `currentDoc`.
-        view.ui.button("preview").disabled = false;
-        view.ui.button("configure-preview").disabled = false;
+        // Enable preview options for controllers
+        if (data.path.startsWith("controller/")) {
+          view.ui.button("preview").disabled = false;
+          view.ui.button("configure-preview").disabled = false;
+        }
 
         let idx = tabs.addTab({
           id: data.path,
@@ -348,9 +352,9 @@
           return;
         }
 
-        let contents = editor.getValue("\n")
-        await os.network.post(`/boss-code/file/${bundleId}/${currentDoc.path}`, {
-          contents: contents
+        let source = editor.getValue("\n")
+        await os.network.post(`/boss-code/source/${bundleId}/${currentDoc.path}`, {
+          source: source
         });
         currentDoc.isDirty = false;
         currentDoc.doc = editor.getDoc()
@@ -398,8 +402,8 @@
         // If no changes were made, load from disk. This is a convenient way to
         // always keep the UI updated with what is on the server.
         if (!doc.isDirty) {
-          let resp = await os.network.get(`/boss-code/file/${bundleId}/${doc.path}`);
-          editor.setValue(resp.contents);
+          let resp = await os.network.get(`/boss-code/source/${bundleId}/${doc.path}`);
+          editor.setValue(resp.source);
         }
 
         currentDoc = doc;
@@ -413,17 +417,36 @@
       /**
        * Configure how the controller gets previewed.
        */
-      function configurePreview() {
+      async function configurePreview() {
+        let win = await $(app.controller).loadController("LivePreviewConfig");
+        win.ui.show(function(ctrl) {
+          ctrl.configure(bundleId, currentDoc.path);
+        });
       }
       this.configurePreview = configurePreview;
 
       /**
        * Live preview the controller.
        *
-       * This will perform the necessary steps to start the app and display
-       * on the active controller.
+       * This will perform the necessary steps to start the app and preview
+       * the active controller.
        */
       function preview() {
+        os.closeApplication(bundleId);
+
+        let config = os.network.get(`/boss-code/${bundleId}/${currentDoc.path}`);
+
+        if (config.isSimple) {
+          if (isEmpty(config.endpoint)) {
+            await os.openApplication(bundleId, new MainController(config.name));
+          }
+          else {
+            await os.openApplication(bundleId, new MainController(config.name, config.endpoint));
+          }
+        }
+        else {
+          eval(`(async () => { ${config.source} })();`);
+        }
       }
       this.preview = preview;
     }

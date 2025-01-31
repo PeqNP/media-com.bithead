@@ -1,6 +1,17 @@
 /// Copyright ⓒ 2024 Bithead LLC. All rights reserved.
 
 /**
+ * When opening an app, this allows you to override the application config's
+ * main controller.
+ *
+ * This is designed to be used for debugging only!
+ */
+function MainController(name, endpoint) {
+    readOnly(this, "name", name);
+    readOnly(this, "endpoint", endpoint);
+}
+
+/**
  * Bithead OS aka BOSS
  *
  * Provides system-level features
@@ -215,15 +226,16 @@ function OS() {
     /**
      * Open a BOSS application.
      *
-     * TODO: Check if user has permission to access app.
-     * TODO: Move this into an ApplicationManager.js - it's part of UI but does not need to live in there.
+     * If `MainController` is provided, it will show the controller regardless
+     * of what value is set to `application.json:main`.
      *
      * @param {string} bundleId - The Bundle ID of the application to open e.g. 'io.bithead.test-management'
+     * @param {MainController?} mainController - Overrides `application.json:main` controller
      * @returns UIApplication
      * @throws
      */
-    async function openApplication(bundleId, fn) {
-        return await app.openApplication(bundleId, fn);
+    async function openApplication(bundleId, mainController) {
+        return await app.openApplication(bundleId, mainController);
     }
     this.openApplication = openApplication;
 

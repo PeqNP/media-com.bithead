@@ -126,13 +126,17 @@ function ApplicationManager(os) {
      * Open a BOSS application.
      *
      * TODO: Check if user has permission to access app.
-     * TODO: Move this into an ApplicationManager.js - it's part of UI but does not need to live in there.
      *
-     * @param {string} bundleId - The Bundle ID of the application to open e.g. 'io.bithead.test-management'
+     * If `MainController` is provided, it will show the controller regardless
+     * of what value is set to `application.json:main`.
+     *
+     * @param {string} bundleId - The Bundle ID of the application to open
+     *  e.g. 'io.bithead.test-management'
+     * @param {MainController?} mainController - Overrides `application.json:main` controller
      * @returns UIApplication
      * @throws
      */
-    async function openApplication(bundleId, fn) {
+    async function openApplication(bundleId, mainController) {
         let loadedApp = loadedApps[bundleId];
         if (!isEmpty(loadedApp)) {
             switchApplication(bundleId);
@@ -286,24 +290,35 @@ function ApplicationManager(os) {
             os.ui.addOSBarApp(win);
         }
 
-        // Application delegate will manage which controller is shown, if any
-        if (config.application.main == "Application") {
+        // Application delegate will manage which controller is shown, if any.
+        // If a controller override is provided, do not return early.
+        if (config.application.main == "Application" && isEmpty(mainController)) {
             app.applicationDidStart(controller);
             switchApplication(bundleId);
-
             progressBar?.ui.close();
-
             return app;
         }
 
         progressBar?.setProgress(50, "Loading controller...");
 
+        let main;
+        let endpoint;
+
+        // Determine which controller to load
+        if (isEmpty(mainController?.name)) {
+            main = config.application.main;
+            endpoint = config.application.endpoint;
+        }
+        else {
+            main = mainController.name;
+        }
+
         let container;
         try {
-            container = await app.loadController(config.application.main);
+            container = await app.loadController(main, endpoint);
         }
         catch (error) {
-            showError(`Failed to load application (${bundleId}) main controller (${config.application.main})`, error);
+            showError(`Failed to load application (${bundleId}) main controller (${main})`, error);
         }
 
         app.applicationDidStart(controller);
