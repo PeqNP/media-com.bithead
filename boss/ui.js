@@ -1003,6 +1003,10 @@ function UIApplication(id, config) {
     // Visible windows object[windowId:UIController]
     let launchedControllers = {};
 
+    // Set to `true` as soon as `applicationDidStop` is invoked. This is necessary to
+    // prevent the `applicationDidCloseAllWindows` signal.
+    let stopping = false;
+
     // This allows calls to be made on this `UIApplication` instance as well as
     // pass-thru calls to the `main` function.
     const proxy = new Proxy(this, {
@@ -1049,7 +1053,7 @@ function UIApplication(id, config) {
         // - Avoids polluting (over-writing) user code
         // - Controller is not shown at this point. Therefore, `UIController`
         //   will be `undefined` at this point.
-        container.ui.viewDidUnload = function() {
+        container.ui.viewDidUnload = async function() {
             // Order matters. This prevents circular loop if last visible
             // controller and app needs to be shut down. When an app is
             // shut down, all windows are closed.
@@ -1057,6 +1061,13 @@ function UIApplication(id, config) {
 
             if (isEmpty(launchedControllers) && config.application.quitAutomatically === true) {
                 os.closeApplication(bundleId);
+            }
+
+            // If all windows are closed, send signal to app
+            if (!stopping && Object.keys(launchedControllers).length < 1) {
+                if (!isEmpty(main?.applicationDidCloseAllWindows)) {
+                    await main.applicationDidCloseAllWindows();
+                }
             }
         }
 
@@ -1184,8 +1195,9 @@ function UIApplication(id, config) {
      * automatically.
      */
     function applicationDidStop() {
+        stopping = true;
+
         // Close all windows
-        // TODO: Not sure if this works
         for (windowId in launchedControllers) {
             launchedControllers[windowId].ui.close();
         }
@@ -1245,6 +1257,18 @@ function UIApplication(id, config) {
         }
     }
     this.applicationDidBlur = applicationDidBlur;
+
+    /**
+     * Sent to `main` controller if all controllers closed.
+     *
+     * This is not called when the application stops and all controllers are
+     * closed.
+     *
+     * This behavior is managed internally to UIApplication. Therefore, it is
+     * not exposed. This provides the definition of the delegate callback a
+     * UIApplication controller may implement.
+     */
+    async function applicationDidCloseAllWindows() { }
 }
 
 /**
@@ -1460,7 +1484,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
     /**
      * Close the window.
      */
-    function close() {
+    async function close() {
         if (!loaded) {
             console.warn(`Attempting to close window (${id}) which is not loaded.`);
             return;
@@ -1482,7 +1506,7 @@ function UIWindow(bundleId, id, container, isModal, menuId) {
         }
 
         if (!isEmpty(container?.ui.viewDidUnload)) {
-            container.ui.viewDidUnload();
+            await container.ui.viewDidUnload();
         }
 
         loaded = false;

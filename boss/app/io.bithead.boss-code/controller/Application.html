@@ -117,33 +117,12 @@
       }
       this.uploadFile = uploadFile;
 
-      /**
-       * Focus on project.
-       *
-       * This is called by the Editor for an open project.
-       *
-       * @param {string} bundleId - The project's bundle ID
-       */
-      function didFocusProject(bundleId) {
-        focusedBundleId = bundleId;
-
+      function toggleMenus(on) {
         let menus = $(this.controller).menus();
         let menu = menus.ui.select("file-menu");
         let product = menus.ui.select("product-menu");
 
-        if (isEmpty(bundleId)) {
-          menu.ui.disableOption("Add controller");
-          menu.ui.disableOption("Add file");
-          menu.ui.disableOption("Add folder");
-          menu.ui.disableOption("Upload file");
-          menu.ui.disableOption("Close project");
-          menu.ui.disableOption("Save project");
-
-          product.ui.disableOption("Run");
-          product.ui.disableOption("Export");
-          product.ui.disableOption("Deploy");
-        }
-        else {
+        if (on) {
           menu.ui.enableOption("Add controller");
           menu.ui.enableOption("Add file");
           menu.ui.enableOption("Add folder");
@@ -155,8 +134,42 @@
           product.ui.enableOption("Export");
           product.ui.enableOption("Deploy");
         }
+        else {
+          menu.ui.disableOption("Add controller");
+          menu.ui.disableOption("Add file");
+          menu.ui.disableOption("Add folder");
+          menu.ui.disableOption("Upload file");
+          menu.ui.disableOption("Close project");
+          menu.ui.disableOption("Save project");
+
+          product.ui.disableOption("Run");
+          product.ui.disableOption("Export");
+          product.ui.disableOption("Deploy");
+        }
+      }
+
+      /**
+       * Focus on project.
+       *
+       * This is called by the Editor for an open project.
+       *
+       * @param {string} bundleId - The project's bundle ID
+       */
+      function didFocusProject(bundleId) {
+        focusedBundleId = bundleId;
+        toggleMenus(!isEmpty(bundleId));
       }
       this.didFocusProject = didFocusProject;
+
+      async function applicationDidCloseAllWindows() {
+        focusedBundleId = null;
+        toggleMenus(false);
+
+        // Show the splash screen if all controllers are closed
+        let win = await $(this.controller).loadController("Splash");
+        win.ui.show();
+      }
+      this.applicationDidCloseAllWindows = applicationDidCloseAllWindows;
     }
   </script>
   <div class="ui-menus">
