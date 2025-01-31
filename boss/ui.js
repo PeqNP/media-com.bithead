@@ -385,6 +385,8 @@ function UI(os) {
         let div = parseHTML(bundleId, controllerName, attr, html);
 
         let container = document.createElement("div");
+        // The ID is not functionally necessary. This is for debugging.
+        container.id = attr.this.id;
         container.classList.add("ui-container");
         container.appendChild(div.firstChild);
         let point = nextWindowStaggerPoint();

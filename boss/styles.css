@@ -86,6 +86,16 @@ body {
   background-color: #ebebeb;
 }
 
+/**
+ * Some contexts set `resize` to none, such as in the `.fullscreen > .ui-window > .container`
+ * context. This always ensures the CodeMirror editor allows resizing.
+ *
+ * Also, by default, CodeMirror editors should not be resiable.
+ */
+.resizable-editor .CodeMirror {
+  resize: both;
+}
+
 #desktop {
   position: relative;
   width: 100vw;
@@ -289,12 +299,14 @@ body {
   border-bottom: 1px solid #000;
 }
 
-/* The ui-container wraps a ui-window and manages position, z-index, etc.
+/**
+ * The ui-container wraps a ui-window and manages position, z-index, etc.
  * When fullscreen, it also manages width and height. This div is completely
  * managed by the OS. Therefore, do NOT wrap your ui-window in this container.
  *
  * NOTE: When making your window fullscreen by default, set fullscreen style
- * on ui-window. It will automatically be moved to the ui-container by the OS. */
+ * on ui-window. It will automatically be moved to the ui-container by the OS.
+ */
 #desktop .ui-container {
   position: absolute;
   /* NOTE: The top/left positions are managed by the OS. */
@@ -315,20 +327,10 @@ body {
   width: 100%;
   height: 100%;
 }
-
-#desktop .ui-window.fullscreen {
-  border-left: 0px;
-  border-right: 0px;
-  border-top: 1px solid #000;
-  border-bottom: 0px;
-  width: 100%;
+#desktop .ui-container.fullscreen > .ui-window > .container {
+  /* NOTE: Adding `width` makes content exceed size of window */
   height: 100%;
-  /* The height of the os-bar */
-  top: 26px;
-  left: 0px;
-}
-#desktop .ui-window.fullscreen .container {
-  overflow: hidden;
+
   resize: none;
 }
 
@@ -424,7 +426,7 @@ body {
   font-size: 16px;
   overflow: auto;
   /* Prevents window from being resized down any further */
-  min-width: 360px;
+  min-width: 300px;
   min-height: 40px;
 }
 #desktop .ui-window > .container.resizable {
@@ -434,6 +436,7 @@ body {
 #desktop .ui-window > .container.no-padding {
   padding: 0px;
 }
+
 /**
  * Component groups
  *
@@ -658,7 +661,6 @@ button.secondary.add-left-margin {
 .controls {
   display: flex;
   justify-content: flex-end;
-  padding-top: 10px;
   gap: 10px;
   align-items: center;
 }
@@ -1000,10 +1002,6 @@ ul.ui-folder .metadata, ul.ui-folder .metadata-title {
 
 /** Fieldset **/
 
-fieldset.add-margin {
-  margin-bottom: 20px;
-}
-
 fieldset {
   border: none;
   border: 1px solid #000;
@@ -1255,10 +1253,6 @@ label {
   font-size: 14px;
 }
 
-.checkbox-field.add-2x-margin {
-  margin-bottom: 20px;
-}
-
 .text-field label {
   display: block;
 }
@@ -1376,11 +1370,29 @@ label {
   justify-content: flex-end;
 }
 
+.hbox.gap-5 {
+  gap: 5px;
+}
 .hbox.gap-10 {
   gap: 10px;
 }
+.vbox.gap-5 {
+  gap: 5px;
+}
 .vbox.gap-10 {
   gap: 10px;
+}
+
+/** Add padding where boxes aren't possible. */
+
+.add-5 {
+  margin-bottom: 5px;
+}
+.add-10 {
+  margin-bottom: 10px;
+}
+.add-20 {
+  margin-bottom: 20px;
 }
 
 /** Inline info and error messages **/
